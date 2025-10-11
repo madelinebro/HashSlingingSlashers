@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!--
+        Financial Management Capstone Project
+        Payment Transfers
+        Author: Samantha Saunsaucie
+        Date: 10/11/2025
+        -->
+         <!-- Setup and Title -->
+        <title>Payment Transfers</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="style.css" rel="stylesheet" />
+        <script src="script.js" defer></script>
+        <script src="transfers.js" defer></script>
+    </head>
+    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+    <body class="dashboard">
+        <header class="toparea">
+            <div class="space"></div>
+            <div class="user">
+                <!-- Placeholder for avatar -->
+                <img src="https://placehold.co/28x28" alt="Jane avatar">
+                <!-- Profile Toggle  -->
+                <button id="userToggle" class="user-name">Jane &#9662;</button>
+                <!-- Toggle options, hidden dropdown menu -->
+                <div id="userMenu" class="user-menu">
+                    <a href="profile.html">Profile</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="login.html">Log Out</a>
+                </div>
+            </div>
+        </header>
+        <!-- Main content area for Payment Transfers -->
+        <main class="transfer-container">
+            <h1>Payment Transfers</h1>
+
+            <!-- Make a Transfer Section -->
+            <section class="transfer-card">
+                <h2>Make a Transfer</h2>
+                <!-- Form for submitting a new transfer -->
+                <form id="makeTransferForm">
+                    <!-- Choose the account to transfer money from -->
+                    <label for="fromAccount">Transfer From:</label>
+                    <select id="fromAccount" required>
+                        <option value="">Select Account</option>
+                        <option>Checking</option>
+                        <option>Savings</option>
+                    </select>
+                    <!-- Choose the account to transfer money to -->
+                    <label for="toAccount">Transfer To:</label>
+                    <select id="toAccount" required>
+                        <option value="">Select Account</option>
+                        <option>Checking</option>
+                        <option>Savings</option>
+                    </select>
+                    <!-- Select the transfer date -->
+                    <label for="transferDate">Date:</label>
+                    <input type="date" id="transferDate" required>
+                    <!-- Enter the amount to transfer -->
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" placeholder="$0.00" required>
+                    <!-- Submit button to process the transfer -->
+                    <button type="submit" class="save-btn">Submit Transfer</button>
+                </form>
+            </section>
+
+            <!-- Pending Transfers Section -->
+            <section class="transfer-card">
+                <h2>Pending Transfers</h2>
+                <!-- Example of a pending transfer waiting to be processed -->
+                <div class="transfer-item">
+                    <p><strong>Date:</strong> Dec 18, 2025</p>
+                    <p><strong>From:</strong> Checking ***4567</p>
+                    <p><strong>To:</strong> Savings ***9876</p>
+                    <p><strong>Amount:</strong> $598.00</p>
+                </div>
+            </section>
+
+            <!-- Recurring Transfers Section -->
+            <section class="transfer-card">
+            <h2>Edit Recurring Transfers</h2>
+            <!-- Form for editing recurring transfers -->
+            <form id="recurringForm">
+                <label>Next Transfer:</label>
+                <input type="date" id="nextTransfer">
+                <!-- Enter the amount to transfer -->
+                <label>Amount:</label>
+                <input type="number" id="recurringAmount" placeholder="$0.00">
+                <!-- Choose the account to transfer money from -->
+                <label>From:</label>
+                <select id="recurringFrom">
+                    <option>Checking</option>
+                    <option>Savings</option>
+                </select>
+                <!-- Choose the account to transfer money to -->
+                <label>To:</label>
+                <select id="recurringTo">
+                    <option>Checking</option>
+                    <option>Savings</option>
+                </select>
+                <!-- Choose the frequency of the transfer -->
+                <label>Frequency:</label>
+                <select id="recurringFrequency">
+                    <option>Monthly</option>
+                    <option>Weekly</option>
+                    <option>Yearly</option>
+                </select>
+                <!-- Submit button to process the recurring transfer -->
+                <button type="submit" class="save-btn">Update Recurring</button>
+            </form>
+        </section>
+
+        <!-- Transfer History Section -->
+        <section class="transfer-card">
+        <h2>Transfer History</h2>
+            <!-- Example of a past completed transfer -->
+            <div class="transfer-item">
+                <p><strong>Date:</strong> Sep 18, 2025</p>
+                <p><strong>From:</strong> Checking ***4567</p>
+                <p><strong>To:</strong> Savings ***9876</p>
+                <p><strong>Amount:</strong> $598.00</p>
+            </div>
+            <!-- Example of a past completed transfer -->
+            <div class="transfer-item">
+                <p><strong>Date:</strong> Oct 18, 2025</p>
+                <p><strong>From:</strong> Checking ***4567</p>
+                <p><strong>To:</strong> Savings ***9876</p>
+                <p><strong>Amount:</strong> $598.00</p>
+            </div>
+        </section>
+    </main>
+</body>

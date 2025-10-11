@@ -1,0 +1,789 @@
+:root {
+  /* Main Theme Colors for Web and Mobile Across the Board */
+  --primary: #4729CF;        /* Primary brand color */
+  --secondary: #279AB4;      /* Secondary / Info */
+  --accent: #DAAE4F;         /* Accent / Highlight */
+  --warning: #CF5E44;        /* Warning / Negative */
+
+  /* Neutral Light Mode (default) */
+  --background: #DBCACA;             /* Background / Neutral */
+  --text: #140C17;           /* Text / Dark tone */
+}
+
+[data-theme="dark"] {
+  /* Dark Mode reverses the background and text */
+  --background: #140C17;
+  --text: #DBCACA;
+}
+
+/*================================== Styling for Login Page=====================================*/
+/* Basic Body setup */
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+/* Centers the login form both veritcally and horizontally */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Card Container for login fields and buttons */
+.login-card {
+  background-color: var(--secondary);
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Inputs-- applies to all, unless specified */
+input {
+  width: 100%;
+  padding: 10px;
+  color: var(--background);
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 5px;
+}
+
+/* Buttons-- applies to all, unless specified */
+.btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Hover state for buttons */
+.btn:hover {
+  background-color: var(--accent);
+}
+
+/* links colors and hover states */
+/* defines text color  */
+.links a {
+  color: var(--text);
+  text-decoration: none;
+}
+ /* Create hover effect for links and underlines them */
+.links a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+
+ /*================================Create Account (Register) Styling================================= */
+ /* Layout similar to Log In, centered on the screen */
+ .register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Card container for registration fields */
+.register-card {
+  background-color: var(--secondary);
+  padding: 30px;
+  border-radius: 10px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+/* Input fields--Full Name, Username, etc. within registration form */
+.register-card input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 5px;
+}
+/* Activate Account Button */
+.register-card .btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+/* Activate Account Button Hover highlight */
+.register-card .btn:hover {
+  background-color: var(--accent);
+}
+
+
+/*=======================================Dashboard Settings==================================================== */
+/* Body of the Dashboard styling */
+body.dashboard{ 
+    margin:0; 
+    background:var(--background); 
+    color:var(--text);
+    font-family:Inter,system-ui,Arial,sans-serif; 
+}
+
+/* Top Area for navigation/user options */
+.toparea{
+    display:flex; 
+    align-items:center; 
+    gap:8px; 
+    padding:14px 18px;
+}
+/* Creates space for layout in header */
+.space{
+    flex:1 1 auto; 
+}
+/* User area with avatar and dropdown toggle */
+.user{
+    position:relative; 
+    display:flex; 
+    align-items:center; 
+    gap:10px;
+}
+/* Avatar--user image */
+.user img{
+    width:28px; 
+    height:28px; 
+    border-radius:999px; 
+    box-shadow:var(--shadow);
+}
+/* The Username button */
+.user-name{
+    background:transparent; 
+    border:0; 
+    color:var(--text); 
+    font: weight 800px; 
+    cursor:pointer;
+}
+/* Profile, Settings, Log Out-- dropdown menu */
+.user-menu{
+  position:absolute; 
+  right:0; 
+  top:36px; 
+  background:var(--panel);
+  border-radius:12px; 
+  box-shadow:var(--shadow); 
+  padding:6px; 
+  display:none; 
+  min-width:140px;
+}
+.user-menu a{
+    display:block; 
+    padding:8px 10px; 
+    border-radius:8px; 
+    color:var(--text); 
+    text-decoration:none;
+}
+.user-menu a:hover{
+    color:var(--accent)
+}
+
+/* Two column layout-- grid (transaction menu) and side menu (dashboard options) */
+/* Transaction Grid */
+.menu{
+  display:grid; 
+  grid-template-columns:240px 1fr; 
+  grid-gap:28px; 
+  padding:12px 22px 80px;
+}
+/* Sidebar navigation */
+.side-menu{
+    display:grid; 
+    gap:16px; 
+    align-content:start;
+}
+
+/* Sidebar buttons (my accounts, transfers, etc.) */
+.dash{
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
+  background:var(--chip); 
+  color:var(--secondary); 
+  padding:12px 16px;
+  border-radius:999px; 
+  text-decoration:none; 
+  box-shadow:var(--shadow);
+}
+.dash.active{
+    background:var(--primary);
+}
+.dash:hover{
+    color:var(--accent);
+}
+
+/* Main content area titles */
+main h1{
+    margin:18px 0; 
+    letter-spacing:-.02em;
+}
+
+/* Container for the transaction section on the dashboard */
+.transaction-card{
+    background:var(--panel); 
+    border-radius:var(--radius); 
+    box-shadow:var(--shadow); 
+    padding:18px; 
+}
+/* Styles the header inside the transaction card */
+.transaction-card h2{ 
+    margin:2px 0 12px; 
+}
+/* Wrapper that allows the table to scroll horizontally */
+.transaction-table{ 
+    overflow:auto; 
+}
+/* Main table setup for the transaction data */
+.tt{ 
+    width:100%; 
+    border-collapse:collapse; 
+}
+/* Table cells and headers */
+.tt th, .tt td{ 
+    text-align:left; 
+    padding:12px 14px; 
+    border-bottom:1px solid rgba(0,0,0,.08); 
+}
+/* Styling for transaction, based on type of expense ("warning" for money withdrawn) */
+.tt .neg{ color:var(--warning); }
+.tt .pos{ color:var(--secondary); }
+/* "View More Transactions" styling */
+.view-more-t{ 
+    text-align:center; 
+    margin:12px 0 2px; 
+}
+/* Default link for "View More Transactions" and the styling for link */
+.view-more-t a{ color:var(--secondary); text-decoration:none; }
+.view-more-t a:hover{ color:var(--accent); text-decoration:underline; }
+
+/* Chatbot button Styling */
+.chatbot{
+  position:fixed; 
+  right:20px; 
+  bottom:20px; 
+  border:0; 
+  cursor:pointer;
+  background:var(--chip); 
+  color:var(--secondary); 
+  padding:12px 18px; 
+  border-radius:999px; 
+  box-shadow:var(--shadow);
+}
+.chatbot:hover{
+    color:var(--accent);
+}
+
+/* Adjusts layout for smaller screens */
+@media (max-width:880px){
+  .menu{ 
+    /* Converts the main layout from two columns into a single-column layout for mobile or tablet screen */
+    grid-template-columns:1fr; 
+}   /* Changes the sidebar into a horizontal scrollable navigation bar
+     - Items flow left to right instead of top to bottom
+     - Enables horizontal scrolling if items exceed screen width */
+  .side-menu{ 
+    grid-auto-flow:column; 
+    grid-auto-columns:1fr; 
+    overflow:auto; 
+}
+}
+
+
+
+/*======================================================== My Accounts Styling==================================================================================*/
+/* Centers horizontally */
+.account-container {
+  display: flex;
+  justify-content: center;
+}
+/* Wrapper for Account Summary Section */
+.account-summary {
+  max-width: 640px;
+  padding: 2px 1px;
+  width: 100%;
+  margin: 1px auto; 
+  margin-top: 175px;        
+}
+/* Account title (e.g., “My Accounts”) */
+.account-summary h2 { 
+    margin: 7px 0 0; 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+}
+/* Subtitle under the main header */
+.account-sub { 
+    margin: 0 0 8px; 
+    opacity: 0.8; 
+}
+/* Base table setup */
+.account-table {
+    width: 100%; 
+    border-collapse: collapse; 
+}
+/* Padding inside all table cells and headers */
+.account-table th, .account-table td { 
+    padding: 10px 0; 
+}
+/* Aligns and styles table headers */
+.account-table th { 
+    text-align: left; 
+    font-weight: 500; 
+}
+/* Aligns numeric data, such as the amount in each account to the right */
+.account-table td.amount { 
+    text-align: right; 
+    white-space: nowrap; 
+}
+/* Divider line between sections of the table */
+.account-table tr.divider { 
+    border-top: 1px solid rgba(20, 12, 23, 0.15); 
+}
+/* Adjusts divider color for dark mode */
+[data-theme="dark"] .account-table tr.divider { 
+    border-top-color: rgba(219, 202, 202, 0.25); }
+/* Currency symbols next to amounts (e.g., USD, $) */
+.currency { 
+    margin-left: 6px; 
+    opacity: 0.8; 
+    font-size: 0.95rem; 
+}
+/* Meta information under totals or at the bottom of tables */
+.meta { 
+    font-size: 0.8rem; 
+    opacity: 0.75; 
+    margin-top: 2px; 
+    text-align: right; 
+}
+
+/*============================================================Profile Styling============================================================================= */
+/* Main container for the user's profile section */
+.profile-container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 20px;
+    background-color: var(--primary);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,01.1em);
+}
+/* Page title within the profile section */
+.profile-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+/* Card element that holds profile information */
+.profile-card {
+    position: relative;
+    padding: 20px;
+}
+/* Paragraph styling for user details (full name, email, etc.) */
+.profile-info p {
+    margin: 12px 0;
+    font-size: 1.1em;
+}
+/* Edit icon (pencil icon) in the top-right corner */
+.edit-icon {
+    position: absolute;
+    color: var(--accent);
+    top: 20px;
+    right: 20px;
+    font-size: 1.3em;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*====================================================== Styling for Settings=============================================================== */
+/* Main container for all settings content */
+.settings-container {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 20px;
+}
+/* Page title */
+.settings-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+/* Card element that holds each settings category information */
+.settings-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 25px 30px;
+  margin-bottom: 40px;
+}
+/* Sub headings inside each settings section */
+.settings-card h2 {
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+/* Layout for forms inside each settings card (change password and update profile */
+.settings-card form {
+  display: flex;
+  flex-direction: column;
+}
+/* Labels for form fields */
+.settings-card label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+/* Settings input field styling */
+.settings-card input {
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+/* Save Changes button styling */
+.save-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--secondary);
+  color: white;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease;
+}
+/* Button hover effect */
+.save-btn:hover {
+  background-color: var(--accent);
+}
+
+
+/*============================================Styling for Payment Transfers================================================================================= */
+/* Main container for the entire Transfers page */
+.transfer-container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 20px;
+}
+/* Page title */
+.transfer-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+/* Card wrapper for individual transfer sections (Make Transfer, Recurring Transfer, etc,) */
+.transfer-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 25px 30px;
+  margin-bottom: 40px;
+}
+/* Section headings inside each transfer card */
+.transfer-card h2 {
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+}
+/* Layout for form elements inside transfer cards */
+.transfer-card form {
+  display: flex;
+  flex-direction: column;
+}
+/* Labels for each input field */
+.transfer-card label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+/* Input and select fields (account, amount, date) */
+.transfer-card input,
+.transfer-card select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+/*Individual transfer entry item--transfer history section examples*/
+.transfer-item {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+/* “Save” or “Submit Transfer” button */
+.save-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--secondary);
+  color: white;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: var(--accent);
+}
+
+/*======================================================== Monthly Budget Stylying======================================================= */
+/* Container that holds the entire Monthly budget content */
+.budget-container{
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 20px;
+}
+/* Header styling for page title */
+.budget-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Budget Tabs--Week, Month, Year */
+.budget-btn {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+/* Default style for tab buttons */
+.tab-btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  text-align: center;
+}
+
+/* Hover effect */
+.tab-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Styling for current (active) tab */
+.tab-btn-active {
+  background: var(--primary);           
+  color: #fff;
+  border-radius: 6px;
+}
+
+/* Budget Cards Sections for Info or Inputs */
+/* Card container styling */
+.budget-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 25px 30px;
+  margin-bottom: 40px;
+}
+/* Section headers within the budget cards */
+.budget-card h2 {
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+}
+/* Basic table layout for spending data */
+.spending-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+/* Table header and cell styling */
+.spending-table th, .spending-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+/* Arrange input fields vertically */
+.budget-card form {
+  display: flex;
+  flex-direction: column;
+}
+/* Label styling for form fields */
+.budget-card label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+/* Input box style */
+.budget-card input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+/* Primary button for saving changes */
+.save-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-size: 1em;
+}
+/* Hover effect for save button */
+.save-btn:hover {
+  background-color: var(--accent);
+}
+
+
+/*============================================================= Forgot Password Styling=========================================================================== */
+/* Main container for the "Forgot Password" form */
+.forgot-password-container {
+  max-width: 500px;
+  margin: 5% auto;
+  text-align: center;
+  background: var(--secondary);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+/* Page title for forgot password */
+.forgot-password-container h1 {
+  font-family: Arial, sans-serif;
+  color: var(--text);
+}
+/* Group for input and button layout */
+.forgot-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+/* Input field styling inside forgot password container */
+.forgot-password-container input {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  width: 45%;
+  background: white;
+  color: #fff;
+  text-align: center;
+}
+/* Submit button styling */
+.submit-btn {
+  padding: 10px 20px;
+  background: var(--primary);
+  border: none;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+/* Hover effect for submit button */
+.submit-btn:hover {
+  background: var(--accent);
+}
+/* Success or error message styling */
+.message {
+  margin-top: 15px;
+  font-weight: bold;
+}
+/* Container for forgot username form Styling */
+.forgot-username-container {
+  max-width: 600px;
+  margin: 5% auto;
+  text-align: center;
+  background: var(--secondary);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+/* Apply text color theme to this container */
+.forgot-username-container {color: var(--text);}
+/* Group input fields for forgot username */
+.forgot-username-container .forgot-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+/* Input fields inside forgot username form */
+.forgot-username-container input {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  width: 45%;
+  background: white;
+  text-align: center;
+}
+/* Submit button in forgot username form */
+.forgot-username-container .submit-btn {
+  padding: 10px 20px;
+  background: var(--primary);
+  border: none;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+/* Hover effect for forgot username submit button */
+.forgot-username-container .submit-btn:hover {
+  background: var(--accent);
+}
+/* Redirect to login button */
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 14px;
+}
+/* Hover effect for login button */
+.link-btn:hover{color: var(--accent);}
+
+/*==================================================Confirm Password Page Styling======================================================== */
+/* Main container for confirm password form */
+.confirm-password-container {
+  max-width: 500px;
+  margin: 5% auto;
+  text-align: center;
+  background: var(--secondary);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+/* Group for confirm password input fields */
+.confirm-password-container .forgot-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+/* Input fields for confirming new password */
+.confirm-password-container input {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  width: 45%;
+  background: white;
+  text-align: center;
+}
+/* Submit button for confirm password form */
+.confirm-password-container .submit-btn {
+  padding: 10px 20px;
+  background: var(--primary);
+  border: none;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+/* Hover effect for confirm password submit button */
+.confirm-password-container .submit-btn:hover {
+  background: var(--accent);
+}

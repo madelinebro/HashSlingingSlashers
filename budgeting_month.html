@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!--
+        Financial Management Capstone Project
+        Monthly Budget
+        Author: Samantha Saunsaucie
+        Date: 10/11/2025
+        -->
+        <title>Monthly Budget</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="style.css" rel="stylesheet" />
+        <script src="script.js" defer></script>
+        <script src="budgeting.js" defer></script>
+    </head>
+    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+    <body class="dashboard">
+        <header class="toparea">
+            <div class="space"></div>
+            <div class="user">
+                <img src="https://placehold.co/28x28" alt="Jane avatar">
+                <!-- Profile Toggle  -->
+                <button id="userToggle" class="user-name">Jane &#9662;</button>
+                <!-- Toggle options, hidden dropdown menu -->
+                <div id="userMenu" class="user-menu">
+                    <a href="profile.html">Profile</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="login.html">Log Out</a>
+                </div>
+            </div>
+        </header>
+         <!-- Main content area for Monthly Budget Section -->
+        <main class="budget-container">
+            <h1>Monthly Budget</h1>
+            <!--Tab buttons for Week, Month, and Year Selection Tabs -->
+            <div class="budget-btn">
+            <button class="tab-btn" data-period="week">Week</button>
+            <button class="tab-btn-active" data-period="month">Month</button>
+            <button class="tab-btn" data-period="year">Year</button>
+            </div>
+
+            <!-- Spending Summary for Month Section -->
+            <section class="budget-card" id="spendingSummary">
+                <h2>Monthly Spending Summary</h2>
+                <!-- Summary of Total Monthly Spending and remaining budget -->
+                <div class="summary">
+                    <p><strong>Total Spend in October:</strong> $2,567</p>
+                    <p><strong>Left for Spending:</strong> $1,138</p>
+                </div>
+                <!-- Spending Summary Table for Month, split each row by categories -->
+                <table class="spending-table">
+                    <tr><th>Category</th><th>Amount</th></tr>
+                    <tr><td>Bills & Utilities</td><td>$2,135</td></tr>
+                    <tr><td>Shopping</td><td>$58</td></tr>
+                    <tr><td>Car & Transportation</td><td>$71</td></tr>
+                    <tr><td>Groceries</td><td>$126</td></tr>
+                    <tr><td>Food & Drinks</td><td>$133</td></tr>
+                    <tr><td>Entertainment</td><td>$42</td></tr>
+                </table>
+            </section>
+
+            <!-- Monthly Budget form section for editing budget -->
+            <section class="budget-card" id="monthlyBudget">
+                <h2>Monthly Budget</h2>
+                <!-- Allows for updating the category amounts -->
+                <form id="budgetForm">
+                    <!-- Total Monthly Spend input field-->
+                    <label>Monthly Spend</label>
+                    <input type="number" id="monthlySpend" value="3705">
+                    <!-- Total Monthly Spend on Bills & Utilities input field -->
+                    <label>Bills & Utilities</label>
+                    <input type="number" id="bills" value="2200">
+                    <!-- Total Monthly Spend on Shopping input field -->
+                    <label>Shopping</label>
+                    <input type="number" id="shopping" value="150">
+                    <!-- Total Monthly Spend on Car & Transportation input field -->
+                    <label>Car & Transportation</label>
+                    <input type="number" id="car" value="150">
+                    <!-- Total Monthly Spend on Groceries input field -->
+                    <label>Groceries</label>
+                    <input type="number" id="groceries" value="300">
+                    <!-- Total Monthly Spend on Food and Drinks input field -->
+                    <label>Food & Drinks</label>
+                    <input type="number" id="food" value="250">
+                    <!-- Total Monthly Spend on Entertainment input field -->
+                    <label>Entertainment</label>
+                    <input type="number" id="entertainment" value="100">
+                    <!-- Submit button to update and save options -->
+                    <button type="submit" class="save-btn">Update Budget</button>
+                </form>
+            </section>
+        </main>
+    </body>
+</html>

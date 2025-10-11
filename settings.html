@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!--
+        Financial Management Capstone Project
+        Settings
+        Author: Samantha Saunsaucie
+        Date: 10/11/2025
+        -->
+         <!-- Setup and Title -->
+        <title>Settings</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="style.css" rel="stylesheet" />
+        <script src="script.js" defer></script>
+        <script src="profile_settings.js" defer></script>
+    </head>
+    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+    <body class="dashboard">
+        <header class="toparea">
+            <div class="space"></div>
+            <div class="user">
+                <!-- Placeholder for avatar -->
+                <img src="https://placehold.co/28x28" alt="Jane avatar">
+                <!-- Profile Toggle  -->
+                <button id="userToggle" class="user-name">Jane &#9662;</button>
+                <!-- Toggle options -->
+                <div id="userMenu" class="user-menu">
+                    <a href="profile.html">Profile</a>
+                    <a href="settings.html">Settings</a>
+                    <a href="login.html">Log Out</a>
+                </div>
+            </div>
+        </header>
+        <!-- Main content area for Setting Container-->
+        <main class="settings-container">
+            <!-- Main heading -->
+            <h1>Settings</h1>
+
+            <!-- Update Profile Info Section -->
+            <section class="settings-card">
+                <h2>Update Profile Information</h2>
+                <!-- Update Profile Form -->
+                <!-- Allows user to edit and save their profile information -->
+                <form id="profileForm">
+                    <!-- Full Name input -->
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" placeholder="Jane Doe" required>
+                    <!-- Username input -->
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="JaneDoe234" required>
+                    <!-- mobile Number input -->
+                    <label>Mobile Number</label>
+                    <input type="tel" id="mobile" placeholder="(605) 338-2167" required>
+                    <!-- Email input -->
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="jdoe@email.com" required>
+                    <!-- Button to submit form and save changes -->
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </form>
+            </section>
+            <!-- Change Password Section -->
+            <section class="settings-card">
+                <!-- heading -->
+                <h2>Change Password</h2>
+                <!-- Change Password Form-->
+                <!-- Allows user to change and save their password (if the know their current password) -->
+                <form id="passwordForm">
+                    <!-- Current Password input -->
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                    <!-- Email input -->
+                    <label>Email</label>
+                    <input type="email" id="changeEmail" placeholder="jdoe@email.com" required>
+                    <!-- New Password input -->
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required>
+                    <!-- Confirm Password input -->
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                    <!-- Button to submit form and update password -->
+                    <button type="submit" class="save-btn">Update Password</button>
+                </form>
+            </section>
+        </main>
+</html>
