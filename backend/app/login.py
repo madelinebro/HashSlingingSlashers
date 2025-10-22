@@ -1,65 +1,105 @@
 # -------------------------------------------------------------
-#  LOGIN & REGISTRATION
-#  This module exposes two endpoints:
-#    POST /auth/register  → Create a user + return JWT
-#    POST /auth/login     → Authenticate + return JWT
-#  We use FastAPI's decorator syntax (@router.post) to register
-#  10/21/2025 last update
+#  AUTHENTICATION MODULE
+#  This file handles user registration, login, and logout.
+#  It also includes a lightweight CSRF protection system using
+#  the double-submit cookie pattern.
+#
+#  Overview:
+#    • /auth/register  – create a new user and return a JWT
+#    • /auth/login     – verify credentials, set CSRF cookie,
+#                         and return JWT + CSRF token
+#    • /auth/logout    – verify CSRF header/cookie and clear token
+#
+#  CSRF workflow:
+#    1. When a user logs in, the server generates a random CSRF token.
+#    2. The token is stored as a cookie and also sent in the JSON body.
+#    3. The frontend includes this token in the "X-CSRF-Token" header
+#       on any future state-changing requests.
+#    4. The backend checks that the header and cookie match before
+#       allowing the action to proceed.
 # -------------------------------------------------------------
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from pydantic import BaseModel, EmailStr
 from passlib.hash import bcrypt
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+import secrets
 
-# Helper to mint JWT access tokens ( for authorize.py)
+# Imports for JWT creation and database session management
 from .authorize import create_access_token
-# Database session and User model (for routes/database.py)
 from .routes.database import get_db, User
 
-# Create router that will later be included in app/main.py
-#   app.include_router(router, prefix="/auth", tags=["auth"])
 router = APIRouter()
 
 
-# =========================
-#  Request/Response Models
-# =========================
+# =============================================================
+# Request / Response Models
+# =============================================================
 
 class UserCreate(BaseModel):
-    """
-    Payload for register/login requests.
-    - FastAPI/Pydantic will validate email format automatically.
-    - Password arrives as plaintext (we hash it before storing).
-    """
+    """Expected payload for both registration and login."""
     email: EmailStr
     password: str
 
 
 class TokenOut(BaseModel):
-    """
-    Standard bearer-token response payload.
-    """
+    """Structure of the response containing both tokens."""
     access_token: str
     token_type: str = "bearer"
+    csrf_token: str | None = None
 
 
-# =========================
-#  Small Utility
-# =========================
+# =============================================================
+# Helper Functions
+# =============================================================
 
 def normalize_email(email: str) -> str:
-    """
-    Normalize email to avoid duplicates with different casing/spacing.
-    Example: ' User@Example.com ' → 'user@example.com'
-    """
+    """Lowercase and trim whitespace to keep emails consistent."""
     return email.strip().lower()
 
 
-# =========================
-#  REGISTER
-# =========================
+def set_csrf_cookie(response: Response, token: str) -> None:
+    """
+    Attach the CSRF token to the response as a cookie.
+    The cookie is secure and same-site restricted to mitigate
+    cross-origin attacks.
+    """
+    response.set_cookie(
+        key="csrf_token",
+        value=token,
+        max_age=60 * 60 * 8,  # Valid for ~8 hours
+        secure=True,          # Use HTTPS in production
+        httponly=False,       # Frontend may read token from JSON instead
+        samesite="Strict",    # Restricts cross-site sending
+        path="/",
+    )
+
+
+def validate_csrf(request: Request) -> None:
+    """
+    Validate that the X-CSRF-Token header matches the csrf_token cookie.
+    If either is missing or mismatched, raise a 403 error.
+    """
+    header_token = request.headers.get("X-CSRF-Token")
+    cookie_token = request.cookies.get("csrf_token")
+
+    if not header_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF token header missing",
+        )
+
+    if not cookie_token or header_token != cookie_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF validation failed",
+        )
+
+
+# =============================================================
+# Registration Endpoint
+# =============================================================
 
 @router.post(
     "/register",
@@ -69,106 +109,105 @@ def normalize_email(email: str) -> str:
 )
 def register(payload: UserCreate, db: Session = Depends(get_db)):
     """
-    Flow:
-      1) Normalize the email for consistency
-      2) Check if email is already in use (quick path)
-      3) Hash the password
-      4) Insert user and commit
-      5) If a race causes duplicate: catch IntegrityError, 409
-      6) Create a JWT token tied to the user's id
-      7) Return token in a standard shape
-    """
+    Handles new user registration.
 
-    # 1) Normalize email input
+    Steps:
+      1. Normalize the email for consistent storage.
+      2. Check if the email already exists to prevent duplicates.
+      3. Hash the password using bcrypt before saving.
+      4. Commit the new record to the database.
+      5. Create and return a JWT access token.
+    """
     email = normalize_email(payload.email)
 
-    # 2) Pre-check for an existing user (helps return a nice error quickly)
+    # Check for an existing user before inserting
     if db.query(User).filter(User.email == email).first():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered",
-        )
+        raise HTTPException(status_code=409, detail="Email already registered")
 
-    # 3) Hash the password using passlib's bcrypt
-    hashed = bcrypt.hash(payload.password)
-
-    # 4) Create and add the user row
-    user = User(email=email, password_hash=hashed)
+    hashed_pw = bcrypt.hash(payload.password)
+    user = User(email=email, password_hash=hashed_pw)
     db.add(user)
 
-    # 5) Commit and handle a possible duplicate email race
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered",
-        )
+        raise HTTPException(status_code=409, detail="Email already registered")
 
-    # Load DB-generated fields
     db.refresh(user)
-
-    # 6) Mint a JWT access token with the user's id as the subject
     token = create_access_token(sub=str(user.id))
 
-    # 7) Return the token payload
-    return {"access_token": token, "token_type": "bearer"}
+    # Registration doesn’t create a CSRF cookie; that happens on login.
+    return {"access_token": token, "token_type": "bearer", "csrf_token": None}
 
 
-# =========================
-#  LOGIN
-# =========================
+# =============================================================
+# Login Endpoint (Generates CSRF Token)
+# =============================================================
 
 @router.post(
     "/login",
     response_model=TokenOut,
-    summary="Authenticate with email/password and get an access token",
+    summary="Authenticate user and return JWT + CSRF token",
 )
-def login(payload: UserCreate, db: Session = Depends(get_db)):
+def login(payload: UserCreate, response: Response, db: Session = Depends(get_db)):
     """
-    Flow:
-      1) Normalize email
-      2) Fetch the user row (if none → generic 401)
-      3) Verify the password hash with passlib (if mismatch → generic 401)
-      4) Create JWT with the user's id as subject
-      5) Return token in a standard shape
-    """
+    Authenticates an existing user and establishes a CSRF token.
 
-    # 1) Normalize input to match storage
+    Steps:
+      1. Normalize email and look up the user.
+      2. Verify the password against the stored hash.
+      3. Create a JWT for authentication.
+      4. Generate a random CSRF token and set it as a cookie.
+      5. Return both tokens to the frontend.
+    """
     email = normalize_email(payload.email)
-
-    # 2) Look up user by email, return a generic error if not found
     user = db.query(User).filter(User.email == email).first()
-    if not user:
-        # Generic message prevents account enumeration
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
 
-    # 3) Verify password using bcrypt, reject on mismatch
-    if not bcrypt.verify(payload.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
+    if not user or not bcrypt.verify(payload.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # 4) Password ok, then mint a fresh JWT
-    token = create_access_token(sub=str(user.id))
+    access_token = create_access_token(sub=str(user.id))
+    csrf_token = secrets.token_hex(32)
+    set_csrf_cookie(response, csrf_token)
 
-    # 5) Return standard token payload
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "csrf_token": csrf_token}
 
 
-# =========================
-#  HOW THIS GETS MOUNTED
-# =========================
-# In app/main.py, include this router:
+# =============================================================
+# Logout Endpoint (Requires CSRF Validation)
+# =============================================================
+
+@router.post(
+    "/logout",
+    summary="Logout and clear CSRF cookie",
+    status_code=status.HTTP_200_OK,
+)
+def logout(request: Request, response: Response):
+    """
+    Example of a protected endpoint that requires CSRF validation.
+    The function checks the X-CSRF-Token header and cookie for a match
+    before proceeding. If valid, it clears the cookie to invalidate the session.
+    """
+    validate_csrf(request)
+    response.delete_cookie("csrf_token", path="/")
+    return {"message": "Logout successful"}
+
+
+# =============================================================
+# Integration Notes
+# =============================================================
+# To connect these routes, include the router in app/main.py:
 #
 #   from .login import router as auth_router
 #   app.include_router(auth_router, prefix="/auth", tags=["auth"])
 #
-# That produces the final paths:
+# This setup exposes:
 #   POST /auth/register
 #   POST /auth/login
+#   POST /auth/logout
+#
+# The frontend should:
+#   • Store the JWT and CSRF token after login.
+#   • Send JWT in Authorization header for authenticated requests.
+#   • Send CSRF token in X-CSRF-Token header for POST/PUT/DELETE calls.
