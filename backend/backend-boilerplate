@@ -2,8 +2,8 @@ backend/
   app/
     __init__.py
     main.py
-    login.py
-    dashboard.py
+    login.py                   # Handles user login/register/logout + CSRF
+    dashboard.py               # Handles dashboard logic
     profile.py
     settings.py
     authorize.py
