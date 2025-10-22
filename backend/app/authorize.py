@@ -2,9 +2,9 @@
 #  AUTHORIZATION & TOKEN UTILITIES
 #  Purpose:
 #    Central place for:
-#      • Creating and verifying JWT access tokens
-#      • Extracting the current user from Authorization headers
-#      • Lightweight CSRF helpers (double-submit cookie pattern)
+#      Creating and verifying JWT access tokens
+#      Extracting the current user from Authorization headers
+#      Lightweight CSRF helpers (double-submit cookie pattern)
 #
 #  Exposed functions:
 #    create_access_token(sub: str, extra: dict | None = None) -> str
