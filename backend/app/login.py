@@ -5,10 +5,10 @@
 #  the double-submit cookie pattern.
 #
 #  Overview:
-#    • /auth/register  – create a new user and return a JWT
-#    • /auth/login     – verify credentials, set CSRF cookie,
+#     /auth/register  – create a new user and return a JWT
+#     /auth/login     – verify credentials, set CSRF cookie,
 #                         and return JWT + CSRF token
-#    • /auth/logout    – verify CSRF header/cookie and clear token
+#     /auth/logout    – verify CSRF header/cookie and clear token
 #
 #  CSRF workflow:
 #    1. When a user logs in, the server generates a random CSRF token.
@@ -208,6 +208,6 @@ def logout(request: Request, response: Response):
 #   POST /auth/logout
 #
 # The frontend should:
-#   • Store the JWT and CSRF token after login.
-#   • Send JWT in Authorization header for authenticated requests.
-#   • Send CSRF token in X-CSRF-Token header for POST/PUT/DELETE calls.
+#    Store the JWT and CSRF token after login.
+#    Send JWT in Authorization header for authenticated requests.
+#    Send CSRF token in X-CSRF-Token header for POST/PUT/DELETE calls.
