@@ -16,7 +16,8 @@ CREATE TABLE accounts (
     accountnumber SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     account_type VARCHAR(20) NOT NULL, -- e.g., 'Checking', 'Savings'
-    balance NUMERIC(15,2) DEFAULT 0.00
+    balance NUMERIC(15,2) DEFAULT 0.00,
+	account_display_number VARCHAR(20) -- For masked display like ***4567
     
 );
 
@@ -43,11 +44,11 @@ VALUES
 
 -- Insert accounts for the 2 users
 -- Accounts (2 Checkings, 1 Savings)
-INSERT INTO accounts (user_id, account_type, balance)
+INSERT INTO accounts (user_id, account_type, balance,account_display_number) -- For masked display like ***4567)
 VALUES
-(1, 'Checking', 2000.00),  -- User 1 Checking
-(2, 'Checking', 1500.00),  -- User 2 Checking
-(1, 'Savings', 5000.00);   -- User 1 Savings
+(1, 'Checking', 2000.00,'***4567'),  -- User 1 Checking
+(2, 'Checking', 1500.00, '***9876'),  -- User 2 Checking
+(1, 'Savings', 5000.00,'***1234');   -- User 1 Savings
 
 
 select * from accounts;
@@ -586,6 +587,5 @@ INSERT INTO transactions (accountnumber, transaction_date, transaction_type, amo
 
 
 
-select * from transactions
-where transaction_type = 'Transfer';
+
 
