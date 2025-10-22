@@ -1,6 +1,6 @@
 # -------------------------------------------------------------
 #  AUTHENTICATION MODULE
-#  This file handles user registration, login, and logout.
+#  This file handles user registration, login, and logout
 #  It also includes a lightweight CSRF protection system using
 #  the double-submit cookie pattern.
 #
