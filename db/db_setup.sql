@@ -70,9 +70,9 @@ CREATE TABLE IF NOT EXISTS public.recurring_transfers (
 -- a new record is inserted into the "transactions" table.
 --
 -- It handles:
---  ✅ Deposits  → adds money to the account
---  ✅ Withdrawals → subtracts money from the account
---  ✅ Transfers → moves money between the user’s Checking & Savings accounts
+--   Deposits  → adds money to the account
+--   Withdrawals → subtracts money from the account
+--   Transfers → moves money between the user’s Checking & Savings accounts
 --
 -- Notes:
 -- - It automatically finds the second account (for transfers)
@@ -88,19 +88,19 @@ RETURNS TRIGGER AS $$
 DECLARE
     target_account INT;
 BEGIN
-    -- ✅ Handle DEPOSITS
+    --  Handle DEPOSITS
     IF NEW.transaction_type = 'Deposit' THEN
         UPDATE accounts
         SET balance = balance + NEW.amount
         WHERE accountnumber = NEW.accountnumber;
 
-    -- ✅ Handle WITHDRAWALS
+    --  Handle WITHDRAWALS
     ELSIF NEW.transaction_type = 'Withdrawal' THEN
         UPDATE accounts
         SET balance = balance - NEW.amount
         WHERE accountnumber = NEW.accountnumber;
 
-    -- ✅ Handle TRANSFERS
+    --  Handle TRANSFERS
     ELSIF NEW.transaction_type = 'Transfer' THEN
         -- Deduct from source account
         UPDATE accounts
@@ -115,7 +115,7 @@ BEGIN
         )
         AND accountnumber != NEW.accountnumber;
 
-        -- ✅ If user has another account, add amount there
+        --  If user has another account, add amount there
         IF FOUND THEN
             UPDATE accounts
             SET balance = balance + NEW.amount
