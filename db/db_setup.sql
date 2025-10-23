@@ -63,6 +63,78 @@ CREATE TABLE IF NOT EXISTS public.recurring_transfers (
 
 
 
+-- ============================================================
+-- TRIGGER: Automatically update account balances
+-- ============================================================
+-- This trigger updates the "accounts.balance" column whenever
+-- a new record is inserted into the "transactions" table.
+--
+-- It handles:
+--  ✅ Deposits  → adds money to the account
+--  ✅ Withdrawals → subtracts money from the account
+--  ✅ Transfers → moves money between the user’s Checking & Savings accounts
+--
+-- Notes:
+-- - It automatically finds the second account (for transfers)
+-- - If the user has only one account (like User 2), the system will just deduct
+--   money from the source account and skip the deposit step safely
+-- Drop existing trigger and function if they exist
+DROP TRIGGER IF EXISTS update_balance_on_transfer ON transactions;
+DROP FUNCTION IF EXISTS handle_account_transfer;
+
+-- Create function
+CREATE OR REPLACE FUNCTION handle_account_transfer()
+RETURNS TRIGGER AS $$
+DECLARE
+    target_account INT;
+BEGIN
+    -- ✅ Handle DEPOSITS
+    IF NEW.transaction_type = 'Deposit' THEN
+        UPDATE accounts
+        SET balance = balance + NEW.amount
+        WHERE accountnumber = NEW.accountnumber;
+
+    -- ✅ Handle WITHDRAWALS
+    ELSIF NEW.transaction_type = 'Withdrawal' THEN
+        UPDATE accounts
+        SET balance = balance - NEW.amount
+        WHERE accountnumber = NEW.accountnumber;
+
+    -- ✅ Handle TRANSFERS
+    ELSIF NEW.transaction_type = 'Transfer' THEN
+        -- Deduct from source account
+        UPDATE accounts
+        SET balance = balance - NEW.amount
+        WHERE accountnumber = NEW.accountnumber;
+
+        -- Try to find the other account belonging to the same user
+        SELECT accountnumber INTO target_account
+        FROM accounts
+        WHERE user_id = (
+            SELECT user_id FROM accounts WHERE accountnumber = NEW.accountnumber
+        )
+        AND accountnumber != NEW.accountnumber;
+
+        -- ✅ If user has another account, add amount there
+        IF FOUND THEN
+            UPDATE accounts
+            SET balance = balance + NEW.amount
+            WHERE accountnumber = target_account;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- The trigger listens to the "transactions" table and executes
+-- the above function AFTER every INSERT
+-- Create trigger
+CREATE TRIGGER update_balance_on_transfer
+AFTER INSERT ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION handle_account_transfer();
+
 
 
 -- Users
@@ -81,214 +153,256 @@ VALUES
 (2, 'Checking', 1500.00, '***9876');  -- User 2 Checking
 
 
+select * from accounts
+
+
+INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
+(2, '2025-10-23','Transfer',300,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',500, 'ATM BOA', 'Shopping','MO');
 
 
 
-
-
-
-INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, balance, description, category, state) VALUES
-(2, '2025-03-28 14:09:37', 'Deposit', 1161.83, 6171.19, 'Gift Deposit', 'Food & Dining', 'MO'),
-(3, '2025-12-22 06:19:47', 'Deposit', 150.6, 1658.68, 'Salary Deposit', 'Food & Dining', 'MO'),
-(1, '2025-12-05 01:11:46', 'Deposit', 1935.44, 3936.03, 'Salary Deposit', 'Utilities', 'MO'),
-(2, '2025-07-19 03:40:04', 'Transfer', 1324.16, 7490.22, 'Transfer Savings to Checking', 'Bills', 'MO'),
-(3, '2025-05-24 12:34:58', 'Withdrawal', 1375.64, 274.56, 'Restaurant Bill', 'Bills', 'MO'),
-(2, '2025-09-26 18:50:08', 'Withdrawal', 403.97, 7083.58, 'Restaurant Bill', 'Transportation', 'MO'),
-(3, '2025-09-30 06:10:02', 'Deposit', 1653.02, 1921.83, 'Cash Deposit', 'Shopping', 'MO'),
-(2, '2025-07-04 14:33:03', 'Transfer', 68.74, 7161.49, 'Transfer Savings to Checking', 'Transportation', 'MO'),
-(1, '2025-03-22 10:47:30', 'Transfer', 223.45, 3721.81, 'Transfer Checking to Savings', 'Bills', 'MO'),
-(3, '2025-05-20 16:26:42', 'Deposit', 1483.77, 3398.15, 'Gift Deposit', 'Entertainment', 'MO'),
-(1, '2025-02-13 22:08:25', 'Withdrawal', 1763.88, 1960.25, 'Restaurant Bill', 'Groceries', 'MO'),
-(3, '2025-05-09 22:48:05', 'Deposit', 1185.59, 4587.83, 'Gift Deposit', 'Bills', 'MO'),
-(2, '2025-09-27 04:19:44', 'Deposit', 1632.17, 8791.05, 'Cash Deposit', 'Groceries', 'MO'),
-(3, '2025-09-07 08:40:53', 'Withdrawal', 1679.3, 2917.85, 'Fuel Payment', 'Utilities', 'MO'),
-(1, '2025-09-09 22:32:27', 'Withdrawal', 1708.05, 254.22, 'ATM Withdrawal', 'Transportation', 'MO'),
-(3, '2025-03-19 00:26:44', 'Withdrawal', 1198.17, 1715.13, 'Fuel Payment', 'Groceries', 'MO'),
-(1, '2025-02-03 07:31:52', 'Transfer', 1682.33, -1434.64, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(1, '2025-04-02 19:04:19', 'Deposit', 1436.64, -6.35, 'Salary Deposit', 'Groceries', 'MO'),
-(1, '2025-05-11 05:45:11', 'Transfer', 339.8, -350.31, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(3, '2025-01-22 08:27:15', 'Deposit', 554.11, 2264.55, 'Refund Deposit', 'Groceries', 'MO'),
-(1, '2025-04-13 02:52:32', 'Withdrawal', 1408.42, -1758.7, 'Online Purchase', 'Utilities', 'MO'),
-(1, '2025-08-06 15:04:02', 'Deposit', 1861.49, 109.57, 'Refund Deposit', 'Food & Dining', 'MO'),
-(2, '2025-03-31 02:17:17', 'Withdrawal', 1448.17, 7334.76, 'Restaurant Bill', 'Transportation', 'MO'),
-(3, '2025-06-25 14:27:51', 'Deposit', 1598.11, 3865.11, 'Refund Deposit', 'Food & Dining', 'MO'),
-(3, '2025-01-06 02:33:04', 'Deposit', 899.17, 4771.08, 'Salary Deposit', 'Utilities', 'MO'),
-(2, '2025-06-14 11:05:05', 'Deposit', 554.14, 7879.52, 'Salary Deposit', 'Bills', 'MO'),
-(3, '2025-03-24 02:59:19', 'Deposit', 1049.95, 5829.07, 'Refund Deposit', 'Shopping', 'MO'),
-(1, '2025-12-15 23:15:10', 'Transfer', 1990.91, -1890.1, 'Transfer Checking to Savings', 'Transportation', 'MO'),
-(2, '2025-10-06 04:12:45', 'Transfer', 1662.63, 9538.46, 'Transfer Savings to Checking', 'Shopping', 'MO'),
-(3, '2025-05-03 12:41:23', 'Deposit', 1560.53, 7386.1, 'Salary Deposit', 'Groceries', 'MO'),
-(1, '2025-12-07 16:50:57', 'Deposit', 1866.75, -29.39, 'Salary Deposit', 'Utilities', 'MO'),
-(1, '2025-12-04 20:07:59', 'Transfer', 1450.81, -1474.69, 'Transfer Checking to Savings', 'Transportation', 'MO'),
-(1, '2025-06-19 19:56:41', 'Withdrawal', 1266.29, -2734.91, 'Online Purchase', 'Entertainment', 'MO'),
-(3, '2025-07-05 05:00:01', 'Deposit', 670.57, 8057.37, 'Gift Deposit', 'Shopping', 'MO'),
-(3, '2025-02-10 18:11:40', 'Withdrawal', 1256.55, 6803.55, 'ATM Withdrawal', 'Food & Dining', 'MO'),
-(2, '2025-12-20 06:35:35', 'Deposit', 1723.5, 11261.28, 'Salary Deposit', 'Bills', 'MO'),
-(3, '2025-11-28 01:08:59', 'Deposit', 1332.37, 8136.32, 'Cash Deposit', 'Food & Dining', 'MO'),
-(1, '2025-10-13 19:57:06', 'Withdrawal', 233.38, -2960.1, 'Online Purchase', 'Groceries', 'MO'),
-(3, '2025-01-28 10:24:25', 'Deposit', 257.77, 8387.47, 'Cash Deposit', 'Transportation', 'MO'),
-(1, '2025-10-02 22:08:57', 'Withdrawal', 1623.48, -4575.76, 'ATM Withdrawal', 'Transportation', 'MO'),
-(2, '2025-04-11 19:21:27', 'Transfer', 278.11, 11533.92, 'Transfer Savings to Checking', 'Shopping', 'MO'),
-(1, '2025-06-30 16:16:53', 'Withdrawal', 612.98, -5183.76, 'Utility Payment', 'Entertainment', 'MO'),
-(2, '2025-05-12 14:19:07', 'Deposit', 1636.15, 13165.17, 'Salary Deposit', 'Food & Dining', 'MO'),
-(2, '2025-11-28 20:46:39', 'Transfer', 1405.88, 14564.51, 'Transfer Savings to Checking', 'Bills', 'MO'),
-(3, '2025-09-14 04:23:50', 'Withdrawal', 1381.1, 7013.63, 'ATM Withdrawal', 'Entertainment', 'MO'),
-(3, '2025-04-09 18:33:27', 'Deposit', 1585.54, 8608.21, 'Salary Deposit', 'Bills', 'MO'),
-(2, '2025-12-09 04:56:10', 'Deposit', 669.69, 15231.69, 'Gift Deposit', 'Transportation', 'MO'),
-(2, '2025-03-30 05:07:31', 'Withdrawal', 603.72, 14633.08, 'Fuel Payment', 'Groceries', 'MO'),
-(1, '2025-01-21 06:41:49', 'Transfer', 1306.21, -6483.71, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(2, '2025-06-19 17:04:19', 'Withdrawal', 685.52, 13942.36, 'Utility Payment', 'Food & Dining', 'MO'),
-(3, '2025-05-15 02:13:33', 'Deposit', 1650.19, 10265.98, 'Gift Deposit', 'Food & Dining', 'MO'),
-(1, '2025-12-06 02:15:48', 'Transfer', 1911.59, -8386.37, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(2, '2025-12-04 19:34:04', 'Transfer', 1575.36, 15514.94, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
-(1, '2025-01-11 02:14:03', 'Deposit', 687.92, -7701.05, 'Refund Deposit', 'Food & Dining', 'MO'),
-(3, '2025-03-19 01:35:51', 'Deposit', 1495.16, 11757.36, 'Cash Deposit', 'Food & Dining', 'MO'),
-(2, '2025-09-03 13:28:31', 'Transfer', 654.27, 16177.2, 'Transfer Savings to Checking', 'Bills', 'MO'),
-(3, '2025-05-17 19:24:36', 'Withdrawal', 1491.19, 10267.92, 'Fuel Payment', 'Bills', 'MO'),
-(3, '2025-01-05 14:01:26', 'Deposit', 919.97, 11182.06, 'Refund Deposit', 'Shopping', 'MO'),
-(3, '2025-09-28 06:18:04', 'Deposit', 1919.39, 13100.68, 'Salary Deposit', 'Food & Dining', 'MO'),
-(3, '2025-06-16 17:31:26', 'Deposit', 1449.08, 14556.17, 'Gift Deposit', 'Groceries', 'MO'),
-(3, '2025-10-17 06:10:44', 'Deposit', 483.54, 15037.04, 'Refund Deposit', 'Bills', 'MO'),
-(3, '2025-10-03 16:19:31', 'Deposit', 792.15, 15825.74, 'Refund Deposit', 'Groceries', 'MO'),
-(2, '2025-07-10 18:59:40', 'Withdrawal', 1946.36, 14232.94, 'Utility Payment', 'Bills', 'MO'),
-(2, '2025-11-05 19:54:58', 'Transfer', 1144.14, 15385.28, 'Transfer Savings to Checking', 'Utilities', 'MO'),
-(3, '2025-08-10 00:24:10', 'Withdrawal', 269.96, 15549.93, 'ATM Withdrawal', 'Transportation', 'MO'),
-(1, '2025-10-05 10:18:25', 'Transfer', 1709.77, -9402.17, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(3, '2025-06-20 04:55:38', 'Deposit', 348.75, 15891.4, 'Cash Deposit', 'Food & Dining', 'MO'),
-(3, '2025-06-13 05:12:30', 'Deposit', 588.22, 16471.47, 'Salary Deposit', 'Utilities', 'MO'),
-(1, '2025-03-06 05:54:39', 'Transfer', 1811.31, -11218.84, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(1, '2025-12-05 19:08:31', 'Deposit', 391.02, -10823.58, 'Cash Deposit', 'Utilities', 'MO'),
-(3, '2025-06-14 19:47:43', 'Deposit', 1680.28, 18160.63, 'Cash Deposit', 'Bills', 'MO'),
-(2, '2025-12-15 15:00:54', 'Transfer', 1743.68, 17125.36, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
-(1, '2025-05-11 12:11:08', 'Withdrawal', 1995.34, -12824.36, 'Utility Payment', 'Entertainment', 'MO'),
-(2, '2025-05-01 09:46:01', 'Withdrawal', 900.16, 16216.9, 'Restaurant Bill', 'Utilities', 'MO'),
-(1, '2025-04-26 00:10:01', 'Withdrawal', 292.71, -13110.27, 'Restaurant Bill', 'Utilities', 'MO'),
-(3, '2025-07-03 02:01:17', 'Deposit', 1892.39, 20054.86, 'Cash Deposit', 'Bills', 'MO'),
-(1, '2025-05-17 14:49:15', 'Withdrawal', 504.18, -13616.39, 'ATM Withdrawal', 'Shopping', 'MO'),
-(2, '2025-10-01 18:43:09', 'Transfer', 704.37, 16920.57, 'Transfer Savings to Checking', 'Shopping', 'MO'),
-(3, '2025-11-01 15:29:00', 'Withdrawal', 131.2, 19923.84, 'Online Purchase', 'Shopping', 'MO'),
-(3, '2025-06-17 23:47:59', 'Withdrawal', 833.21, 19091.71, 'Utility Payment', 'Bills', 'MO'),
-(3, '2025-09-24 14:34:45', 'Withdrawal', 57.65, 19039.88, 'Restaurant Bill', 'Utilities', 'MO'),
-(3, '2025-11-08 02:23:17', 'Withdrawal', 478.37, 18557.23, 'Utility Payment', 'Utilities', 'MO'),
-(1, '2025-01-11 09:19:17', 'Transfer', 1610.96, -15228.53, 'Transfer Checking to Savings', 'Bills', 'MO'),
-(2, '2025-05-16 20:44:19', 'Withdrawal', 1795.54, 15117.36, 'Restaurant Bill', 'Bills', 'MO'),
-(2, '2025-11-02 05:42:14', 'Withdrawal', 1237.84, 13876.93, 'ATM Withdrawal', 'Food & Dining', 'MO'),
-(2, '2025-09-02 00:27:22', 'Deposit', 1630.29, 15515.04, 'Gift Deposit', 'Bills', 'MO'),
-(2, '2025-09-25 22:54:57', 'Transfer', 362.44, 15871.35, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
-(1, '2025-05-01 19:53:21', 'Transfer', 324.14, -15553.94, 'Transfer Checking to Savings', 'Utilities', 'MO'),
-(1, '2025-12-20 12:53:01', 'Transfer', 1454.27, -17002.75, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(1, '2025-10-18 12:19:51', 'Withdrawal', 426.22, -17437.11, 'Restaurant Bill', 'Entertainment', 'MO'),
-(3, '2025-04-28 04:00:33', 'Withdrawal', 1214.13, 17336.31, 'ATM Withdrawal', 'Groceries', 'MO'),
-(1, '2025-09-02 16:58:34', 'Deposit', 1431.16, -16012.7, 'Cash Deposit', 'Utilities', 'MO'),
-(1, '2025-03-18 21:47:30', 'Deposit', 747.94, -15268.26, 'Cash Deposit', 'Transportation', 'MO'),
-(2, '2025-01-10 12:04:23', 'Deposit', 503.66, 16368.61, 'Refund Deposit', 'Shopping', 'MO'),
-(1, '2025-09-12 11:12:16', 'Transfer', 1270.76, -16533.36, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(3, '2025-06-25 09:05:23', 'Withdrawal', 1172.59, 16166.38, 'Fuel Payment', 'Entertainment', 'MO'),
-(3, '2025-11-30 18:19:13', 'Deposit', 1889.55, 18049.43, 'Cash Deposit', 'Groceries', 'MO'),
-(2, '2025-07-14 07:14:21', 'Deposit', 1309.97, 17676.86, 'Gift Deposit', 'Food & Dining', 'MO'),
-(3, '2025-09-15 08:45:17', 'Deposit', 792.02, 18850.56, 'Cash Deposit', 'Entertainment', 'MO'),
-(3, '2025-03-16 02:58:15', 'Deposit', 1795.32, 20655.7, 'Salary Deposit', 'Transportation', 'MO'),
-(3, '2025-08-06 10:11:04', 'Deposit', 1302.85, 21960.02, 'Refund Deposit', 'Transportation', 'MO'),
-(3, '2025-12-25 10:00:49', 'Deposit', 586.47, 22539.47, 'Salary Deposit', 'Groceries', 'MO'),
-(1, '2025-08-16 18:47:05', 'Withdrawal', 1819.06, -18360.67, 'ATM Withdrawal', 'Bills', 'MO'),
-(1, '2025-02-14 03:39:12', 'Deposit', 589.44, -17763.58, 'Cash Deposit', 'Bills', 'MO'),
-(2, '2025-05-24 01:17:53', 'Deposit', 925.37, 18608.91, 'Cash Deposit', 'Groceries', 'MO'),
-(2, '2025-04-18 22:12:59', 'Deposit', 1325.92, 19943.23, 'Refund Deposit', 'Food & Dining', 'MO'),
-(3, '2025-08-11 01:09:42', 'Withdrawal', 882.18, 21660.16, 'Restaurant Bill', 'Shopping', 'MO'),
-(2, '2025-07-03 14:34:05', 'Withdrawal', 1902.5, 18046.96, 'Utility Payment', 'Groceries', 'MO'),
-(2, '2025-07-30 01:59:39', 'Deposit', 1977.16, 20026.86, 'Gift Deposit', 'Shopping', 'MO'),
-(2, '2025-07-16 15:49:51', 'Transfer', 556.44, 20573.81, 'Transfer Savings to Checking', 'Groceries', 'MO'),
-(1, '2025-01-14 08:43:51', 'Transfer', 1791.81, -19547.87, 'Transfer Checking to Savings', 'Utilities', 'MO'),
-(1, '2025-12-29 06:10:54', 'Transfer', 719.29, -20264.25, 'Transfer Checking to Savings', 'Bills', 'MO'),
-(1, '2025-04-12 01:57:26', 'Withdrawal', 1684.76, -21940.88, 'Utility Payment', 'Transportation', 'MO'),
-(1, '2025-04-08 03:53:46', 'Withdrawal', 1582.43, -23530.09, 'Utility Payment', 'Transportation', 'MO'),
-(3, '2025-01-25 11:58:30', 'Deposit', 1987.41, 23641.81, 'Cash Deposit', 'Shopping', 'MO'),
-(2, '2025-09-22 20:39:29', 'Transfer', 1620.91, 22197.77, 'Transfer Savings to Checking', 'Groceries', 'MO'),
-(2, '2025-12-25 13:08:42', 'Transfer', 1925.89, 24124.74, 'Transfer Savings to Checking', 'Transportation', 'MO'),
-(2, '2025-12-16 02:10:52', 'Transfer', 1834.12, 25967.53, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
-(3, '2025-10-23 21:13:43', 'Deposit', 1130.37, 24769.04, 'Refund Deposit', 'Bills', 'MO'),
-(1, '2025-02-24 12:02:59', 'Withdrawal', 1921.57, -25453.96, 'Online Purchase', 'Entertainment', 'MO'),
-(3, '2025-05-04 10:28:19', 'Deposit', 1552.38, 26330.55, 'Salary Deposit', 'Utilities', 'MO'),
-(2, '2025-09-24 04:58:04', 'Withdrawal', 1147.89, 24828.62, 'Restaurant Bill', 'Shopping', 'MO'),
-(3, '2025-09-16 05:18:31', 'Deposit', 1918.36, 28242.68, 'Gift Deposit', 'Shopping', 'MO'),
-(1, '2025-04-05 20:15:23', 'Deposit', 1940.02, -23523.75, 'Cash Deposit', 'Shopping', 'MO'),
-(3, '2025-09-15 07:42:22', 'Deposit', 1054.09, 29300.45, 'Salary Deposit', 'Groceries', 'MO'),
-(1, '2025-10-04 23:27:10', 'Transfer', 1372.52, -24905.28, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(2, '2025-12-14 15:59:49', 'Deposit', 596.96, 25422.58, 'Cash Deposit', 'Bills', 'MO'),
-(3, '2025-01-06 01:48:30', 'Withdrawal', 1657.47, 27651.11, 'Utility Payment', 'Bills', 'MO'),
-(1, '2025-04-14 20:50:02', 'Deposit', 1867.54, -23039.64, 'Cash Deposit', 'Bills', 'MO'),
-(3, '2025-09-28 22:51:23', 'Deposit', 1213.29, 28864.68, 'Gift Deposit', 'Entertainment', 'MO'),
-(2, '2025-01-11 13:59:38', 'Withdrawal', 1340.56, 24082.65, 'Fuel Payment', 'Groceries', 'MO'),
-(2, '2025-08-03 02:09:22', 'Deposit', 1465.83, 25543.58, 'Gift Deposit', 'Utilities', 'MO'),
-(1, '2025-02-12 20:58:36', 'Deposit', 345.75, -22697.7, 'Refund Deposit', 'Bills', 'MO'),
-(3, '2025-06-10 06:37:34', 'Withdrawal', 1142.91, 27716.5, 'ATM Withdrawal', 'Entertainment', 'MO'),
-(1, '2025-04-04 22:47:13', 'Deposit', 1525.82, -21166.41, 'Refund Deposit', 'Food & Dining', 'MO'),
-(2, '2025-07-05 00:04:49', 'Withdrawal', 887.24, 24665.85, 'Utility Payment', 'Food & Dining', 'MO'),
-(1, '2025-12-25 16:59:41', 'Withdrawal', 1031.03, -22206.05, 'Utility Payment', 'Groceries', 'MO'),
-(1, '2025-05-12 14:00:35', 'Transfer', 1521.25, -23722.21, 'Transfer Checking to Savings', 'Shopping', 'MO'),
-(1, '2025-04-05 21:49:12', 'Withdrawal', 1876.42, -25602.52, 'Utility Payment', 'Shopping', 'MO'),
-(2, '2025-07-19 10:36:10', 'Transfer', 257.02, 24922.83, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
-(3, '2025-08-31 19:09:36', 'Withdrawal', 355.34, 27361.3, 'Online Purchase', 'Food & Dining', 'MO'),
-(2, '2025-10-18 12:46:35', 'Deposit', 1065.78, 25981.97, 'Cash Deposit', 'Shopping', 'MO'),
-(3, '2025-06-26 06:19:55', 'Deposit', 554.97, 27906.34, 'Cash Deposit', 'Groceries', 'MO'),
-(1, '2025-06-08 10:23:18', 'Withdrawal', 246.9, -25852.73, 'Online Purchase', 'Groceries', 'MO'),
-(2, '2025-01-15 17:16:07', 'Withdrawal', 693.85, 25279.5, 'Restaurant Bill', 'Entertainment', 'MO'),
-(1, '2025-04-13 04:37:02', 'Deposit', 1108.88, -24743.8, 'Cash Deposit', 'Shopping', 'MO'),
-(2, '2025-12-26 04:52:36', 'Deposit', 243.43, 25514.2, 'Gift Deposit', 'Entertainment', 'MO'),
-(3, '2025-02-24 20:59:52', 'Withdrawal', 973.35, 26925.53, 'Restaurant Bill', 'Groceries', 'MO'),
-(3, '2025-10-07 10:14:23', 'Deposit', 410.44, 27342.0, 'Salary Deposit', 'Groceries', 'MO'),
-(1, '2025-10-08 18:54:21', 'Deposit', 1186.85, -23553.04, 'Refund Deposit', 'Transportation', 'MO'),
-(2, '2025-03-04 20:05:19', 'Withdrawal', 1663.61, 23840.66, 'Utility Payment', 'Entertainment', 'MO'),
-(1, '2025-04-02 08:12:43', 'Withdrawal', 889.8, -24438.5, 'Online Purchase', 'Shopping', 'MO'),
-(1, '2025-03-27 19:50:48', 'Transfer', 229.32, -24660.34, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(1, '2025-05-04 14:53:37', 'Transfer', 1992.89, -26657.01, 'Transfer Checking to Savings', 'Food & Dining', 'MO'),
-(1, '2025-05-26 03:08:22', 'Withdrawal', 707.91, -27369.37, 'Fuel Payment', 'Transportation', 'MO'),
-(3, '2025-06-16 21:25:47', 'Deposit', 93.64, 27436.28, 'Salary Deposit', 'Shopping', 'MO'),
-(2, '2025-06-23 03:49:35', 'Deposit', 1275.34, 25110.98, 'Cash Deposit', 'Food & Dining', 'MO'),
-(3, '2025-04-24 19:38:19', 'Withdrawal', 1110.88, 26325.05, 'Online Purchase', 'Entertainment', 'MO'),
-(3, '2025-12-01 19:45:57', 'Withdrawal', 1472.09, 24850.15, 'Restaurant Bill', 'Transportation', 'MO'),
-(2, '2025-04-01 19:13:09', 'Transfer', 454.38, 25568.07, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
-(3, '2025-05-13 17:29:00', 'Deposit', 1119.4, 25968.3, 'Salary Deposit', 'Transportation', 'MO'),
-(3, '2025-04-29 15:45:18', 'Withdrawal', 1356.9, 24608.14, 'Online Purchase', 'Food & Dining', 'MO'),
-(1, '2025-03-14 05:50:13', 'Transfer', 1487.22, -28862.65, 'Transfer Checking to Savings', 'Entertainment', 'MO'),
-(2, '2025-05-12 14:39:37', 'Deposit', 305.72, 25869.56, 'Cash Deposit', 'Food & Dining', 'MO'),
-(1, '2025-03-13 05:06:48', 'Deposit', 1949.69, -26917.34, 'Gift Deposit', 'Shopping', 'MO'),
-(3, '2025-11-27 18:09:20', 'Withdrawal', 696.42, 23910.2, 'Restaurant Bill', 'Utilities', 'MO'),
-(1, '2025-02-16 08:18:22', 'Transfer', 780.56, -27697.69, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(3, '2025-06-02 05:16:48', 'Withdrawal', 1974.26, 21941.58, 'Restaurant Bill', 'Entertainment', 'MO'),
-(3, '2025-05-10 07:21:16', 'Deposit', 1534.43, 23470.15, 'Refund Deposit', 'Utilities', 'MO'),
-(3, '2025-04-25 02:21:19', 'Withdrawal', 1241.43, 22223.38, 'Utility Payment', 'Groceries', 'MO'),
-(3, '2025-02-17 02:26:17', 'Withdrawal', 1770.01, 20456.26, 'Fuel Payment', 'Groceries', 'MO'),
-(3, '2025-04-03 04:25:47', 'Deposit', 947.43, 21413.56, 'Gift Deposit', 'Utilities', 'MO'),
-(2, '2025-05-09 21:49:10', 'Deposit', 495.07, 26359.5, 'Cash Deposit', 'Entertainment', 'MO'),
-(3, '2025-07-21 19:48:54', 'Deposit', 1285.67, 22698.61, 'Gift Deposit', 'Food & Dining', 'MO'),
-(3, '2025-01-22 02:50:48', 'Deposit', 1974.66, 24667.83, 'Cash Deposit', 'Shopping', 'MO'),
-(3, '2025-07-02 08:09:27', 'Deposit', 1218.43, 25892.25, 'Refund Deposit', 'Bills', 'MO'),
-(1, '2025-10-18 11:21:24', 'Transfer', 1529.57, -29228.02, 'Transfer Checking to Savings', 'Entertainment', 'MO'),
-(1, '2025-12-18 11:09:32', 'Withdrawal', 181.58, -29419.51, 'Online Purchase', 'Groceries', 'MO'),
-(2, '2025-09-30 14:53:47', 'Withdrawal', 614.11, 25737.39, 'Utility Payment', 'Transportation', 'MO'),
-(3, '2025-12-01 10:55:34', 'Deposit', 775.04, 26674.85, 'Refund Deposit', 'Bills', 'MO'),
-(2, '2025-08-06 04:41:39', 'Transfer', 1223.83, 26966.45, 'Transfer Savings to Checking', 'Bills', 'MO'),
-(3, '2025-02-14 10:11:27', 'Withdrawal', 770.3, 25901.11, 'Utility Payment', 'Transportation', 'MO'),
-(1, '2025-12-15 20:10:53', 'Deposit', 863.95, -28565.48, 'Cash Deposit', 'Transportation', 'MO'),
-(3, '2025-05-21 02:03:38', 'Deposit', 1086.48, 26981.04, 'Refund Deposit', 'Entertainment', 'MO'),
-(3, '2025-05-26 14:43:33', 'Deposit', 1672.23, 28650.8, 'Salary Deposit', 'Food & Dining', 'MO'),
-(2, '2025-07-13 00:33:41', 'Withdrawal', 1367.61, 25599.68, 'Utility Payment', 'Bills', 'MO'),
-(1, '2025-04-11 11:24:00', 'Withdrawal', 1403.0, -29963.07, 'Fuel Payment', 'Food & Dining', 'MO'),
-(3, '2025-08-02 20:25:39', 'Withdrawal', 662.28, 27993.18, 'Restaurant Bill', 'Bills', 'MO'),
-(1, '2025-09-21 13:16:07', 'Deposit', 651.92, -29306.3, 'Cash Deposit', 'Utilities', 'MO'),
-(2, '2025-05-22 08:52:10', 'Withdrawal', 1518.59, 24090.48, 'Fuel Payment', 'Entertainment', 'MO'),
-(1, '2025-08-26 14:55:20', 'Withdrawal', 257.67, -29555.29, 'Fuel Payment', 'Bills', 'MO'),
-(3, '2025-11-25 11:30:02', 'Withdrawal', 571.77, 27411.87, 'Fuel Payment', 'Groceries', 'MO'),
-(3, '2025-11-19 09:58:49', 'Withdrawal', 908.05, 26498.6, 'Fuel Payment', 'Food & Dining', 'MO'),
-(1, '2025-05-12 14:03:41', 'Deposit', 1802.2, -27756.36, 'Refund Deposit', 'Bills', 'MO'),
-(1, '2025-10-07 10:28:03', 'Transfer', 93.81, -27846.14, 'Transfer Checking to Savings', 'Groceries', 'MO'),
-(3, '2025-12-18 14:46:31', 'Deposit', 1844.21, 28344.87, 'Cash Deposit', 'Groceries', 'MO'),
-(2, '2025-01-23 21:06:00', 'Withdrawal', 60.73, 24025.91, 'Utility Payment', 'Shopping', 'MO'),
-(3, '2025-12-01 18:13:54', 'Withdrawal', 1244.06, 27100.09, 'Fuel Payment', 'Utilities', 'MO'),
-(2, '2025-03-27 14:47:21', 'Transfer', 1881.82, 25900.39, 'Transfer Savings to Checking', 'Transportation', 'MO'),
-(2, '2025-03-26 09:06:26', 'Withdrawal', 486.95, 25413.64, 'Restaurant Bill', 'Entertainment', 'MO');
-
+INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
+(2, '2025-08-08 19:59:49', 'Withdrawal', 1003.47, 'Fuel Payment', 'Food & Dining', 'CA'),
+(2, '2025-11-15 05:17:05', 'Transfer', 529.57, 'Transfer Savings to Checking', 'Food & Dining', 'NY'),
+(1, '2025-04-16 12:20:17', 'Withdrawal', 1889.45, 'ATM Withdrawal', 'Shopping', 'MO'),
+(3, '2025-08-19 11:10:48', 'Deposit', 799.93, 'Cash Deposit', 'Groceries', 'MO'),
+(3, '2025-01-05 07:50:33', 'Withdrawal', 313.75, 'Online Purchase', 'Shopping', 'CA'),
+(1, '2025-01-06 07:38:53', 'Withdrawal', 1877.88, 'Restaurant Bill', 'Bills', 'CA'),
+(1, '2025-10-22 17:39:53', 'Transfer', 543.02, 'Transfer Checking to Savings', 'Shopping', 'NY'),
+(3, '2025-11-28 02:33:28', 'Withdrawal', 95.07, 'Utility Payment', 'Bills', 'NY'),
+(2, '2025-07-18 01:00:49', 'Deposit', 785.02, 'Gift Deposit', 'Bills', 'CA'),
+(2, '2025-06-22 20:55:23', 'Deposit', 1189.96, 'Refund Deposit', 'Food & Dining', 'MO'),
+(2, '2025-09-07 04:04:02', 'Deposit', 1828.64, 'Gift Deposit', 'Transportation', 'CA'),
+(3, '2025-01-01 21:36:08', 'Deposit', 817.78, 'Salary Deposit', 'Food & Dining', 'NY'),
+(1, '2025-11-18 22:23:38', 'Deposit', 531.82, 'Gift Deposit', 'Utilities', 'MO'),
+(2, '2025-11-17 03:45:46', 'Transfer', 819.92, 'Transfer Savings to Checking', 'Groceries', 'NY'),
+(1, '2025-02-06 05:18:14', 'Deposit', 473.58, 'Cash Deposit', 'Bills', 'CA'),
+(1, '2025-04-04 02:53:26', 'Transfer', 1408.74, 'Transfer Checking to Savings', 'Transportation', 'CA'),
+(1, '2025-05-12 03:03:03', 'Transfer', 582.65, 'Transfer Checking to Savings', 'Transportation', 'NY'),
+(2, '2025-10-28 20:03:56', 'Transfer', 751.63, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(1, '2025-11-02 16:52:58', 'Deposit', 1764.77, 'Gift Deposit', 'Food & Dining', 'MO'),
+(2, '2025-10-09 11:49:32', 'Transfer', 758.72, 'Transfer Savings to Checking', 'Groceries', 'NY'),
+(2, '2025-06-20 04:21:05', 'Withdrawal', 1827.76, 'Fuel Payment', 'Utilities', 'NY'),
+(2, '2025-07-12 01:54:13', 'Deposit', 412.3, 'Cash Deposit', 'Entertainment', 'CA'),
+(2, '2025-06-14 05:24:24', 'Transfer', 196.98, 'Transfer Savings to Checking', 'Income', 'MO'),
+(2, '2025-06-24 14:23:59', 'Deposit', 1073.99, 'Cash Deposit', 'Shopping', 'MO'),
+(1, '2025-09-19 12:59:35', 'Deposit', 1787.41, 'Refund Deposit', 'Entertainment', 'MO'),
+(1, '2025-02-05 07:45:13', 'Deposit', 143.3, 'Refund Deposit', 'Groceries', 'CA'),
+(3, '2025-08-14 01:50:42', 'Withdrawal', 1201.31, 'Online Purchase', 'Utilities', 'CA'),
+(1, '2025-07-09 23:22:23', 'Withdrawal', 1314.63, 'ATM Withdrawal', 'Entertainment', 'NY'),
+(3, '2025-09-19 08:08:49', 'Deposit', 668.9, 'Gift Deposit', 'Bills', 'CA'),
+(3, '2025-06-22 19:45:47', 'Deposit', 1668.01, 'Refund Deposit', 'Transportation', 'CA'),
+(2, '2025-07-03 15:13:10', 'Withdrawal', 486.52, 'Fuel Payment', 'Groceries', 'CA'),
+(2, '2025-12-25 05:48:01', 'Deposit', 198.18, 'Salary Deposit', 'Food & Dining', 'CA'),
+(1, '2025-01-06 17:14:31', 'Withdrawal', 311.37, 'Restaurant Bill', 'Transportation', 'NY'),
+(3, '2025-04-13 07:09:01', 'Deposit', 354.88, 'Refund Deposit', 'Utilities', 'MO'),
+(1, '2025-07-18 08:30:28', 'Transfer', 582.3, 'Transfer Checking to Savings', 'Transportation', 'NY'),
+(3, '2025-06-01 08:18:24', 'Deposit', 281.08, 'Cash Deposit', 'Utilities', 'NY'),
+(3, '2025-08-09 10:31:42', 'Withdrawal', 410.29, 'ATM Withdrawal', 'Groceries', 'MO'),
+(2, '2025-05-12 16:45:47', 'Withdrawal', 967.67, 'ATM Withdrawal', 'Shopping', 'NY'),
+(3, '2025-09-21 23:28:14', 'Withdrawal', 1282.7, 'Fuel Payment', 'Shopping', 'CA'),
+(2, '2025-03-11 13:36:53', 'Deposit', 1107.56, 'Gift Deposit', 'Shopping', 'CA'),
+(2, '2025-02-28 06:04:35', 'Withdrawal', 258.36, 'Utility Payment', 'Entertainment', 'CA'),
+(3, '2025-12-02 04:35:14', 'Withdrawal', 473.11, 'ATM Withdrawal', 'Bills', 'CA'),
+(3, '2025-12-01 14:17:21', 'Deposit', 1075.51, 'Cash Deposit', 'Bills', 'CA'),
+(3, '2025-08-09 17:15:14', 'Withdrawal', 1261.54, 'Utility Payment', 'Food & Dining', 'MO'),
+(3, '2025-12-25 21:07:13', 'Deposit', 1355.77, 'Cash Deposit', 'Bills', 'CA'),
+(1, '2025-01-10 20:56:36', 'Withdrawal', 310.08, 'Fuel Payment', 'Groceries', 'MO'),
+(3, '2025-09-27 00:02:26', 'Deposit', 332.24, 'Gift Deposit', 'Shopping', 'CA'),
+(2, '2025-09-10 18:26:14', 'Withdrawal', 610.87, 'Online Purchase', 'Income', 'NY'),
+(1, '2025-02-24 09:30:19', 'Transfer', 1865.48, 'Transfer Checking to Savings', 'Groceries', 'CA'),
+(1, '2025-09-18 10:38:20', 'Transfer', 1216.37, 'Transfer Checking to Savings', 'Food & Dining', 'MO'),
+(2, '2025-02-27 06:52:11', 'Transfer', 728.67, 'Transfer Savings to Checking', 'Income', 'MO'),
+(3, '2025-04-17 01:50:18', 'Withdrawal', 454.33, 'Restaurant Bill', 'Bills', 'CA'),
+(2, '2025-10-16 18:46:49', 'Transfer', 437.99, 'Transfer Savings to Checking', 'Transportation', 'CA'),
+(1, '2025-12-13 02:36:14', 'Transfer', 308.17, 'Transfer Checking to Savings', 'Income', 'NY'),
+(3, '2025-05-18 15:05:58', 'Deposit', 582.65, 'Gift Deposit', 'Transportation', 'CA'),
+(1, '2025-06-28 04:05:35', 'Deposit', 1733.98, 'Gift Deposit', 'Food & Dining', 'NY'),
+(3, '2025-06-23 18:47:26', 'Deposit', 1068.91, 'Cash Deposit', 'Income', 'NY'),
+(2, '2025-08-02 18:55:34', 'Deposit', 1742.5, 'Salary Deposit', 'Entertainment', 'CA'),
+(1, '2025-01-15 20:38:24', 'Withdrawal', 256.78, 'Utility Payment', 'Groceries', 'MO'),
+(3, '2025-09-27 11:22:25', 'Withdrawal', 427.01, 'Restaurant Bill', 'Shopping', 'CA'),
+(2, '2025-03-19 07:53:34', 'Deposit', 177.26, 'Gift Deposit', 'Utilities', 'CA'),
+(3, '2025-07-03 07:27:14', 'Withdrawal', 1319.3, 'ATM Withdrawal', 'Transportation', 'NY'),
+(3, '2025-12-23 22:32:09', 'Withdrawal', 371.63, 'Online Purchase', 'Groceries', 'CA'),
+(2, '2025-05-25 09:24:48', 'Deposit', 1035.14, 'Cash Deposit', 'Transportation', 'CA'),
+(2, '2025-08-21 12:57:53', 'Deposit', 1394.78, 'Refund Deposit', 'Income', 'MO'),
+(1, '2025-01-14 10:42:05', 'Deposit', 857.0, 'Salary Deposit', 'Shopping', 'CA'),
+(1, '2025-11-28 14:57:54', 'Deposit', 232.38, 'Gift Deposit', 'Entertainment', 'NY'),
+(1, '2025-04-06 02:21:18', 'Withdrawal', 1883.67, 'Utility Payment', 'Food & Dining', 'MO'),
+(3, '2025-11-30 00:54:38', 'Withdrawal', 197.04, 'Utility Payment', 'Entertainment', 'NY'),
+(1, '2025-02-12 07:48:09', 'Deposit', 709.61, 'Gift Deposit', 'Food & Dining', 'MO'),
+(2, '2025-02-05 10:06:52', 'Deposit', 808.42, 'Cash Deposit', 'Utilities', 'NY'),
+(3, '2025-01-29 05:01:22', 'Deposit', 1082.66, 'Refund Deposit', 'Transportation', 'NY'),
+(1, '2025-10-04 04:25:29', 'Withdrawal', 477.16, 'Restaurant Bill', 'Utilities', 'NY'),
+(2, '2025-07-14 06:29:04', 'Withdrawal', 1283.35, 'Restaurant Bill', 'Groceries', 'MO'),
+(1, '2025-07-22 05:11:38', 'Transfer', 1461.06, 'Transfer Checking to Savings', 'Utilities', 'NY'),
+(1, '2025-08-28 09:12:27', 'Deposit', 1448.27, 'Gift Deposit', 'Entertainment', 'MO'),
+(3, '2025-09-13 07:10:01', 'Deposit', 1384.98, 'Cash Deposit', 'Transportation', 'NY'),
+(3, '2025-07-10 16:06:18', 'Withdrawal', 358.46, 'Fuel Payment', 'Shopping', 'MO'),
+(1, '2025-02-28 05:24:02', 'Deposit', 1115.22, 'Gift Deposit', 'Shopping', 'MO'),
+(1, '2025-08-20 11:41:31', 'Deposit', 510.67, 'Salary Deposit', 'Transportation', 'CA'),
+(1, '2025-10-12 22:13:01', 'Transfer', 364.14, 'Transfer Checking to Savings', 'Income', 'CA'),
+(3, '2025-08-09 22:31:55', 'Deposit', 1366.55, 'Salary Deposit', 'Entertainment', 'NY'),
+(3, '2025-03-30 16:15:13', 'Deposit', 481.0, 'Gift Deposit', 'Entertainment', 'MO'),
+(1, '2025-05-16 14:24:08', 'Withdrawal', 631.0, 'Utility Payment', 'Food & Dining', 'CA'),
+(2, '2025-10-29 09:36:30', 'Transfer', 145.17, 'Transfer Savings to Checking', 'Income', 'CA'),
+(3, '2025-07-25 14:32:22', 'Withdrawal', 689.46, 'ATM Withdrawal', 'Bills', 'MO'),
+(3, '2025-09-29 14:25:07', 'Deposit', 216.16, 'Gift Deposit', 'Transportation', 'CA'),
+(2, '2025-05-13 09:00:13', 'Deposit', 1722.21, 'Gift Deposit', 'Entertainment', 'MO'),
+(3, '2025-09-27 13:01:38', 'Deposit', 293.04, 'Cash Deposit', 'Food & Dining', 'NY'),
+(1, '2025-07-26 07:26:55', 'Deposit', 619.02, 'Refund Deposit', 'Income', 'NY'),
+(2, '2025-02-26 01:37:10', 'Withdrawal', 194.27, 'Online Purchase', 'Food & Dining', 'MO'),
+(1, '2025-09-03 10:34:11', 'Deposit', 776.21, 'Salary Deposit', 'Income', 'NY'),
+(2, '2025-08-16 09:47:04', 'Transfer', 1206.86, 'Transfer Savings to Checking', 'Entertainment', 'CA'),
+(2, '2025-09-02 06:59:03', 'Transfer', 1216.22, 'Transfer Savings to Checking', 'Shopping', 'NY'),
+(3, '2025-10-22 20:23:27', 'Withdrawal', 1495.6, 'Restaurant Bill', 'Shopping', 'CA'),
+(2, '2025-12-02 02:06:52', 'Withdrawal', 454.53, 'Restaurant Bill', 'Transportation', 'NY'),
+(2, '2025-07-30 12:18:04', 'Transfer', 604.05, 'Transfer Savings to Checking', 'Groceries', 'MO'),
+(3, '2025-03-17 17:47:00', 'Deposit', 705.51, 'Salary Deposit', 'Utilities', 'NY'),
+(2, '2025-01-17 21:48:09', 'Withdrawal', 395.87, 'Fuel Payment', 'Bills', 'CA'),
+(2, '2025-12-19 11:41:13', 'Deposit', 1182.75, 'Salary Deposit', 'Utilities', 'CA'),
+(1, '2025-08-18 20:11:13', 'Deposit', 1343.0, 'Refund Deposit', 'Shopping', 'MO'),
+(1, '2025-10-14 07:57:59', 'Transfer', 1774.92, 'Transfer Checking to Savings', 'Food & Dining', 'CA'),
+(3, '2025-07-25 21:20:50', 'Withdrawal', 247.53, 'Fuel Payment', 'Income', 'CA'),
+(2, '2025-02-09 15:05:08', 'Withdrawal', 1459.34, 'Online Purchase', 'Bills', 'CA'),
+(3, '2025-01-18 23:58:54', 'Deposit', 673.55, 'Cash Deposit', 'Food & Dining', 'MO'),
+(1, '2025-11-21 16:27:27', 'Transfer', 614.64, 'Transfer Checking to Savings', 'Shopping', 'CA'),
+(3, '2025-02-27 03:04:17', 'Deposit', 1107.19, 'Refund Deposit', 'Transportation', 'CA'),
+(2, '2025-01-09 20:45:36', 'Transfer', 385.29, 'Transfer Savings to Checking', 'Transportation', 'CA'),
+(2, '2025-08-14 05:32:04', 'Deposit', 1701.65, 'Cash Deposit', 'Transportation', 'CA'),
+(3, '2025-10-27 22:28:54', 'Deposit', 185.51, 'Gift Deposit', 'Utilities', 'NY'),
+(1, '2025-12-02 09:35:34', 'Transfer', 942.3, 'Transfer Checking to Savings', 'Transportation', 'CA'),
+(2, '2025-07-29 14:05:14', 'Transfer', 157.55, 'Transfer Savings to Checking', 'Utilities', 'NY'),
+(1, '2025-11-02 11:06:28', 'Withdrawal', 237.04, 'Online Purchase', 'Bills', 'CA'),
+(2, '2025-12-08 12:14:14', 'Transfer', 1051.7, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(2, '2025-10-18 00:08:27', 'Deposit', 430.44, 'Refund Deposit', 'Shopping', 'MO'),
+(1, '2025-11-02 18:27:26', 'Deposit', 1872.11, 'Cash Deposit', 'Entertainment', 'CA'),
+(1, '2025-10-31 19:43:43', 'Transfer', 1643.98, 'Transfer Checking to Savings', 'Income', 'MO'),
+(1, '2025-06-15 03:39:50', 'Transfer', 801.12, 'Transfer Checking to Savings', 'Transportation', 'MO'),
+(1, '2025-09-23 08:33:21', 'Transfer', 1743.84, 'Transfer Checking to Savings', 'Food & Dining', 'MO'),
+(1, '2025-04-01 06:58:05', 'Deposit', 1034.23, 'Salary Deposit', 'Transportation', 'CA'),
+(1, '2025-10-08 23:16:52', 'Withdrawal', 1652.54, 'Restaurant Bill', 'Groceries', 'CA'),
+(2, '2025-02-02 19:14:14', 'Withdrawal', 1025.96, 'ATM Withdrawal', 'Shopping', 'NY'),
+(3, '2025-09-23 23:38:50', 'Deposit', 162.31, 'Refund Deposit', 'Shopping', 'NY'),
+(1, '2025-05-28 23:44:07', 'Transfer', 1279.99, 'Transfer Checking to Savings', 'Bills', 'CA'),
+(2, '2025-03-21 09:26:06', 'Deposit', 358.3, 'Salary Deposit', 'Utilities', 'CA'),
+(1, '2025-02-10 23:11:32', 'Deposit', 618.5, 'Gift Deposit', 'Bills', 'NY'),
+(2, '2025-10-10 22:19:17', 'Deposit', 1556.84, 'Gift Deposit', 'Bills', 'CA'),
+(3, '2025-04-22 17:38:57', 'Withdrawal', 55.57, 'Restaurant Bill', 'Shopping', 'MO'),
+(1, '2025-12-12 03:47:18', 'Deposit', 888.17, 'Salary Deposit', 'Transportation', 'NY'),
+(1, '2025-02-06 13:59:07', 'Transfer', 1558.9, 'Transfer Checking to Savings', 'Food & Dining', 'CA'),
+(1, '2025-03-09 13:21:40', 'Deposit', 712.36, 'Gift Deposit', 'Groceries', 'CA'),
+(2, '2025-06-20 16:41:22', 'Transfer', 1116.63, 'Transfer Savings to Checking', 'Bills', 'CA'),
+(2, '2025-12-08 23:37:13', 'Deposit', 1712.46, 'Salary Deposit', 'Shopping', 'NY'),
+(2, '2025-08-23 05:50:50', 'Withdrawal', 1451.94, 'Fuel Payment', 'Food & Dining', 'MO'),
+(1, '2025-07-07 02:59:32', 'Deposit', 1065.33, 'Cash Deposit', 'Entertainment', 'MO'),
+(3, '2025-01-30 11:28:23', 'Withdrawal', 1718.11, 'Fuel Payment', 'Shopping', 'MO'),
+(1, '2025-04-03 21:31:00', 'Withdrawal', 1799.7, 'Restaurant Bill', 'Transportation', 'CA'),
+(2, '2025-11-09 05:50:06', 'Withdrawal', 855.28, 'Online Purchase', 'Utilities', 'CA'),
+(2, '2025-03-21 10:42:03', 'Transfer', 1876.0, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(1, '2025-09-04 20:52:59', 'Transfer', 478.08, 'Transfer Checking to Savings', 'Utilities', 'CA'),
+(3, '2025-06-19 01:58:29', 'Withdrawal', 506.88, 'Online Purchase', 'Utilities', 'MO'),
+(3, '2025-09-14 01:27:51', 'Deposit', 703.52, 'Cash Deposit', 'Transportation', 'MO'),
+(2, '2025-12-23 21:23:01', 'Withdrawal', 1125.61, 'ATM Withdrawal', 'Shopping', 'MO'),
+(3, '2025-08-15 06:44:39', 'Deposit', 80.7, 'Gift Deposit', 'Shopping', 'CA'),
+(2, '2025-12-30 10:00:27', 'Transfer', 1709.08, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(1, '2025-03-16 05:46:54', 'Transfer', 849.45, 'Transfer Checking to Savings', 'Bills', 'CA'),
+(1, '2025-04-18 21:32:01', 'Transfer', 1144.66, 'Transfer Checking to Savings', 'Food & Dining', 'CA'),
+(2, '2025-04-18 00:38:03', 'Transfer', 606.97, 'Transfer Savings to Checking', 'Entertainment', 'NY'),
+(3, '2025-04-02 10:52:42', 'Deposit', 650.75, 'Gift Deposit', 'Bills', 'CA'),
+(2, '2025-09-11 10:05:14', 'Withdrawal', 1622.83, 'Fuel Payment', 'Transportation', 'CA'),
+(2, '2025-02-27 05:58:05', 'Transfer', 970.0, 'Transfer Savings to Checking', 'Entertainment', 'NY'),
+(2, '2025-03-20 04:54:05', 'Deposit', 1114.98, 'Refund Deposit', 'Entertainment', 'CA'),
+(1, '2025-07-20 02:19:05', 'Transfer', 799.39, 'Transfer Checking to Savings', 'Entertainment', 'CA'),
+(1, '2025-09-16 10:59:50', 'Transfer', 661.53, 'Transfer Checking to Savings', 'Income', 'MO'),
+(2, '2025-01-08 07:15:17', 'Withdrawal', 1782.93, 'Utility Payment', 'Income', 'NY'),
+(2, '2025-09-10 12:20:56', 'Transfer', 584.57, 'Transfer Savings to Checking', 'Utilities', 'MO'),
+(1, '2025-12-21 19:43:19', 'Withdrawal', 1184.49, 'Online Purchase', 'Entertainment', 'MO'),
+(2, '2025-04-22 09:40:06', 'Transfer', 1529.63, 'Transfer Savings to Checking', 'Food & Dining', 'NY'),
+(1, '2025-08-15 18:34:03', 'Withdrawal', 263.81, 'Utility Payment', 'Groceries', 'MO'),
+(2, '2025-06-28 10:11:12', 'Transfer', 966.34, 'Transfer Savings to Checking', 'Entertainment', 'NY'),
+(2, '2025-12-06 06:16:13', 'Transfer', 158.02, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(2, '2025-12-06 04:37:18', 'Withdrawal', 1580.79, 'Utility Payment', 'Transportation', 'MO'),
+(2, '2025-01-24 23:31:08', 'Transfer', 460.71, 'Transfer Savings to Checking', 'Income', 'NY'),
+(1, '2025-02-19 16:31:49', 'Deposit', 1551.22, 'Refund Deposit', 'Groceries', 'NY'),
+(2, '2025-09-19 13:54:11', 'Transfer', 817.53, 'Transfer Savings to Checking', 'Entertainment', 'CA'),
+(2, '2025-01-12 14:07:28', 'Deposit', 1115.22, 'Gift Deposit', 'Entertainment', 'CA'),
+(1, '2025-05-25 10:12:06', 'Deposit', 1783.67, 'Refund Deposit', 'Entertainment', 'NY'),
+(1, '2025-10-04 03:10:31', 'Transfer', 1371.06, 'Transfer Checking to Savings', 'Utilities', 'MO'),
+(1, '2025-05-20 20:17:46', 'Withdrawal', 1666.84, 'Fuel Payment', 'Groceries', 'CA'),
+(1, '2025-03-17 14:24:48', 'Deposit', 932.01, 'Refund Deposit', 'Shopping', 'CA'),
+(1, '2025-01-27 08:59:46', 'Withdrawal', 755.06, 'Fuel Payment', 'Transportation', 'NY'),
+(3, '2025-02-12 08:29:51', 'Withdrawal', 1374.16, 'Restaurant Bill', 'Shopping', 'MO'),
+(1, '2025-08-15 08:11:01', 'Transfer', 1428.38, 'Transfer Checking to Savings', 'Income', 'NY'),
+(2, '2025-07-21 18:54:15', 'Withdrawal', 826.52, 'Utility Payment', 'Utilities', 'MO'),
+(2, '2025-09-11 19:51:56', 'Deposit', 1827.04, 'Refund Deposit', 'Entertainment', 'MO'),
+(2, '2025-02-20 00:25:27', 'Transfer', 1419.58, 'Transfer Savings to Checking', 'Shopping', 'NY'),
+(3, '2025-08-17 00:12:23', 'Withdrawal', 804.33, 'ATM Withdrawal', 'Income', 'MO'),
+(2, '2025-04-15 19:31:27', 'Withdrawal', 296.37, 'Utility Payment', 'Transportation', 'MO'),
+(3, '2025-07-21 12:14:57', 'Deposit', 692.0, 'Cash Deposit', 'Income', 'MO'),
+(3, '2025-11-04 15:45:15', 'Withdrawal', 403.51, 'ATM Withdrawal', 'Shopping', 'MO'),
+(2, '2025-05-30 12:10:25', 'Deposit', 1335.07, 'Salary Deposit', 'Transportation', 'CA'),
+(2, '2025-04-08 06:44:58', 'Withdrawal', 1808.16, 'Utility Payment', 'Income', 'CA'),
+(2, '2025-08-17 14:30:50', 'Deposit', 1670.72, 'Refund Deposit', 'Income', 'MO'),
+(2, '2025-10-06 17:08:20', 'Transfer', 600.13, 'Transfer Savings to Checking', 'Utilities', 'CA'),
+(3, '2025-05-06 10:26:06', 'Withdrawal', 446.64, 'ATM Withdrawal', 'Groceries', 'NY'),
+(2, '2025-10-05 15:25:23', 'Withdrawal', 211.92, 'Online Purchase', 'Utilities', 'NY'),
+(1, '2025-11-21 16:12:05', 'Deposit', 482.84, 'Cash Deposit', 'Groceries', 'CA'),
+(2, '2025-03-15 05:45:02', 'Withdrawal', 463.43, 'Utility Payment', 'Shopping', 'MO'),
+(2, '2025-04-26 07:05:42', 'Withdrawal', 349.77, 'Restaurant Bill', 'Groceries', 'MO'),
+(3, '2025-12-16 07:24:24', 'Withdrawal', 1336.48, 'Online Purchase', 'Food & Dining', 'MO'),
+(2, '2025-11-08 13:38:24', 'Transfer', 144.38, 'Transfer Savings to Checking', 'Shopping', 'CA'),
+(3, '2025-11-03 03:06:22', 'Withdrawal', 1750.96, 'Online Purchase', 'Utilities', 'CA'),
+(1, '2025-11-04 08:51:55', 'Withdrawal', 441.78, 'ATM Withdrawal', 'Entertainment', 'CA'),
+(2, '2025-05-24 09:39:09', 'Withdrawal', 1315.43, 'Utility Payment', 'Groceries', 'MO'),
+(2, '2025-09-29 05:42:18', 'Deposit', 141.71, 'Gift Deposit', 'Income', 'NY'),
+(1, '2025-07-25 15:03:41', 'Deposit', 306.36, 'Gift Deposit', 'Food & Dining', 'NY'),
+(1, '2025-05-25 11:05:18', 'Transfer', 995.5, 'Transfer Checking to Savings', 'Shopping', 'NY'),
+(1, '2025-11-05 12:54:11', 'Withdrawal', 629.32, 'Utility Payment', 'Income', 'NY'),
+(3, '2025-12-03 18:49:48', 'Deposit', 544.8, 'Salary Deposit', 'Transportation', 'NY'),
+(1, '2025-02-10 22:51:55', 'Withdrawal', 272.26, 'Online Purchase', 'Utilities', 'MO'),
+(1, '2025-01-29 00:15:31', 'Transfer', 1142.51, 'Transfer Checking to Savings', 'Utilities', 'MO'),
+(3, '2025-04-05 12:23:06', 'Withdrawal', 377.21, 'Fuel Payment', 'Shopping', 'CA'),
+(2, '2025-10-04 17:30:19', 'Withdrawal', 132.49, 'Online Purchase', 'Income', 'NY'),
+(1, '2025-06-17 01:33:28', 'Transfer', 711.77, 'Transfer Checking to Savings', 'Transportation', 'NY'),
+(2, '2025-09-22 08:43:34', 'Transfer', 156.01, 'Transfer Savings to Checking', 'Utilities', 'NY'),
+(2, '2025-03-17 10:01:47', 'Deposit', 1577.68, 'Refund Deposit', 'Transportation', 'NY'),
+(1, '2025-03-30 19:12:51', 'Withdrawal', 1051.44, 'Restaurant Bill', 'Bills', 'NY'),
+(1, '2025-11-08 00:23:07', 'Transfer', 926.53, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(2, '2025-02-17 16:06:12', 'Withdrawal', 871.03, 'Utility Payment', 'Utilities', 'CA'),
+(3, '2025-12-03 05:31:59', 'Withdrawal', 675.61, 'ATM Withdrawal', 'Income', 'NY'),
+(1, '2025-10-30 06:12:40', 'Withdrawal', 514.24, 'Utility Payment', 'Transportation', 'CA'),
+(2, '2025-04-19 09:44:15', 'Withdrawal', 1105.37, 'ATM Withdrawal', 'Entertainment', 'NY'),
+(1, '2025-12-28 18:36:48', 'Transfer', 1810.26, 'Transfer Checking to Savings', 'Entertainment', 'MO'),
+(3, '2025-07-08 05:00:42', 'Deposit', 1652.06, 'Cash Deposit', 'Groceries', 'MO'),
+(2, '2025-06-29 18:51:13', 'Deposit', 1695.76, 'Refund Deposit', 'Groceries', 'CA'),
+(2, '2025-06-09 03:10:04', 'Withdrawal', 684.28, 'Fuel Payment', 'Income', 'CA'),
+(1, '2025-12-27 00:49:58', 'Transfer', 1424.53, 'Transfer Checking to Savings', 'Entertainment', 'NY'),
+(2, '2025-06-07 20:45:52', 'Deposit', 1633.5, 'Salary Deposit', 'Shopping', 'MO'),
+(3, '2025-04-16 12:52:40', 'Deposit', 951.23, 'Cash Deposit', 'Groceries', 'MO'),
+(1, '2025-02-20 06:52:37', 'Withdrawal', 606.14, 'Fuel Payment', 'Income', 'MO'),
+(1, '2025-02-23 14:47:36', 'Transfer', 1686.15, 'Transfer Checking to Savings', 'Transportation', 'NY'),
+(2, '2025-09-09 08:48:13', 'Transfer', 1744.7, 'Transfer Savings to Checking', 'Groceries', 'CA'),
+(3, '2025-01-21 07:02:54', 'Deposit', 92.09, 'Salary Deposit', 'Bills', 'NY'),
+(1, '2025-11-30 01:53:40', 'Transfer', 1009.29, 'Transfer Checking to Savings', 'Groceries', 'NY'),
+(2, '2025-01-08 02:07:44', 'Deposit', 1767.14, 'Refund Deposit', 'Transportation', 'CA'),
+(2, '2025-04-16 22:50:23', 'Deposit', 419.48, 'Gift Deposit', 'Bills', 'MO'),
+(2, '2025-05-05 14:49:16', 'Withdrawal', 1672.04, 'Online Purchase', 'Food & Dining', 'NY'),
+(1, '2025-09-06 19:46:24', 'Transfer', 1451.33, 'Transfer Checking to Savings', 'Transportation', 'MO'),
+(3, '2025-10-19 07:03:29', 'Deposit', 757.94, 'Cash Deposit', 'Utilities', 'NY'),
+(3, '2025-07-30 21:28:26', 'Withdrawal', 1671.52, 'Utility Payment', 'Shopping', 'NY'),
+(1, '2025-08-26 07:58:47', 'Deposit', 1753.86, 'Gift Deposit', 'Food & Dining', 'NY'),
+(3, '2025-07-02 17:45:06', 'Withdrawal', 1827.39, 'Fuel Payment', 'Shopping', 'NY'),
+(2, '2025-02-23 04:40:15', 'Transfer', 1147.4, 'Transfer Savings to Checking', 'Utilities', 'CA'),
+(2, '2025-08-20 23:51:00', 'Transfer', 137.4, 'Transfer Savings to Checking', 'Bills', 'CA'),
+(1, '2025-01-10 18:33:15', 'Transfer', 1466.04, 'Transfer Checking to Savings', 'Entertainment', 'NY'),
+(1, '2025-12-08 07:45:55', 'Transfer', 1261.5, 'Transfer Checking to Savings', 'Shopping', 'CA'),
+(3, '2025-12-08 07:22:24', 'Deposit', 600.01, 'Refund Deposit', 'Bills', 'NY'),
+(2, '2025-04-22 22:46:46', 'Transfer', 110.27, 'Transfer Savings to Checking', 'Bills', 'NY'),
+(1, '2025-05-11 19:48:05', 'Withdrawal', 1067.81, 'Online Purchase', 'Transportation', 'CA'),
+(3, '2025-07-23 01:31:17', 'Withdrawal', 1706.8, 'Fuel Payment', 'Transportation', 'CA');
 
 
 
@@ -335,64 +449,6 @@ INSERT INTO public.recurring_transfers (from_account, to_account, amount, freque
 (2, 1, 1672.74, 'Weekly', '2025-03-27 00:00:00', '2025-04-15 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
 (2, 1, 1807.78, 'Monthly', '2025-01-02 00:00:00', '2025-01-09 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Monthly)'),
 (2, 1, 1003.19, 'Weekly', '2025-01-05 00:00:00', '2025-01-13 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
