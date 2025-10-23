@@ -63,35 +63,6 @@ CREATE TABLE IF NOT EXISTS public.recurring_transfers (
 
 
 
-DROP TRIGGER IF EXISTS transfer_trigger ON transactions;
-DROP FUNCTION IF EXISTS update_transfer_balance;
-
-CREATE OR REPLACE FUNCTION update_transfer_balance()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.transaction_type = 'Transfer' THEN
-        -- Subtract from the source account
-        UPDATE accounts
-        SET balance = balance - NEW.amount
-        WHERE accountnumber = NEW.accountnumber;
-
-        -- Add to the other account (the same user’s other account)
-        UPDATE accounts
-        SET balance = balance + NEW.amount
-        WHERE user_id = (
-            SELECT user_id FROM accounts WHERE accountnumber = NEW.accountnumber
-        )
-        AND accountnumber != NEW.accountnumber;
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER transfer_trigger
-BEFORE INSERT ON transactions
-FOR EACH ROW
-EXECUTE FUNCTION update_transfer_balance();
 
 
 -- Users
