@@ -1,588 +1,425 @@
 
---user table
-CREATE TABLE users (
+-- Users Table
+CREATE TABLE IF NOT EXISTS public.users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone_number VARCHAR(20),
     password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'user', -- 'admin' or 'user'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-
 -- Bank Accounts
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS public.accounts (
     accountnumber SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     account_type VARCHAR(20) NOT NULL, -- e.g., 'Checking', 'Savings'
     balance NUMERIC(15,2) DEFAULT 0.00,
-	account_display_number VARCHAR(20) -- For masked display like ***4567
-    
+    account_display_number VARCHAR(20) -- For masked display like ***4567
 );
 
 
 -- Transactions
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
     transaction_id SERIAL PRIMARY KEY,
     accountnumber INT REFERENCES accounts(accountnumber) ON DELETE CASCADE,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transaction_type VARCHAR(20) NOT NULL, -- 'Deposit', 'Withdrawal', 'Transfer'
     amount DECIMAL(12,2) NOT NULL,
-    balance DECIMAL(15,2), 
+    balance DECIMAL(15,2),
     description VARCHAR(70) NOT NULL,
     category VARCHAR(50),
     state VARCHAR(20)
+	
 );
 
 
-INSERT INTO users(username, email, phone_number, password_hash)
+-- Pending Transfers
+CREATE TABLE IF NOT EXISTS public.pending_transfers (
+    pending_id SERIAL PRIMARY KEY,
+    from_account INT REFERENCES public.accounts(accountnumber) ON DELETE CASCADE,
+    to_account INT REFERENCES public.accounts(accountnumber) ON DELETE CASCADE,
+    amount DECIMAL(12,2) NOT NULL,
+    scheduled_date TIMESTAMP NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'completed', 'failed'
+    description VARCHAR(100)
+);
+
+
+-- Recurring Transfers
+CREATE TABLE IF NOT EXISTS public.recurring_transfers (
+    recurring_id SERIAL PRIMARY KEY,
+    from_account INT REFERENCES public.accounts(accountnumber) ON DELETE CASCADE,
+    to_account INT REFERENCES public.accounts(accountnumber) ON DELETE CASCADE,
+    amount DECIMAL(12,2) NOT NULL,
+    frequency VARCHAR(20) NOT NULL, -- e.g., 'weekly', 'monthly'
+    start_date TIMESTAMP NOT NULL,
+    next_transfer_date TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'active', -- 'active', 'paused', 'canceled'
+    description VARCHAR(100)
+);
+
+
+
+DROP TRIGGER IF EXISTS transfer_trigger ON transactions;
+DROP FUNCTION IF EXISTS update_transfer_balance;
+
+CREATE OR REPLACE FUNCTION update_transfer_balance()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.transaction_type = 'Transfer' THEN
+        -- Subtract from the source account
+        UPDATE accounts
+        SET balance = balance - NEW.amount
+        WHERE accountnumber = NEW.accountnumber;
+
+        -- Add to the other account (the same user’s other account)
+        UPDATE accounts
+        SET balance = balance + NEW.amount
+        WHERE user_id = (
+            SELECT user_id FROM accounts WHERE accountnumber = NEW.accountnumber
+        )
+        AND accountnumber != NEW.accountnumber;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER transfer_trigger
+BEFORE INSERT ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION update_transfer_balance();
+
+
+-- Users
+INSERT INTO users(username, email, phone_number, password_hash, role)
 VALUES
-('username1', 'user1@example.com', '555-111-2222', 'hashedpassword1'),
-('username2', 'user2@example.com', '555-222-3333', 'hashedpassword2');
+('username1', 'user1@example.com', '555-111-2222', 'hashedpassword1', 'user'),
+('username2', 'user2@example.com', '555-222-3333', 'hashedpassword2', 'user');
 
 
--- Insert accounts for the 2 users
--- Accounts (2 Checkings, 1 Savings)
-INSERT INTO accounts (user_id, account_type, balance,account_display_number) -- For masked display like ***4567)
+-- Accounts
+-- =========================
+INSERT INTO accounts (user_id, account_type, balance, account_display_number)
 VALUES
-(1, 'Checking', 2000.00,'***4567'),  -- User 1 Checking
-(2, 'Checking', 1500.00, '***9876'),  -- User 2 Checking
-(1, 'Savings', 5000.00,'***1234');   -- User 1 Savings
-
-
-select * from accounts;
-
-INSERT INTO transactions (accountnumber, transaction_date, transaction_type, amount, balance, description, category, state) VALUES
-(1, '2025-01-01 08:00:00', 'Deposit', 3000.00, 5000.00, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-01-02 10:30:00', 'Withdrawal', 1200.00, 3800.00, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-01-03 14:20:00', 'Withdrawal', 85.50, 3714.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-01-04 09:15:00', 'Withdrawal', 45.00, 3669.50, 'Shell Gas Station', 'Transportation', 'MO'),
-(1, '2025-01-05 12:30:00', 'Withdrawal', 28.75, 3640.75, 'Starbucks Coffee', 'Food & Dining', 'MO'),
-(1, '2025-01-06 16:30:00', 'Withdrawal', 150.00, 3490.75, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-01-07 11:00:00', 'Withdrawal', 65.00, 3425.75, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-01-08 13:25:00', 'Withdrawal', 120.00, 3305.75, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-01-09 10:45:00', 'Withdrawal', 42.50, 3263.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-01-10 15:00:00', 'Transfer', 500.00, 2763.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-01-11 09:30:00', 'Withdrawal', 95.25, 2668.00, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-01-12 14:15:00', 'Withdrawal', 55.00, 2613.00, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-01-13 11:20:00', 'Withdrawal', 78.00, 2535.00, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-01-14 16:45:00', 'Withdrawal', 135.00, 2400.00, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-01-15 08:00:00', 'Deposit', 3000.00, 5400.00, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-01-16 10:30:00', 'Withdrawal', 48.00, 5352.00, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-01-17 19:30:00', 'Withdrawal', 75.50, 5276.50, 'Chipotle Dinner', 'Food & Dining', 'MO'),
-(1, '2025-01-18 13:00:00', 'Withdrawal', 92.00, 5184.50, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-01-19 11:15:00', 'Withdrawal', 68.25, 5116.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-01-20 15:40:00', 'Withdrawal', 200.00, 4916.25, 'Car Insurance', 'Insurance', 'MO'),
-(1, '2025-01-21 10:00:00', 'Withdrawal', 52.00, 4864.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-01-22 14:30:00', 'Withdrawal', 85.00, 4779.25, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-01-23 12:15:00', 'Withdrawal', 38.50, 4740.75, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-01-24 16:00:00', 'Withdrawal', 110.00, 4630.75, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-01-25 11:30:00', 'Transfer', 500.00, 4130.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-01-26 09:45:00', 'Withdrawal', 72.00, 4058.75, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-01-27 13:20:00', 'Withdrawal', 45.00, 4013.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-01-28 18:00:00', 'Withdrawal', 88.00, 3925.75, 'Olive Garden', 'Food & Dining', 'MO'),
-(1, '2025-01-29 14:45:00', 'Withdrawal', 65.00, 3860.75, 'Target', 'Shopping', 'MO'),
-(1, '2025-01-30 10:30:00', 'Withdrawal', 42.00, 3818.75, 'Starbucks', 'Food & Dining', 'MO'),
-
--- February 2025
-(1, '2025-02-01 08:00:00', 'Deposit', 3000.00, 6818.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-02-02 10:30:00', 'Withdrawal', 1200.00, 5618.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-02-03 14:00:00', 'Withdrawal', 92.00, 5526.75, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-02-04 09:30:00', 'Withdrawal', 48.00, 5478.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-02-05 12:15:00', 'Withdrawal', 35.25, 5443.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-02-06 16:20:00', 'Withdrawal', 145.00, 5298.50, 'Water & Trash Bill', 'Utilities', 'MO'),
-(1, '2025-02-07 11:30:00', 'Withdrawal', 78.00, 5220.50, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-02-08 13:45:00', 'Withdrawal', 105.00, 5115.50, 'Costco Shopping', 'Groceries', 'MO'),
-(1, '2025-02-09 10:00:00', 'Withdrawal', 52.00, 5063.50, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-02-10 15:30:00', 'Transfer', 500.00, 4563.50, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-02-11 09:15:00', 'Withdrawal', 68.50, 4495.00, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-02-12 14:00:00', 'Withdrawal', 45.00, 4450.00, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-02-13 11:45:00', 'Withdrawal', 82.00, 4368.00, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-02-14 18:00:00', 'Withdrawal', 125.00, 4243.00, 'Valentine Dinner', 'Food & Dining', 'MO'),
-(1, '2025-02-15 08:00:00', 'Deposit', 3000.00, 7243.00, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-02-16 10:30:00', 'Withdrawal', 65.00, 7178.00, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-02-17 14:30:00', 'Withdrawal', 88.00, 7090.00, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-02-18 09:45:00', 'Withdrawal', 42.00, 7048.00, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-02-19 13:15:00', 'Withdrawal', 95.00, 6953.00, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-02-20 16:00:00', 'Withdrawal', 58.00, 6895.00, 'Chipotle', 'Food & Dining', 'MO'),
-(1, '2025-02-21 11:00:00', 'Withdrawal', 48.00, 6847.00, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-02-22 14:45:00', 'Withdrawal', 110.00, 6737.00, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-02-23 10:30:00', 'Withdrawal', 75.00, 6662.00, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-02-24 15:20:00', 'Withdrawal', 38.50, 6623.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-02-25 12:00:00', 'Transfer', 500.00, 6123.50, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-02-26 09:30:00', 'Withdrawal', 52.00, 6071.50, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-02-27 13:45:00', 'Withdrawal', 92.00, 5979.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-02-28 18:30:00', 'Withdrawal', 68.00, 5911.50, 'Texas Roadhouse', 'Food & Dining', 'MO'),
-
--- March 2025
-(1, '2025-03-01 08:00:00', 'Deposit', 3000.00, 8911.50, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-03-02 10:30:00', 'Withdrawal', 1200.00, 7711.50, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-03-03 14:00:00', 'Withdrawal', 88.50, 7623.00, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-03-04 09:30:00', 'Withdrawal', 52.00, 7571.00, 'Phillips 66 Gas', 'Transportation', 'MO'),
-(1, '2025-03-05 12:45:00', 'Withdrawal', 30.00, 7541.00, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-03-06 16:00:00', 'Withdrawal', 155.00, 7386.00, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-03-07 11:15:00', 'Withdrawal', 65.00, 7321.00, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-03-08 13:30:00', 'Withdrawal', 75.00, 7246.00, 'Haircut', 'Personal Care', 'MO'),
-(1, '2025-03-09 10:00:00', 'Withdrawal', 95.75, 7150.25, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-03-10 15:45:00', 'Transfer', 600.00, 6550.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-03-11 09:20:00', 'Withdrawal', 48.00, 6502.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-03-12 14:15:00', 'Withdrawal', 105.00, 6397.25, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-03-13 11:30:00', 'Withdrawal', 62.00, 6335.25, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-03-14 16:00:00', 'Withdrawal', 85.00, 6250.25, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-03-15 08:00:00', 'Deposit', 3000.00, 9250.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-03-16 10:45:00', 'Withdrawal', 72.00, 9178.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-03-17 13:20:00', 'Withdrawal', 45.00, 9133.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-03-18 19:00:00', 'Withdrawal', 65.50, 9067.75, 'Chipotle Dinner', 'Food & Dining', 'MO'),
-(1, '2025-03-19 11:00:00', 'Withdrawal', 120.00, 8947.75, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-03-20 14:30:00', 'Withdrawal', 200.00, 8747.75, 'Car Insurance', 'Insurance', 'MO'),
-(1, '2025-03-21 10:15:00', 'Withdrawal', 58.00, 8689.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-03-22 15:00:00', 'Withdrawal', 135.00, 8554.75, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-03-23 12:30:00', 'Withdrawal', 88.00, 8466.75, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-03-24 09:45:00', 'Withdrawal', 42.00, 8424.75, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-03-25 14:00:00', 'Transfer', 600.00, 7824.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-03-26 11:20:00', 'Withdrawal', 95.00, 7729.75, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-03-27 16:30:00', 'Withdrawal', 52.00, 7677.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-03-28 10:00:00', 'Withdrawal', 78.00, 7599.75, 'Clothing Store', 'Shopping', 'MO'),
-(1, '2025-03-29 13:45:00', 'Withdrawal', 68.00, 7531.75, 'Olive Garden', 'Food & Dining', 'MO'),
-(1, '2025-03-30 09:30:00', 'Withdrawal', 48.00, 7483.75, 'Shell Gas', 'Transportation', 'MO'),
-
--- April 2025
-(1, '2025-04-01 08:00:00', 'Deposit', 3100.00, 10583.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-04-02 10:30:00', 'Withdrawal', 1200.00, 9383.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-04-03 14:15:00', 'Withdrawal', 102.50, 9281.25, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-04-04 09:20:00', 'Withdrawal', 55.00, 9226.25, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-04-05 12:40:00', 'Withdrawal', 28.75, 9197.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-04-06 16:00:00', 'Withdrawal', 148.00, 9049.50, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-04-07 11:15:00', 'Withdrawal', 65.00, 8984.50, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-04-08 13:30:00', 'Withdrawal', 115.00, 8869.50, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-04-09 10:00:00', 'Withdrawal', 50.00, 8819.50, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-04-10 15:00:00', 'Transfer', 600.00, 8219.50, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-04-11 09:30:00', 'Withdrawal', 88.00, 8131.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-04-12 14:00:00', 'Withdrawal', 72.00, 8059.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-04-13 11:45:00', 'Withdrawal', 95.00, 7964.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-04-14 16:30:00', 'Withdrawal', 110.00, 7854.50, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-04-15 08:00:00', 'Deposit', 3100.00, 10954.50, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-04-16 10:45:00', 'Withdrawal', 78.00, 10876.50, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-04-17 13:20:00', 'Withdrawal', 52.00, 10824.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-04-18 11:00:00', 'Transfer', 300.00, 11124.50, 'Transfer from Savings', 'Transfer', 'MO'),
-(1, '2025-04-19 18:30:00', 'Withdrawal', 85.00, 11039.50, 'Red Lobster', 'Food & Dining', 'MO'),
-(1, '2025-04-20 14:15:00', 'Withdrawal', 125.00, 10914.50, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-04-21 10:30:00', 'Withdrawal', 58.00, 10856.50, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-04-22 15:45:00', 'Withdrawal', 92.00, 10764.50, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-04-23 12:00:00', 'Withdrawal', 68.00, 10696.50, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-04-24 09:15:00', 'Withdrawal', 45.00, 10651.50, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-04-25 14:30:00', 'Transfer', 600.00, 10051.50, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-04-26 11:20:00', 'Withdrawal', 85.00, 9966.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-04-27 16:00:00', 'Withdrawal', 48.00, 9918.50, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-04-28 10:45:00', 'Withdrawal', 95.00, 9823.50, 'Target', 'Shopping', 'MO'),
-(1, '2025-04-29 13:30:00', 'Withdrawal', 62.00, 9761.50, 'Chipotle', 'Food & Dining', 'MO'),
-(1, '2025-04-30 09:00:00', 'Withdrawal', 52.00, 9709.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- May 2025
-(1, '2025-05-01 08:00:00', 'Deposit', 3100.00, 12809.50, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-05-02 10:30:00', 'Withdrawal', 1200.00, 11609.50, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-05-03 14:20:00', 'Withdrawal', 98.00, 11511.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-05-04 09:45:00', 'Withdrawal', 52.50, 11459.00, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-05-05 12:15:00', 'Withdrawal', 32.00, 11427.00, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-05-06 16:30:00', 'Withdrawal', 160.00, 11267.00, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-05-07 11:30:00', 'Withdrawal', 65.00, 11202.00, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-05-08 13:45:00', 'Withdrawal', 90.00, 11112.00, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-05-09 10:00:00', 'Withdrawal', 105.75, 11006.25, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-05-10 15:00:00', 'Transfer', 700.00, 10306.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-05-11 09:30:00', 'Withdrawal', 48.00, 10258.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-05-12 14:15:00', 'Withdrawal', 115.00, 10143.25, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-05-13 11:45:00', 'Withdrawal', 68.00, 10075.25, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-05-14 16:00:00', 'Withdrawal', 82.00, 9993.25, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-05-15 08:00:00', 'Deposit', 3100.00, 13093.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-05-16 10:30:00', 'Withdrawal', 92.00, 13001.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-05-17 13:20:00', 'Withdrawal', 55.00, 12946.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-05-18 18:45:00', 'Withdrawal', 70.50, 12875.75, 'Applebees', 'Food & Dining', 'MO'),
-(1, '2025-05-19 11:00:00', 'Withdrawal', 135.00, 12740.75, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-05-20 14:30:00', 'Withdrawal', 200.00, 12540.75, 'Car Insurance', 'Insurance', 'MO'),
-(1, '2025-05-21 10:15:00', 'Withdrawal', 52.00, 12488.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-05-22 15:00:00', 'Withdrawal', 150.00, 12338.75, 'Lowes', 'Home Improvement', 'MO'),
-(1, '2025-05-23 12:30:00', 'Withdrawal', 78.00, 12260.75, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-05-24 09:45:00', 'Withdrawal', 38.50, 12222.25, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-05-25 14:00:00', 'Transfer', 700.00, 11522.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-05-26 11:20:00', 'Withdrawal', 95.00, 11427.25, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-05-27 16:30:00', 'Withdrawal', 48.00, 11379.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-05-28 10:00:00', 'Withdrawal', 88.00, 11291.25, 'Nike Store', 'Shopping', 'MO'),
-(1, '2025-05-29 13:45:00', 'Withdrawal', 65.00, 11226.25, 'Texas Roadhouse', 'Food & Dining', 'MO'),
-(1, '2025-05-30 09:30:00', 'Withdrawal', 52.00, 11174.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- June 2025
-(1, '2025-06-01 08:00:00', 'Deposit', 3100.00, 14274.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-06-02 10:30:00', 'Withdrawal', 1200.00, 13074.25, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-06-03 14:00:00', 'Withdrawal', 110.00, 12964.25, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-06-04 09:30:00', 'Withdrawal', 55.00, 12909.25, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-06-05 12:30:00', 'Withdrawal', 35.50, 12873.75, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-06-06 16:00:00', 'Withdrawal', 165.00, 12708.75, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-06-07 11:45:00', 'Withdrawal', 65.00, 12643.75, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-06-08 13:30:00', 'Withdrawal', 95.00, 12548.75, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-06-09 10:00:00', 'Withdrawal', 50.00, 12498.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-06-10 15:00:00', 'Transfer', 700.00, 11798.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-06-11 09:30:00', 'Withdrawal', 82.00, 11716.75, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-06-12 14:15:00', 'Withdrawal', 68.00, 11648.75, 'Chipotle', 'Food & Dining', 'MO'),
-(1, '2025-06-13 11:45:00', 'Withdrawal', 75.00, 11573.75, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-06-14 16:00:00', 'Withdrawal', 125.00, 11448.75, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-06-15 08:00:00', 'Deposit', 3100.00, 14548.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-06-16 10:45:00', 'Withdrawal', 88.00, 14460.75, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-06-17 13:20:00', 'Withdrawal', 52.00, 14408.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-06-18 18:30:00', 'Withdrawal', 88.00, 14320.75, 'Outback Steakhouse', 'Food & Dining', 'MO'),
-(1, '2025-06-19 11:00:00', 'Withdrawal', 115.00, 14205.75, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-06-20 14:30:00', 'Withdrawal', 60.00, 14145.75, 'Barber Shop', 'Personal Care', 'MO'),
-(1, '2025-06-21 10:15:00', 'Withdrawal', 48.00, 14097.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-06-22 15:00:00', 'Withdrawal', 140.00, 13957.75, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-06-23 12:30:00', 'Withdrawal', 92.00, 13865.75, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-06-24 09:45:00', 'Withdrawal', 42.00, 13823.75, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-06-25 14:00:00', 'Transfer', 800.00, 13023.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-06-26 11:20:00', 'Withdrawal', 105.00, 12918.75, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-06-27 16:30:00', 'Withdrawal', 55.00, 12863.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-06-28 10:00:00', 'Withdrawal', 78.00, 12785.75, 'Clothing Store', 'Shopping', 'MO'),
-(1, '2025-06-29 13:45:00', 'Withdrawal', 72.00, 12713.75, 'Olive Garden', 'Food & Dining', 'MO'),
-(1, '2025-06-30 09:30:00', 'Withdrawal', 50.00, 12663.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- July 2025
-(1, '2025-07-01 08:00:00', 'Deposit', 3100.00, 15763.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-07-02 10:30:00', 'Withdrawal', 1200.00, 14563.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-07-03 13:30:00', 'Withdrawal', 120.00, 14443.75, 'BBQ Supplies', 'Groceries', 'MO'),
-(1, '2025-07-04 09:15:00', 'Withdrawal', 58.00, 14385.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-07-05 12:00:00', 'Withdrawal', 30.00, 14355.75, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-07-06 16:15:00', 'Withdrawal', 175.00, 14180.75, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-07-07 11:30:00', 'Withdrawal', 65.00, 14115.75, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-07-08 13:45:00', 'Withdrawal', 85.00, 14030.75, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-07-09 10:00:00', 'Withdrawal', 108.50, 13922.25, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-07-10 15:00:00', 'Transfer', 800.00, 13122.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-07-11 09:30:00', 'Withdrawal', 52.00, 13070.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-07-12 14:15:00', 'Withdrawal', 125.00, 12945.25, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-07-13 11:45:00', 'Withdrawal', 75.00, 12870.25, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-07-14 16:00:00', 'Withdrawal', 95.00, 12775.25, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-07-15 08:00:00', 'Deposit', 3100.00, 15875.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-07-16 10:45:00', 'Withdrawal', 92.00, 15783.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-07-17 13:20:00', 'Withdrawal', 55.00, 15728.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-07-18 11:00:00', 'Transfer', 400.00, 16128.25, 'Transfer from Savings', 'Transfer', 'MO'),
-(1, '2025-07-19 18:30:00', 'Withdrawal', 95.00, 16033.25, 'Cheesecake Factory', 'Food & Dining', 'MO'),
-(1, '2025-07-20 14:30:00', 'Withdrawal', 200.00, 15833.25, 'Car Insurance', 'Insurance', 'MO'),
-(1, '2025-07-21 10:15:00', 'Withdrawal', 48.00, 15785.25, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-07-22 15:00:00', 'Withdrawal', 165.00, 15620.25, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-07-23 12:30:00', 'Withdrawal', 88.00, 15532.25, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-07-24 09:45:00', 'Withdrawal', 38.50, 15493.75, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-07-25 14:00:00', 'Transfer', 800.00, 14693.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-07-26 11:20:00', 'Withdrawal', 110.00, 14583.75, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-07-27 16:30:00', 'Withdrawal', 52.00, 14531.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-07-28 10:00:00', 'Withdrawal', 92.00, 14439.75, 'Target', 'Shopping', 'MO'),
-(1, '2025-07-29 13:45:00', 'Withdrawal', 68.00, 14371.75, 'Chipotle', 'Food & Dining', 'MO'),
-(1, '2025-07-30 09:30:00', 'Withdrawal', 55.00, 14316.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- August 2025
-(1, '2025-08-01 08:00:00', 'Deposit', 3100.00, 17416.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-08-02 10:30:00', 'Withdrawal', 1200.00, 16216.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-08-03 14:15:00', 'Withdrawal', 115.00, 16101.75, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-08-04 09:45:00', 'Withdrawal', 55.00, 16046.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-08-05 12:30:00', 'Withdrawal', 38.50, 16008.25, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-08-06 16:00:00', 'Withdrawal', 180.00, 15828.25, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-08-07 11:15:00', 'Withdrawal', 65.00, 15763.25, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-08-08 13:30:00', 'Withdrawal', 98.00, 15665.25, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-08-09 10:00:00', 'Withdrawal', 50.00, 15615.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-08-10 15:00:00', 'Transfer', 800.00, 14815.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-08-11 09:30:00', 'Withdrawal', 105.00, 14710.25, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-08-12 14:15:00', 'Withdrawal', 72.00, 14638.25, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-08-13 11:45:00', 'Withdrawal', 88.00, 14550.25, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-08-14 16:00:00', 'Withdrawal', 135.00, 14415.25, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-08-15 08:00:00', 'Deposit', 3100.00, 17515.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-08-16 10:45:00', 'Withdrawal', 82.00, 17433.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-08-17 13:20:00', 'Withdrawal', 52.00, 17381.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-08-18 18:30:00', 'Withdrawal', 72.50, 17308.75, 'Olive Garden', 'Food & Dining', 'MO'),
-(1, '2025-08-19 11:00:00', 'Withdrawal', 125.00, 17183.75, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-08-20 14:30:00', 'Withdrawal', 60.00, 17123.75, 'Haircut', 'Personal Care', 'MO'),
-(1, '2025-08-21 10:15:00', 'Withdrawal', 48.00, 17075.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-08-22 15:00:00', 'Withdrawal', 150.00, 16925.75, 'Lowes', 'Home Improvement', 'MO'),
-(1, '2025-08-23 12:30:00', 'Withdrawal', 95.00, 16830.75, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-08-24 09:45:00', 'Withdrawal', 42.00, 16788.75, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-08-25 14:00:00', 'Transfer', 900.00, 15888.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-08-26 11:20:00', 'Withdrawal', 110.00, 15778.75, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-08-27 16:30:00', 'Withdrawal', 55.00, 15723.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-08-28 10:00:00', 'Withdrawal', 88.00, 15635.75, 'Clothing Store', 'Shopping', 'MO'),
-(1, '2025-08-29 13:45:00', 'Withdrawal', 75.00, 15560.75, 'Texas Roadhouse', 'Food & Dining', 'MO'),
-(1, '2025-08-30 09:30:00', 'Withdrawal', 52.00, 15508.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- September 2025
-(1, '2025-09-01 08:00:00', 'Deposit', 3100.00, 18608.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-09-02 10:30:00', 'Withdrawal', 1200.00, 17408.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-09-03 14:00:00', 'Withdrawal', 105.00, 17303.75, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-09-04 09:30:00', 'Withdrawal', 52.00, 17251.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-09-05 12:15:00', 'Withdrawal', 32.00, 17219.75, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-09-06 16:30:00', 'Withdrawal', 170.00, 17049.75, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-09-07 11:45:00', 'Withdrawal', 65.00, 16984.75, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-09-08 13:30:00', 'Withdrawal', 78.00, 16906.75, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-09-09 10:00:00', 'Withdrawal', 112.50, 16794.25, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-09-10 15:00:00', 'Transfer', 900.00, 15894.25, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-09-11 09:30:00', 'Withdrawal', 48.00, 15846.25, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-09-12 14:15:00', 'Withdrawal', 118.00, 15728.25, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-09-13 11:45:00', 'Withdrawal', 68.00, 15660.25, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-09-14 16:00:00', 'Withdrawal', 92.00, 15568.25, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-09-15 08:00:00', 'Deposit', 3100.00, 18668.25, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-09-16 10:45:00', 'Withdrawal', 88.00, 18580.25, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-09-17 13:20:00', 'Withdrawal', 55.00, 18525.25, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-09-18 18:30:00', 'Withdrawal', 85.00, 18440.25, 'Red Lobster', 'Food & Dining', 'MO'),
-(1, '2025-09-19 11:00:00', 'Withdrawal', 130.00, 18310.25, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-09-20 14:30:00', 'Withdrawal', 200.00, 18110.25, 'Car Insurance', 'Insurance', 'MO'),
-(1, '2025-09-21 10:15:00', 'Withdrawal', 52.00, 18058.25, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-09-22 15:00:00', 'Withdrawal', 145.00, 17913.25, 'Home Depot', 'Home Improvement', 'MO'),
-(1, '2025-09-23 12:30:00', 'Withdrawal', 95.00, 17818.25, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(1, '2025-09-24 09:45:00', 'Withdrawal', 38.50, 17779.75, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(1, '2025-09-25 14:00:00', 'Transfer', 900.00, 16879.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-09-26 11:20:00', 'Withdrawal', 105.00, 16774.75, 'Walmart Shopping', 'Shopping', 'MO'),
-(1, '2025-09-27 16:30:00', 'Withdrawal', 52.00, 16722.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-09-28 10:00:00', 'Withdrawal', 88.00, 16634.75, 'Clothing Store', 'Shopping', 'MO'),
-(1, '2025-09-29 13:45:00', 'Withdrawal', 72.00, 16562.75, 'Chipotle', 'Food & Dining', 'MO'),
-(1, '2025-09-30 09:30:00', 'Withdrawal', 55.00, 16507.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-
--- October 2025
-(1, '2025-10-01 08:00:00', 'Deposit', 3200.00, 19707.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-10-02 10:30:00', 'Withdrawal', 1200.00, 18507.75, 'Rent Payment', 'Housing', 'MO'),
-(1, '2025-10-03 14:20:00', 'Withdrawal', 118.00, 18389.75, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(1, '2025-10-04 09:15:00', 'Withdrawal', 58.00, 18331.75, 'BP Gas', 'Transportation', 'MO'),
-(1, '2025-10-05 12:40:00', 'Withdrawal', 35.00, 18296.75, 'Starbucks', 'Food & Dining', 'MO'),
-(1, '2025-10-06 16:00:00', 'Withdrawal', 165.00, 18131.75, 'Electric Bill', 'Utilities', 'MO'),
-(1, '2025-10-07 11:30:00', 'Withdrawal', 65.00, 18066.75, 'Internet Bill', 'Utilities', 'MO'),
-(1, '2025-10-08 13:45:00', 'Withdrawal', 102.00, 17964.75, 'Walmart Grocery', 'Groceries', 'MO'),
-(1, '2025-10-09 10:00:00', 'Withdrawal', 52.00, 17912.75, 'Shell Gas', 'Transportation', 'MO'),
-(1, '2025-10-10 15:00:00', 'Transfer', 1000.00, 16912.75, 'Transfer to Savings', 'Savings', 'MO'),
-(1, '2025-10-11 09:30:00', 'Withdrawal', 125.00, 16787.75, 'Target Shopping', 'Shopping', 'MO'),
-(1, '2025-10-12 14:15:00', 'Withdrawal', 75.00, 16712.75, 'Panera Bread', 'Food & Dining', 'MO'),
-(1, '2025-10-13 11:45:00', 'Withdrawal', 85.00, 16627.75, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(1, '2025-10-14 16:00:00', 'Withdrawal', 140.00, 16487.75, 'Amazon Purchase', 'Shopping', 'MO'),
-(1, '2025-10-15 08:00:00', 'Deposit', 3200.00, 19687.75, 'Salary Deposit', 'Income', 'MO'),
-(1, '2025-10-16 10:45:00', 'Withdrawal', 95.00, 19592.75, 'Aldi Grocery', 'Groceries', 'MO'),
-(1, '2025-10-17 13:20:00', 'Withdrawal', 55.00, 19537.75, 'QuikTrip Gas', 'Transportation', 'MO'),
-(1, '2025-10-18 18:30:00', 'Withdrawal', 92.50, 19445.25, 'Outback Steakhouse', 'Food & Dining', 'MO'),
-(1, '2025-10-19 11:00:00', 'Withdrawal', 135.00, 19310.25, 'Best Buy', 'Electronics', 'MO'),
-(1, '2025-10-20 14:30:00', 'Withdrawal', 60.00, 19250.25, 'Barber Shop', 'Personal Care', 'MO'),
-(1, '2025-10-21 10:15:00', 'Withdrawal', 52.00, 19198.25, 'BP Gas', 'Transportation', 'MO');
+(1, 'Checking', 2000.00, '***4567'),  -- User 1 Checking
+(1, 'Savings', 5000.00, '***1234'),   -- User 1 Savings
+(2, 'Checking', 1500.00, '***9876');  -- User 2 Checking
 
 
 
 
 
-INSERT INTO transactions (accountnumber, transaction_date, transaction_type, amount, balance, description, category, state) VALUES
-(3, '2025-01-10 11:05:00', 'Transfer', 500.00, 5500.00, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-01-15 09:00:00', 'Deposit', 100.00, 5600.00, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-01-20 14:30:00', 'Deposit', 250.00, 5850.00, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-01-25 15:45:00', 'Transfer', 500.00, 6350.00, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-01-31 23:59:00', 'Deposit', 15.88, 6365.88, 'Monthly Interest', 'Interest', 'MO'),
-
--- February 2025
-(3, '2025-02-10 15:35:00', 'Transfer', 500.00, 6865.88, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-02-15 10:00:00', 'Deposit', 200.00, 7065.88, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-02-20 13:00:00', 'Deposit', 150.00, 7215.88, 'Bonus Deposit', 'Savings', 'MO'),
-(3, '2025-02-25 15:05:00', 'Transfer', 500.00, 7715.88, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-02-28 23:59:00', 'Deposit', 19.29, 7735.17, 'Monthly Interest', 'Interest', 'MO'),
-
--- March 2025
-(3, '2025-03-10 16:20:00', 'Transfer', 600.00, 8335.17, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-03-15 11:00:00', 'Deposit', 300.00, 8635.17, 'Tax Refund', 'Savings', 'MO'),
-(3, '2025-03-20 14:15:00', 'Deposit', 175.00, 8810.17, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-03-25 14:05:00', 'Transfer', 600.00, 9410.17, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-03-31 23:59:00', 'Deposit', 23.53, 9433.70, 'Monthly Interest', 'Interest', 'MO'),
-
--- April 2025
-(3, '2025-04-10 15:05:00', 'Transfer', 600.00, 10033.70, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-04-18 10:05:00', 'Withdrawal', 300.00, 9733.70, 'Transfer to Checking', 'Transfer', 'MO'),
-(3, '2025-04-20 13:30:00', 'Deposit', 250.00, 9983.70, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-04-25 14:10:00', 'Transfer', 600.00, 10583.70, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-04-30 23:59:00', 'Deposit', 26.46, 10610.16, 'Monthly Interest', 'Interest', 'MO'),
-
--- May 2025
-(3, '2025-05-10 15:05:00', 'Transfer', 700.00, 11310.16, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-05-15 10:30:00', 'Deposit', 350.00, 11660.16, 'Bonus Deposit', 'Savings', 'MO'),
-(3, '2025-05-20 14:00:00', 'Deposit', 200.00, 11860.16, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-05-25 14:05:00', 'Transfer', 700.00, 12560.16, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-05-31 23:59:00', 'Deposit', 31.40, 12591.56, 'Monthly Interest', 'Interest', 'MO'),
-
--- June 2025
-(3, '2025-06-10 15:05:00', 'Transfer', 700.00, 13291.56, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-06-15 11:00:00', 'Deposit', 400.00, 13691.56, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-06-20 13:30:00', 'Deposit', 225.00, 13916.56, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-06-25 14:10:00', 'Transfer', 800.00, 14716.56, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-06-30 23:59:00', 'Deposit', 36.79, 14753.35, 'Monthly Interest', 'Interest', 'MO'),
-
--- July 2025
-(3, '2025-07-10 15:05:00', 'Transfer', 800.00, 15553.35, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-07-18 10:35:00', 'Withdrawal', 400.00, 15153.35, 'Transfer to Checking', 'Transfer', 'MO'),
-(3, '2025-07-20 14:00:00', 'Deposit', 300.00, 15453.35, 'Bonus Deposit', 'Savings', 'MO'),
-(3, '2025-07-25 14:05:00', 'Transfer', 800.00, 16253.35, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-07-31 23:59:00', 'Deposit', 40.63, 16293.98, 'Monthly Interest', 'Interest', 'MO'),
-
--- August 2025
-(3, '2025-08-10 15:05:00', 'Transfer', 800.00, 17093.98, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-08-15 10:30:00', 'Deposit', 350.00, 17443.98, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-08-20 13:45:00', 'Deposit', 275.00, 17718.98, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-08-25 14:05:00', 'Transfer', 900.00, 18618.98, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-08-31 23:59:00', 'Deposit', 46.55, 18665.53, 'Monthly Interest', 'Interest', 'MO'),
-
--- September 2025
-(3, '2025-09-10 15:05:00', 'Transfer', 900.00, 19565.53, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-09-15 11:00:00', 'Deposit', 400.00, 19965.53, 'Bonus Deposit', 'Savings', 'MO'),
-(3, '2025-09-20 14:30:00', 'Deposit', 250.00, 20215.53, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-09-25 14:05:00', 'Transfer', 900.00, 21115.53, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-09-30 23:59:00', 'Deposit', 52.79, 21168.32, 'Monthly Interest', 'Interest', 'MO'),
-
--- October 2025
-(3, '2025-10-10 15:05:00', 'Transfer', 1000.00, 22168.32, 'Transfer from Checking', 'Transfer', 'MO'),
-(3, '2025-10-15 10:30:00', 'Deposit', 500.00, 22668.32, 'Cash Deposit', 'Savings', 'MO'),
-(3, '2025-10-20 13:00:00', 'Deposit', 300.00, 22968.32, 'Gift Deposit', 'Savings', 'MO'),
-(3, '2025-10-21 23:59:00', 'Deposit', 57.42, 23025.74, 'Monthly Interest', 'Interest', 'MO');
 
 
--- =====================================================
--- ACCOUNT 2 (User 2 - Checking) - accountnumber = 2
--- Starting Balance: 1500.00
--- =====================================================
 
--- January 2025
-INSERT INTO transactions (accountnumber, transaction_date, transaction_type, amount, balance, description, category, state) VALUES
-(2, '2025-01-01 09:00:00', 'Deposit', 2500.00, 4000.00, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-01-02 11:00:00', 'Withdrawal', 950.00, 3050.00, 'Rent Payment', 'Housing', 'MO'),
-(2, '2025-01-03 14:30:00', 'Withdrawal', 75.00, 2975.00, 'Walmart Grocery', 'Groceries', 'MO'),
-(2, '2025-01-04 10:15:00', 'Withdrawal', 40.00, 2935.00, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-01-05 12:45:00', 'Withdrawal', 28.50, 2906.50, 'Starbucks', 'Food & Dining', 'MO'),
-(2, '2025-01-06 15:00:00', 'Withdrawal', 125.00, 2781.50, 'Electric Bill', 'Utilities', 'MO'),
-(2, '2025-01-07 11:30:00', 'Withdrawal', 55.00, 2726.50, 'Internet Bill', 'Utilities', 'MO'),
-(2, '2025-01-08 13:00:00', 'Withdrawal', 90.00, 2636.50, 'Target Shopping', 'Shopping', 'MO'),
-(2, '2025-01-09 10:00:00', 'Withdrawal', 42.00, 2594.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-01-10 14:15:00', 'Withdrawal', 68.00, 2526.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(2, '2025-01-11 12:30:00', 'Withdrawal', 52.00, 2474.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(2, '2025-01-12 16:00:00', 'Withdrawal', 78.00, 2396.50, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-01-13 11:15:00', 'Withdrawal', 95.00, 2301.50, 'Best Buy', 'Electronics', 'MO'),
-(2, '2025-01-14 14:45:00', 'Withdrawal', 62.00, 2239.50, 'Chipotle', 'Food & Dining', 'MO'),
-(2, '2025-01-15 09:00:00', 'Deposit', 2500.00, 4739.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-01-16 13:30:00', 'Withdrawal', 85.00, 4654.50, 'Aldi Grocery', 'Groceries', 'MO'),
-(2, '2025-01-17 10:45:00', 'Withdrawal', 38.00, 4616.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-01-18 18:00:00', 'Withdrawal', 55.00, 4561.50, 'Pizza Hut', 'Food & Dining', 'MO'),
-(2, '2025-01-19 11:30:00', 'Withdrawal', 110.00, 4451.50, 'Amazon Purchase', 'Shopping', 'MO'),
-(2, '2025-01-20 15:00:00', 'Withdrawal', 150.00, 4301.50, 'Car Payment', 'Auto', 'MO'),
-(2, '2025-01-21 10:00:00', 'Withdrawal', 45.00, 4256.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-01-22 14:30:00', 'Withdrawal', 72.00, 4184.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(2, '2025-01-23 12:15:00', 'Withdrawal', 35.00, 4149.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(2, '2025-01-24 16:00:00', 'Withdrawal', 88.00, 4061.50, 'Target', 'Shopping', 'MO'),
-(2, '2025-01-25 11:30:00', 'Withdrawal', 65.00, 3996.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-01-26 09:45:00', 'Withdrawal', 48.00, 3948.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-01-27 13:20:00', 'Withdrawal', 92.00, 3856.50, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(2, '2025-01-28 18:00:00', 'Withdrawal', 78.00, 3778.50, 'Applebees', 'Food & Dining', 'MO'),
-(2, '2025-01-29 14:45:00', 'Withdrawal', 52.00, 3726.50, 'Home Depot', 'Home Improvement', 'MO'),
-(2, '2025-01-30 10:30:00', 'Withdrawal', 38.00, 3688.50, 'Starbucks', 'Food & Dining', 'MO'),
+INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, balance, description, category, state) VALUES
+(2, '2025-03-28 14:09:37', 'Deposit', 1161.83, 6171.19, 'Gift Deposit', 'Food & Dining', 'MO'),
+(3, '2025-12-22 06:19:47', 'Deposit', 150.6, 1658.68, 'Salary Deposit', 'Food & Dining', 'MO'),
+(1, '2025-12-05 01:11:46', 'Deposit', 1935.44, 3936.03, 'Salary Deposit', 'Utilities', 'MO'),
+(2, '2025-07-19 03:40:04', 'Transfer', 1324.16, 7490.22, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(3, '2025-05-24 12:34:58', 'Withdrawal', 1375.64, 274.56, 'Restaurant Bill', 'Bills', 'MO'),
+(2, '2025-09-26 18:50:08', 'Withdrawal', 403.97, 7083.58, 'Restaurant Bill', 'Transportation', 'MO'),
+(3, '2025-09-30 06:10:02', 'Deposit', 1653.02, 1921.83, 'Cash Deposit', 'Shopping', 'MO'),
+(2, '2025-07-04 14:33:03', 'Transfer', 68.74, 7161.49, 'Transfer Savings to Checking', 'Transportation', 'MO'),
+(1, '2025-03-22 10:47:30', 'Transfer', 223.45, 3721.81, 'Transfer Checking to Savings', 'Bills', 'MO'),
+(3, '2025-05-20 16:26:42', 'Deposit', 1483.77, 3398.15, 'Gift Deposit', 'Entertainment', 'MO'),
+(1, '2025-02-13 22:08:25', 'Withdrawal', 1763.88, 1960.25, 'Restaurant Bill', 'Groceries', 'MO'),
+(3, '2025-05-09 22:48:05', 'Deposit', 1185.59, 4587.83, 'Gift Deposit', 'Bills', 'MO'),
+(2, '2025-09-27 04:19:44', 'Deposit', 1632.17, 8791.05, 'Cash Deposit', 'Groceries', 'MO'),
+(3, '2025-09-07 08:40:53', 'Withdrawal', 1679.3, 2917.85, 'Fuel Payment', 'Utilities', 'MO'),
+(1, '2025-09-09 22:32:27', 'Withdrawal', 1708.05, 254.22, 'ATM Withdrawal', 'Transportation', 'MO'),
+(3, '2025-03-19 00:26:44', 'Withdrawal', 1198.17, 1715.13, 'Fuel Payment', 'Groceries', 'MO'),
+(1, '2025-02-03 07:31:52', 'Transfer', 1682.33, -1434.64, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(1, '2025-04-02 19:04:19', 'Deposit', 1436.64, -6.35, 'Salary Deposit', 'Groceries', 'MO'),
+(1, '2025-05-11 05:45:11', 'Transfer', 339.8, -350.31, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(3, '2025-01-22 08:27:15', 'Deposit', 554.11, 2264.55, 'Refund Deposit', 'Groceries', 'MO'),
+(1, '2025-04-13 02:52:32', 'Withdrawal', 1408.42, -1758.7, 'Online Purchase', 'Utilities', 'MO'),
+(1, '2025-08-06 15:04:02', 'Deposit', 1861.49, 109.57, 'Refund Deposit', 'Food & Dining', 'MO'),
+(2, '2025-03-31 02:17:17', 'Withdrawal', 1448.17, 7334.76, 'Restaurant Bill', 'Transportation', 'MO'),
+(3, '2025-06-25 14:27:51', 'Deposit', 1598.11, 3865.11, 'Refund Deposit', 'Food & Dining', 'MO'),
+(3, '2025-01-06 02:33:04', 'Deposit', 899.17, 4771.08, 'Salary Deposit', 'Utilities', 'MO'),
+(2, '2025-06-14 11:05:05', 'Deposit', 554.14, 7879.52, 'Salary Deposit', 'Bills', 'MO'),
+(3, '2025-03-24 02:59:19', 'Deposit', 1049.95, 5829.07, 'Refund Deposit', 'Shopping', 'MO'),
+(1, '2025-12-15 23:15:10', 'Transfer', 1990.91, -1890.1, 'Transfer Checking to Savings', 'Transportation', 'MO'),
+(2, '2025-10-06 04:12:45', 'Transfer', 1662.63, 9538.46, 'Transfer Savings to Checking', 'Shopping', 'MO'),
+(3, '2025-05-03 12:41:23', 'Deposit', 1560.53, 7386.1, 'Salary Deposit', 'Groceries', 'MO'),
+(1, '2025-12-07 16:50:57', 'Deposit', 1866.75, -29.39, 'Salary Deposit', 'Utilities', 'MO'),
+(1, '2025-12-04 20:07:59', 'Transfer', 1450.81, -1474.69, 'Transfer Checking to Savings', 'Transportation', 'MO'),
+(1, '2025-06-19 19:56:41', 'Withdrawal', 1266.29, -2734.91, 'Online Purchase', 'Entertainment', 'MO'),
+(3, '2025-07-05 05:00:01', 'Deposit', 670.57, 8057.37, 'Gift Deposit', 'Shopping', 'MO'),
+(3, '2025-02-10 18:11:40', 'Withdrawal', 1256.55, 6803.55, 'ATM Withdrawal', 'Food & Dining', 'MO'),
+(2, '2025-12-20 06:35:35', 'Deposit', 1723.5, 11261.28, 'Salary Deposit', 'Bills', 'MO'),
+(3, '2025-11-28 01:08:59', 'Deposit', 1332.37, 8136.32, 'Cash Deposit', 'Food & Dining', 'MO'),
+(1, '2025-10-13 19:57:06', 'Withdrawal', 233.38, -2960.1, 'Online Purchase', 'Groceries', 'MO'),
+(3, '2025-01-28 10:24:25', 'Deposit', 257.77, 8387.47, 'Cash Deposit', 'Transportation', 'MO'),
+(1, '2025-10-02 22:08:57', 'Withdrawal', 1623.48, -4575.76, 'ATM Withdrawal', 'Transportation', 'MO'),
+(2, '2025-04-11 19:21:27', 'Transfer', 278.11, 11533.92, 'Transfer Savings to Checking', 'Shopping', 'MO'),
+(1, '2025-06-30 16:16:53', 'Withdrawal', 612.98, -5183.76, 'Utility Payment', 'Entertainment', 'MO'),
+(2, '2025-05-12 14:19:07', 'Deposit', 1636.15, 13165.17, 'Salary Deposit', 'Food & Dining', 'MO'),
+(2, '2025-11-28 20:46:39', 'Transfer', 1405.88, 14564.51, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(3, '2025-09-14 04:23:50', 'Withdrawal', 1381.1, 7013.63, 'ATM Withdrawal', 'Entertainment', 'MO'),
+(3, '2025-04-09 18:33:27', 'Deposit', 1585.54, 8608.21, 'Salary Deposit', 'Bills', 'MO'),
+(2, '2025-12-09 04:56:10', 'Deposit', 669.69, 15231.69, 'Gift Deposit', 'Transportation', 'MO'),
+(2, '2025-03-30 05:07:31', 'Withdrawal', 603.72, 14633.08, 'Fuel Payment', 'Groceries', 'MO'),
+(1, '2025-01-21 06:41:49', 'Transfer', 1306.21, -6483.71, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(2, '2025-06-19 17:04:19', 'Withdrawal', 685.52, 13942.36, 'Utility Payment', 'Food & Dining', 'MO'),
+(3, '2025-05-15 02:13:33', 'Deposit', 1650.19, 10265.98, 'Gift Deposit', 'Food & Dining', 'MO'),
+(1, '2025-12-06 02:15:48', 'Transfer', 1911.59, -8386.37, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(2, '2025-12-04 19:34:04', 'Transfer', 1575.36, 15514.94, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
+(1, '2025-01-11 02:14:03', 'Deposit', 687.92, -7701.05, 'Refund Deposit', 'Food & Dining', 'MO'),
+(3, '2025-03-19 01:35:51', 'Deposit', 1495.16, 11757.36, 'Cash Deposit', 'Food & Dining', 'MO'),
+(2, '2025-09-03 13:28:31', 'Transfer', 654.27, 16177.2, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(3, '2025-05-17 19:24:36', 'Withdrawal', 1491.19, 10267.92, 'Fuel Payment', 'Bills', 'MO'),
+(3, '2025-01-05 14:01:26', 'Deposit', 919.97, 11182.06, 'Refund Deposit', 'Shopping', 'MO'),
+(3, '2025-09-28 06:18:04', 'Deposit', 1919.39, 13100.68, 'Salary Deposit', 'Food & Dining', 'MO'),
+(3, '2025-06-16 17:31:26', 'Deposit', 1449.08, 14556.17, 'Gift Deposit', 'Groceries', 'MO'),
+(3, '2025-10-17 06:10:44', 'Deposit', 483.54, 15037.04, 'Refund Deposit', 'Bills', 'MO'),
+(3, '2025-10-03 16:19:31', 'Deposit', 792.15, 15825.74, 'Refund Deposit', 'Groceries', 'MO'),
+(2, '2025-07-10 18:59:40', 'Withdrawal', 1946.36, 14232.94, 'Utility Payment', 'Bills', 'MO'),
+(2, '2025-11-05 19:54:58', 'Transfer', 1144.14, 15385.28, 'Transfer Savings to Checking', 'Utilities', 'MO'),
+(3, '2025-08-10 00:24:10', 'Withdrawal', 269.96, 15549.93, 'ATM Withdrawal', 'Transportation', 'MO'),
+(1, '2025-10-05 10:18:25', 'Transfer', 1709.77, -9402.17, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(3, '2025-06-20 04:55:38', 'Deposit', 348.75, 15891.4, 'Cash Deposit', 'Food & Dining', 'MO'),
+(3, '2025-06-13 05:12:30', 'Deposit', 588.22, 16471.47, 'Salary Deposit', 'Utilities', 'MO'),
+(1, '2025-03-06 05:54:39', 'Transfer', 1811.31, -11218.84, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(1, '2025-12-05 19:08:31', 'Deposit', 391.02, -10823.58, 'Cash Deposit', 'Utilities', 'MO'),
+(3, '2025-06-14 19:47:43', 'Deposit', 1680.28, 18160.63, 'Cash Deposit', 'Bills', 'MO'),
+(2, '2025-12-15 15:00:54', 'Transfer', 1743.68, 17125.36, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
+(1, '2025-05-11 12:11:08', 'Withdrawal', 1995.34, -12824.36, 'Utility Payment', 'Entertainment', 'MO'),
+(2, '2025-05-01 09:46:01', 'Withdrawal', 900.16, 16216.9, 'Restaurant Bill', 'Utilities', 'MO'),
+(1, '2025-04-26 00:10:01', 'Withdrawal', 292.71, -13110.27, 'Restaurant Bill', 'Utilities', 'MO'),
+(3, '2025-07-03 02:01:17', 'Deposit', 1892.39, 20054.86, 'Cash Deposit', 'Bills', 'MO'),
+(1, '2025-05-17 14:49:15', 'Withdrawal', 504.18, -13616.39, 'ATM Withdrawal', 'Shopping', 'MO'),
+(2, '2025-10-01 18:43:09', 'Transfer', 704.37, 16920.57, 'Transfer Savings to Checking', 'Shopping', 'MO'),
+(3, '2025-11-01 15:29:00', 'Withdrawal', 131.2, 19923.84, 'Online Purchase', 'Shopping', 'MO'),
+(3, '2025-06-17 23:47:59', 'Withdrawal', 833.21, 19091.71, 'Utility Payment', 'Bills', 'MO'),
+(3, '2025-09-24 14:34:45', 'Withdrawal', 57.65, 19039.88, 'Restaurant Bill', 'Utilities', 'MO'),
+(3, '2025-11-08 02:23:17', 'Withdrawal', 478.37, 18557.23, 'Utility Payment', 'Utilities', 'MO'),
+(1, '2025-01-11 09:19:17', 'Transfer', 1610.96, -15228.53, 'Transfer Checking to Savings', 'Bills', 'MO'),
+(2, '2025-05-16 20:44:19', 'Withdrawal', 1795.54, 15117.36, 'Restaurant Bill', 'Bills', 'MO'),
+(2, '2025-11-02 05:42:14', 'Withdrawal', 1237.84, 13876.93, 'ATM Withdrawal', 'Food & Dining', 'MO'),
+(2, '2025-09-02 00:27:22', 'Deposit', 1630.29, 15515.04, 'Gift Deposit', 'Bills', 'MO'),
+(2, '2025-09-25 22:54:57', 'Transfer', 362.44, 15871.35, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(1, '2025-05-01 19:53:21', 'Transfer', 324.14, -15553.94, 'Transfer Checking to Savings', 'Utilities', 'MO'),
+(1, '2025-12-20 12:53:01', 'Transfer', 1454.27, -17002.75, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(1, '2025-10-18 12:19:51', 'Withdrawal', 426.22, -17437.11, 'Restaurant Bill', 'Entertainment', 'MO'),
+(3, '2025-04-28 04:00:33', 'Withdrawal', 1214.13, 17336.31, 'ATM Withdrawal', 'Groceries', 'MO'),
+(1, '2025-09-02 16:58:34', 'Deposit', 1431.16, -16012.7, 'Cash Deposit', 'Utilities', 'MO'),
+(1, '2025-03-18 21:47:30', 'Deposit', 747.94, -15268.26, 'Cash Deposit', 'Transportation', 'MO'),
+(2, '2025-01-10 12:04:23', 'Deposit', 503.66, 16368.61, 'Refund Deposit', 'Shopping', 'MO'),
+(1, '2025-09-12 11:12:16', 'Transfer', 1270.76, -16533.36, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(3, '2025-06-25 09:05:23', 'Withdrawal', 1172.59, 16166.38, 'Fuel Payment', 'Entertainment', 'MO'),
+(3, '2025-11-30 18:19:13', 'Deposit', 1889.55, 18049.43, 'Cash Deposit', 'Groceries', 'MO'),
+(2, '2025-07-14 07:14:21', 'Deposit', 1309.97, 17676.86, 'Gift Deposit', 'Food & Dining', 'MO'),
+(3, '2025-09-15 08:45:17', 'Deposit', 792.02, 18850.56, 'Cash Deposit', 'Entertainment', 'MO'),
+(3, '2025-03-16 02:58:15', 'Deposit', 1795.32, 20655.7, 'Salary Deposit', 'Transportation', 'MO'),
+(3, '2025-08-06 10:11:04', 'Deposit', 1302.85, 21960.02, 'Refund Deposit', 'Transportation', 'MO'),
+(3, '2025-12-25 10:00:49', 'Deposit', 586.47, 22539.47, 'Salary Deposit', 'Groceries', 'MO'),
+(1, '2025-08-16 18:47:05', 'Withdrawal', 1819.06, -18360.67, 'ATM Withdrawal', 'Bills', 'MO'),
+(1, '2025-02-14 03:39:12', 'Deposit', 589.44, -17763.58, 'Cash Deposit', 'Bills', 'MO'),
+(2, '2025-05-24 01:17:53', 'Deposit', 925.37, 18608.91, 'Cash Deposit', 'Groceries', 'MO'),
+(2, '2025-04-18 22:12:59', 'Deposit', 1325.92, 19943.23, 'Refund Deposit', 'Food & Dining', 'MO'),
+(3, '2025-08-11 01:09:42', 'Withdrawal', 882.18, 21660.16, 'Restaurant Bill', 'Shopping', 'MO'),
+(2, '2025-07-03 14:34:05', 'Withdrawal', 1902.5, 18046.96, 'Utility Payment', 'Groceries', 'MO'),
+(2, '2025-07-30 01:59:39', 'Deposit', 1977.16, 20026.86, 'Gift Deposit', 'Shopping', 'MO'),
+(2, '2025-07-16 15:49:51', 'Transfer', 556.44, 20573.81, 'Transfer Savings to Checking', 'Groceries', 'MO'),
+(1, '2025-01-14 08:43:51', 'Transfer', 1791.81, -19547.87, 'Transfer Checking to Savings', 'Utilities', 'MO'),
+(1, '2025-12-29 06:10:54', 'Transfer', 719.29, -20264.25, 'Transfer Checking to Savings', 'Bills', 'MO'),
+(1, '2025-04-12 01:57:26', 'Withdrawal', 1684.76, -21940.88, 'Utility Payment', 'Transportation', 'MO'),
+(1, '2025-04-08 03:53:46', 'Withdrawal', 1582.43, -23530.09, 'Utility Payment', 'Transportation', 'MO'),
+(3, '2025-01-25 11:58:30', 'Deposit', 1987.41, 23641.81, 'Cash Deposit', 'Shopping', 'MO'),
+(2, '2025-09-22 20:39:29', 'Transfer', 1620.91, 22197.77, 'Transfer Savings to Checking', 'Groceries', 'MO'),
+(2, '2025-12-25 13:08:42', 'Transfer', 1925.89, 24124.74, 'Transfer Savings to Checking', 'Transportation', 'MO'),
+(2, '2025-12-16 02:10:52', 'Transfer', 1834.12, 25967.53, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(3, '2025-10-23 21:13:43', 'Deposit', 1130.37, 24769.04, 'Refund Deposit', 'Bills', 'MO'),
+(1, '2025-02-24 12:02:59', 'Withdrawal', 1921.57, -25453.96, 'Online Purchase', 'Entertainment', 'MO'),
+(3, '2025-05-04 10:28:19', 'Deposit', 1552.38, 26330.55, 'Salary Deposit', 'Utilities', 'MO'),
+(2, '2025-09-24 04:58:04', 'Withdrawal', 1147.89, 24828.62, 'Restaurant Bill', 'Shopping', 'MO'),
+(3, '2025-09-16 05:18:31', 'Deposit', 1918.36, 28242.68, 'Gift Deposit', 'Shopping', 'MO'),
+(1, '2025-04-05 20:15:23', 'Deposit', 1940.02, -23523.75, 'Cash Deposit', 'Shopping', 'MO'),
+(3, '2025-09-15 07:42:22', 'Deposit', 1054.09, 29300.45, 'Salary Deposit', 'Groceries', 'MO'),
+(1, '2025-10-04 23:27:10', 'Transfer', 1372.52, -24905.28, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(2, '2025-12-14 15:59:49', 'Deposit', 596.96, 25422.58, 'Cash Deposit', 'Bills', 'MO'),
+(3, '2025-01-06 01:48:30', 'Withdrawal', 1657.47, 27651.11, 'Utility Payment', 'Bills', 'MO'),
+(1, '2025-04-14 20:50:02', 'Deposit', 1867.54, -23039.64, 'Cash Deposit', 'Bills', 'MO'),
+(3, '2025-09-28 22:51:23', 'Deposit', 1213.29, 28864.68, 'Gift Deposit', 'Entertainment', 'MO'),
+(2, '2025-01-11 13:59:38', 'Withdrawal', 1340.56, 24082.65, 'Fuel Payment', 'Groceries', 'MO'),
+(2, '2025-08-03 02:09:22', 'Deposit', 1465.83, 25543.58, 'Gift Deposit', 'Utilities', 'MO'),
+(1, '2025-02-12 20:58:36', 'Deposit', 345.75, -22697.7, 'Refund Deposit', 'Bills', 'MO'),
+(3, '2025-06-10 06:37:34', 'Withdrawal', 1142.91, 27716.5, 'ATM Withdrawal', 'Entertainment', 'MO'),
+(1, '2025-04-04 22:47:13', 'Deposit', 1525.82, -21166.41, 'Refund Deposit', 'Food & Dining', 'MO'),
+(2, '2025-07-05 00:04:49', 'Withdrawal', 887.24, 24665.85, 'Utility Payment', 'Food & Dining', 'MO'),
+(1, '2025-12-25 16:59:41', 'Withdrawal', 1031.03, -22206.05, 'Utility Payment', 'Groceries', 'MO'),
+(1, '2025-05-12 14:00:35', 'Transfer', 1521.25, -23722.21, 'Transfer Checking to Savings', 'Shopping', 'MO'),
+(1, '2025-04-05 21:49:12', 'Withdrawal', 1876.42, -25602.52, 'Utility Payment', 'Shopping', 'MO'),
+(2, '2025-07-19 10:36:10', 'Transfer', 257.02, 24922.83, 'Transfer Savings to Checking', 'Entertainment', 'MO'),
+(3, '2025-08-31 19:09:36', 'Withdrawal', 355.34, 27361.3, 'Online Purchase', 'Food & Dining', 'MO'),
+(2, '2025-10-18 12:46:35', 'Deposit', 1065.78, 25981.97, 'Cash Deposit', 'Shopping', 'MO'),
+(3, '2025-06-26 06:19:55', 'Deposit', 554.97, 27906.34, 'Cash Deposit', 'Groceries', 'MO'),
+(1, '2025-06-08 10:23:18', 'Withdrawal', 246.9, -25852.73, 'Online Purchase', 'Groceries', 'MO'),
+(2, '2025-01-15 17:16:07', 'Withdrawal', 693.85, 25279.5, 'Restaurant Bill', 'Entertainment', 'MO'),
+(1, '2025-04-13 04:37:02', 'Deposit', 1108.88, -24743.8, 'Cash Deposit', 'Shopping', 'MO'),
+(2, '2025-12-26 04:52:36', 'Deposit', 243.43, 25514.2, 'Gift Deposit', 'Entertainment', 'MO'),
+(3, '2025-02-24 20:59:52', 'Withdrawal', 973.35, 26925.53, 'Restaurant Bill', 'Groceries', 'MO'),
+(3, '2025-10-07 10:14:23', 'Deposit', 410.44, 27342.0, 'Salary Deposit', 'Groceries', 'MO'),
+(1, '2025-10-08 18:54:21', 'Deposit', 1186.85, -23553.04, 'Refund Deposit', 'Transportation', 'MO'),
+(2, '2025-03-04 20:05:19', 'Withdrawal', 1663.61, 23840.66, 'Utility Payment', 'Entertainment', 'MO'),
+(1, '2025-04-02 08:12:43', 'Withdrawal', 889.8, -24438.5, 'Online Purchase', 'Shopping', 'MO'),
+(1, '2025-03-27 19:50:48', 'Transfer', 229.32, -24660.34, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(1, '2025-05-04 14:53:37', 'Transfer', 1992.89, -26657.01, 'Transfer Checking to Savings', 'Food & Dining', 'MO'),
+(1, '2025-05-26 03:08:22', 'Withdrawal', 707.91, -27369.37, 'Fuel Payment', 'Transportation', 'MO'),
+(3, '2025-06-16 21:25:47', 'Deposit', 93.64, 27436.28, 'Salary Deposit', 'Shopping', 'MO'),
+(2, '2025-06-23 03:49:35', 'Deposit', 1275.34, 25110.98, 'Cash Deposit', 'Food & Dining', 'MO'),
+(3, '2025-04-24 19:38:19', 'Withdrawal', 1110.88, 26325.05, 'Online Purchase', 'Entertainment', 'MO'),
+(3, '2025-12-01 19:45:57', 'Withdrawal', 1472.09, 24850.15, 'Restaurant Bill', 'Transportation', 'MO'),
+(2, '2025-04-01 19:13:09', 'Transfer', 454.38, 25568.07, 'Transfer Savings to Checking', 'Food & Dining', 'MO'),
+(3, '2025-05-13 17:29:00', 'Deposit', 1119.4, 25968.3, 'Salary Deposit', 'Transportation', 'MO'),
+(3, '2025-04-29 15:45:18', 'Withdrawal', 1356.9, 24608.14, 'Online Purchase', 'Food & Dining', 'MO'),
+(1, '2025-03-14 05:50:13', 'Transfer', 1487.22, -28862.65, 'Transfer Checking to Savings', 'Entertainment', 'MO'),
+(2, '2025-05-12 14:39:37', 'Deposit', 305.72, 25869.56, 'Cash Deposit', 'Food & Dining', 'MO'),
+(1, '2025-03-13 05:06:48', 'Deposit', 1949.69, -26917.34, 'Gift Deposit', 'Shopping', 'MO'),
+(3, '2025-11-27 18:09:20', 'Withdrawal', 696.42, 23910.2, 'Restaurant Bill', 'Utilities', 'MO'),
+(1, '2025-02-16 08:18:22', 'Transfer', 780.56, -27697.69, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(3, '2025-06-02 05:16:48', 'Withdrawal', 1974.26, 21941.58, 'Restaurant Bill', 'Entertainment', 'MO'),
+(3, '2025-05-10 07:21:16', 'Deposit', 1534.43, 23470.15, 'Refund Deposit', 'Utilities', 'MO'),
+(3, '2025-04-25 02:21:19', 'Withdrawal', 1241.43, 22223.38, 'Utility Payment', 'Groceries', 'MO'),
+(3, '2025-02-17 02:26:17', 'Withdrawal', 1770.01, 20456.26, 'Fuel Payment', 'Groceries', 'MO'),
+(3, '2025-04-03 04:25:47', 'Deposit', 947.43, 21413.56, 'Gift Deposit', 'Utilities', 'MO'),
+(2, '2025-05-09 21:49:10', 'Deposit', 495.07, 26359.5, 'Cash Deposit', 'Entertainment', 'MO'),
+(3, '2025-07-21 19:48:54', 'Deposit', 1285.67, 22698.61, 'Gift Deposit', 'Food & Dining', 'MO'),
+(3, '2025-01-22 02:50:48', 'Deposit', 1974.66, 24667.83, 'Cash Deposit', 'Shopping', 'MO'),
+(3, '2025-07-02 08:09:27', 'Deposit', 1218.43, 25892.25, 'Refund Deposit', 'Bills', 'MO'),
+(1, '2025-10-18 11:21:24', 'Transfer', 1529.57, -29228.02, 'Transfer Checking to Savings', 'Entertainment', 'MO'),
+(1, '2025-12-18 11:09:32', 'Withdrawal', 181.58, -29419.51, 'Online Purchase', 'Groceries', 'MO'),
+(2, '2025-09-30 14:53:47', 'Withdrawal', 614.11, 25737.39, 'Utility Payment', 'Transportation', 'MO'),
+(3, '2025-12-01 10:55:34', 'Deposit', 775.04, 26674.85, 'Refund Deposit', 'Bills', 'MO'),
+(2, '2025-08-06 04:41:39', 'Transfer', 1223.83, 26966.45, 'Transfer Savings to Checking', 'Bills', 'MO'),
+(3, '2025-02-14 10:11:27', 'Withdrawal', 770.3, 25901.11, 'Utility Payment', 'Transportation', 'MO'),
+(1, '2025-12-15 20:10:53', 'Deposit', 863.95, -28565.48, 'Cash Deposit', 'Transportation', 'MO'),
+(3, '2025-05-21 02:03:38', 'Deposit', 1086.48, 26981.04, 'Refund Deposit', 'Entertainment', 'MO'),
+(3, '2025-05-26 14:43:33', 'Deposit', 1672.23, 28650.8, 'Salary Deposit', 'Food & Dining', 'MO'),
+(2, '2025-07-13 00:33:41', 'Withdrawal', 1367.61, 25599.68, 'Utility Payment', 'Bills', 'MO'),
+(1, '2025-04-11 11:24:00', 'Withdrawal', 1403.0, -29963.07, 'Fuel Payment', 'Food & Dining', 'MO'),
+(3, '2025-08-02 20:25:39', 'Withdrawal', 662.28, 27993.18, 'Restaurant Bill', 'Bills', 'MO'),
+(1, '2025-09-21 13:16:07', 'Deposit', 651.92, -29306.3, 'Cash Deposit', 'Utilities', 'MO'),
+(2, '2025-05-22 08:52:10', 'Withdrawal', 1518.59, 24090.48, 'Fuel Payment', 'Entertainment', 'MO'),
+(1, '2025-08-26 14:55:20', 'Withdrawal', 257.67, -29555.29, 'Fuel Payment', 'Bills', 'MO'),
+(3, '2025-11-25 11:30:02', 'Withdrawal', 571.77, 27411.87, 'Fuel Payment', 'Groceries', 'MO'),
+(3, '2025-11-19 09:58:49', 'Withdrawal', 908.05, 26498.6, 'Fuel Payment', 'Food & Dining', 'MO'),
+(1, '2025-05-12 14:03:41', 'Deposit', 1802.2, -27756.36, 'Refund Deposit', 'Bills', 'MO'),
+(1, '2025-10-07 10:28:03', 'Transfer', 93.81, -27846.14, 'Transfer Checking to Savings', 'Groceries', 'MO'),
+(3, '2025-12-18 14:46:31', 'Deposit', 1844.21, 28344.87, 'Cash Deposit', 'Groceries', 'MO'),
+(2, '2025-01-23 21:06:00', 'Withdrawal', 60.73, 24025.91, 'Utility Payment', 'Shopping', 'MO'),
+(3, '2025-12-01 18:13:54', 'Withdrawal', 1244.06, 27100.09, 'Fuel Payment', 'Utilities', 'MO'),
+(2, '2025-03-27 14:47:21', 'Transfer', 1881.82, 25900.39, 'Transfer Savings to Checking', 'Transportation', 'MO'),
+(2, '2025-03-26 09:06:26', 'Withdrawal', 486.95, 25413.64, 'Restaurant Bill', 'Entertainment', 'MO');
 
--- February 2025
-(2, '2025-02-01 09:00:00', 'Deposit', 2500.00, 6188.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-02-02 11:00:00', 'Withdrawal', 950.00, 5238.50, 'Rent Payment', 'Housing', 'MO'),
-(2, '2025-02-03 14:00:00', 'Withdrawal', 82.00, 5156.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(2, '2025-02-04 10:30:00', 'Withdrawal', 42.00, 5114.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-02-05 12:30:00', 'Withdrawal', 30.00, 5084.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(2, '2025-02-06 16:00:00', 'Withdrawal', 130.00, 4954.50, 'Utilities', 'Utilities', 'MO'),
-(2, '2025-02-07 11:15:00', 'Withdrawal', 55.00, 4899.50, 'Internet Bill', 'Utilities', 'MO'),
-(2, '2025-02-08 13:30:00', 'Withdrawal', 95.00, 4804.50, 'Target Shopping', 'Shopping', 'MO'),
-(2, '2025-02-09 10:00:00', 'Withdrawal', 45.00, 4759.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-02-10 14:15:00', 'Withdrawal', 75.00, 4684.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(2, '2025-02-11 12:30:00', 'Withdrawal', 58.00, 4626.50, 'Chipotle', 'Food & Dining', 'MO'),
-(2, '2025-02-12 16:00:00', 'Withdrawal', 68.00, 4558.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-02-13 11:15:00', 'Withdrawal', 105.00, 4453.50, 'Best Buy', 'Electronics', 'MO'),
-(2, '2025-02-14 18:00:00', 'Withdrawal', 95.00, 4358.50, 'Valentine Dinner', 'Food & Dining', 'MO'),
-(2, '2025-02-15 09:00:00', 'Deposit', 2500.00, 6858.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-02-16 13:30:00', 'Withdrawal', 88.00, 6770.50, 'Aldi Grocery', 'Groceries', 'MO'),
-(2, '2025-02-17 10:45:00', 'Withdrawal', 42.00, 6728.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-02-18 14:30:00', 'Withdrawal', 52.00, 6676.50, 'Starbucks', 'Food & Dining', 'MO'),
-(2, '2025-02-19 11:30:00', 'Withdrawal', 120.00, 6556.50, 'Amazon Purchase', 'Shopping', 'MO'),
-(2, '2025-02-20 15:00:00', 'Withdrawal', 150.00, 6406.50, 'Car Payment', 'Auto', 'MO'),
-(2, '2025-02-21 10:00:00', 'Withdrawal', 48.00, 6358.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-02-22 14:30:00', 'Withdrawal', 78.00, 6280.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(2, '2025-02-23 12:15:00', 'Withdrawal', 38.00, 6242.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(2, '2025-02-24 16:00:00', 'Withdrawal', 92.00, 6150.50, 'Target', 'Shopping', 'MO'),
-(2, '2025-02-25 11:30:00', 'Withdrawal', 65.00, 6085.50, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-02-26 09:45:00', 'Withdrawal', 45.00, 6040.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-02-27 13:20:00', 'Withdrawal', 85.00, 5955.50, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(2, '2025-02-28 18:00:00', 'Withdrawal', 72.00, 5883.50, 'Olive Garden', 'Food & Dining', 'MO'),
 
--- March 2025
-(2, '2025-03-01 09:00:00', 'Deposit', 2500.00, 8383.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-03-02 11:00:00', 'Withdrawal', 950.00, 7433.50, 'Rent Payment', 'Housing', 'MO'),
-(2, '2025-03-03 14:00:00', 'Withdrawal', 78.00, 7355.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(2, '2025-03-04 10:30:00', 'Withdrawal', 45.00, 7310.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-03-05 12:45:00', 'Withdrawal', 32.00, 7278.50, 'Starbucks', 'Food & Dining', 'MO'),
-(2, '2025-03-06 16:00:00', 'Withdrawal', 135.00, 7143.50, 'Electric Bill', 'Utilities', 'MO'),
-(2, '2025-03-07 11:15:00', 'Withdrawal', 55.00, 7088.50, 'Internet Bill', 'Utilities', 'MO'),
-(2, '2025-03-08 13:30:00', 'Withdrawal', 68.00, 7020.50, 'Haircut', 'Personal Care', 'MO'),
-(2, '2025-03-09 10:00:00', 'Withdrawal', 92.00, 6928.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(2, '2025-03-10 14:15:00', 'Withdrawal', 48.00, 6880.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-03-11 12:30:00', 'Withdrawal', 85.00, 6795.50, 'Target Shopping', 'Shopping', 'MO'),
-(2, '2025-03-12 16:00:00', 'Withdrawal', 55.00, 6740.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(2, '2025-03-13 11:15:00', 'Withdrawal', 72.00, 6668.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-03-14 14:45:00', 'Withdrawal', 110.00, 6558.50, 'Best Buy', 'Electronics', 'MO'),
-(2, '2025-03-15 09:00:00', 'Deposit', 2500.00, 9058.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-03-16 13:30:00', 'Withdrawal', 82.00, 8976.50, 'Aldi Grocery', 'Groceries', 'MO'),
-(2, '2025-03-17 10:45:00', 'Withdrawal', 42.00, 8934.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-03-18 18:00:00', 'Withdrawal', 62.00, 8872.50, 'Chipotle Dinner', 'Food & Dining', 'MO'),
-(2, '2025-03-19 11:30:00', 'Withdrawal', 95.00, 8777.50, 'Amazon Purchase', 'Shopping', 'MO'),
-(2, '2025-03-20 15:00:00', 'Withdrawal', 150.00, 8627.50, 'Car Payment', 'Auto', 'MO'),
-(2, '2025-03-21 10:00:00', 'Withdrawal', 48.00, 8579.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-03-22 14:30:00', 'Withdrawal', 105.00, 8474.50, 'Home Depot', 'Home Improvement', 'MO'),
-(2, '2025-03-23 12:15:00', 'Withdrawal', 78.00, 8396.50, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(2, '2025-03-24 16:00:00', 'Withdrawal', 38.00, 8358.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(2, '2025-03-25 11:30:00', 'Withdrawal', 88.00, 8270.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(2, '2025-03-26 09:45:00', 'Withdrawal', 45.00, 8225.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-03-27 13:20:00', 'Withdrawal', 72.00, 8153.50, 'Clothing Store', 'Shopping', 'MO'),
-(2, '2025-03-28 18:00:00', 'Withdrawal', 65.00, 8088.50, 'Texas Roadhouse', 'Food & Dining', 'MO'),
-(2, '2025-03-29 14:45:00', 'Withdrawal', 52.00, 8036.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-03-30 10:30:00', 'Withdrawal', 42.00, 7994.50, 'QuikTrip Gas', 'Transportation', 'MO'),
 
--- April 2025
-(2, '2025-04-01 09:00:00', 'Deposit', 2600.00, 10594.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-04-02 11:00:00', 'Withdrawal', 950.00, 9644.50, 'Rent Payment', 'Housing', 'MO'),
-(2, '2025-04-03 14:00:00', 'Withdrawal', 95.00, 9549.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(2, '2025-04-04 10:30:00', 'Withdrawal', 48.00, 9501.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-04-05 12:45:00', 'Withdrawal', 28.00, 9473.50, 'Starbucks', 'Food & Dining', 'MO'),
-(2, '2025-04-06 16:00:00', 'Withdrawal', 140.00, 9333.50, 'Electric Bill', 'Utilities', 'MO'),
-(2, '2025-04-07 11:15:00', 'Withdrawal', 55.00, 9278.50, 'Internet Bill', 'Utilities', 'MO'),
-(2, '2025-04-08 13:30:00', 'Withdrawal', 105.00, 9173.50, 'Target Shopping', 'Shopping', 'MO'),
-(2, '2025-04-09 10:00:00', 'Withdrawal', 45.00, 9128.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-04-10 14:15:00', 'Withdrawal', 82.00, 9046.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(2, '2025-04-11 12:30:00', 'Withdrawal', 68.00, 8978.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(2, '2025-04-12 16:00:00', 'Withdrawal', 78.00, 8900.50, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-04-13 11:15:00', 'Withdrawal', 115.00, 8785.50, 'Best Buy', 'Electronics', 'MO'),
-(2, '2025-04-14 14:45:00', 'Withdrawal', 62.00, 8723.50, 'Chipotle', 'Food & Dining', 'MO'),
-(2, '2025-04-15 09:00:00', 'Deposit', 2600.00, 11323.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-04-16 13:30:00', 'Withdrawal', 88.00, 11235.50, 'Aldi Grocery', 'Groceries', 'MO'),
-(2, '2025-04-17 10:45:00', 'Withdrawal', 42.00, 11193.50, 'QuikTrip Gas', 'Transportation', 'MO'),
-(2, '2025-04-18 18:00:00', 'Withdrawal', 75.00, 11118.50, 'Red Lobster', 'Food & Dining', 'MO'),
-(2, '2025-04-19 11:30:00', 'Withdrawal', 125.00, 10993.50, 'Amazon Purchase', 'Shopping', 'MO'),
-(2, '2025-04-20 15:00:00', 'Withdrawal', 150.00, 10843.50, 'Car Payment', 'Auto', 'MO'),
-(2, '2025-04-21 10:00:00', 'Withdrawal', 48.00, 10795.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-04-22 14:30:00', 'Withdrawal', 92.00, 10703.50, 'Home Depot', 'Home Improvement', 'MO'),
-(2, '2025-04-23 12:15:00', 'Withdrawal', 72.00, 10631.50, 'Price Chopper Grocery', 'Groceries', 'MO'),
-(2, '2025-04-24 16:00:00', 'Withdrawal', 38.00, 10593.50, 'Dunkin Donuts', 'Food & Dining', 'MO'),
-(2, '2025-04-25 11:30:00', 'Withdrawal', 95.00, 10498.50, 'Walmart Shopping', 'Shopping', 'MO'),
-(2, '2025-04-26 09:45:00', 'Withdrawal', 45.00, 10453.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-04-27 13:20:00', 'Withdrawal', 78.00, 10375.50, 'Target', 'Shopping', 'MO'),
-(2, '2025-04-28 18:00:00', 'Withdrawal', 68.00, 10307.50, 'Applebees', 'Food & Dining', 'MO'),
-(2, '2025-04-29 14:45:00', 'Withdrawal', 52.00, 10255.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-04-30 10:30:00', 'Withdrawal', 42.00, 10213.50, 'QuikTrip Gas', 'Transportation', 'MO'),
 
--- May 2025
-(2, '2025-05-01 09:00:00', 'Deposit', 2600.00, 12813.50, 'Salary Deposit', 'Income', 'MO'),
-(2, '2025-05-02 11:00:00', 'Withdrawal', 950.00, 11863.50, 'Rent Payment', 'Housing', 'MO'),
-(2, '2025-05-03 14:00:00', 'Withdrawal', 92.00, 11771.50, 'Hy-Vee Grocery', 'Groceries', 'MO'),
-(2, '2025-05-04 10:30:00', 'Withdrawal', 48.00, 11723.50, 'BP Gas', 'Transportation', 'MO'),
-(2, '2025-05-05 12:45:00', 'Withdrawal', 32.00, 11691.50, 'Starbucks', 'Food & Dining', 'MO'),
-(2, '2025-05-06 16:00:00', 'Withdrawal', 145.00, 11546.50, 'Electric Bill', 'Utilities', 'MO'),
-(2, '2025-05-07 11:15:00', 'Withdrawal', 55.00, 11491.50, 'Internet Bill', 'Utilities', 'MO'),
-(2, '2025-05-08 13:30:00', 'Withdrawal', 85.00, 11406.50, 'Walgreens Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-05-09 10:00:00', 'Withdrawal', 98.00, 11308.50, 'Walmart Grocery', 'Groceries', 'MO'),
-(2, '2025-05-10 14:15:00', 'Withdrawal', 45.00, 11263.50, 'Shell Gas', 'Transportation', 'MO'),
-(2, '2025-05-11 12:30:00', 'Withdrawal', 110.00, 11153.50, 'Target Shopping', 'Shopping', 'MO'),
-(2, '2025-05-12 16:00:00', 'Withdrawal', 62.00, 11091.50, 'Panera Bread', 'Food & Dining', 'MO'),
-(2, '2025-05-13 11:15:00', 'Withdrawal', 75.00, 11016.50, 'CVS Pharmacy', 'Healthcare', 'MO'),
-(2, '2025-05-14 14:45:00', 'Withdrawal', 120.00, 10896.50, 'Best Buy', 'Electronics', 'MO');
+INSERT INTO public.pending_transfers (from_account, to_account, amount, scheduled_date, status, description) VALUES
+(1, 2, 1265.15, '2025-07-02 00:00:00', 'pending', 'Scheduled Transfer Checking to Savings'),
+(2, 1, 345.42, '2025-07-09 00:00:00', 'failed', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 530.88, '2025-01-22 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 1729.35, '2025-04-21 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 1415.37, '2025-06-03 00:00:00', 'completed', 'Scheduled Transfer Savings to Checking'),
+(1, 2, 355.4, '2025-04-27 00:00:00', 'pending', 'Scheduled Transfer Checking to Savings'),
+(2, 1, 1246.16, '2025-07-25 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking'),
+(1, 2, 1631.2, '2025-09-03 00:00:00', 'pending', 'Scheduled Transfer Checking to Savings'),
+(2, 1, 105.04, '2025-11-09 00:00:00', 'failed', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 357.69, '2025-02-06 00:00:00', 'completed', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 1703.12, '2025-02-02 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking'),
+(1, 2, 1727.2, '2025-03-26 00:00:00', 'pending', 'Scheduled Transfer Checking to Savings'),
+(1, 2, 897.68, '2025-10-16 00:00:00', 'completed', 'Scheduled Transfer Checking to Savings'),
+(1, 2, 943.91, '2025-10-05 00:00:00', 'pending', 'Scheduled Transfer Checking to Savings'),
+(2, 1, 871.08, '2025-10-01 00:00:00', 'failed', 'Scheduled Transfer Savings to Checking'),
+(1, 2, 1853.86, '2025-11-08 00:00:00', 'completed', 'Scheduled Transfer Checking to Savings'),
+(1, 2, 1400.98, '2025-06-19 00:00:00', 'completed', 'Scheduled Transfer Checking to Savings'),
+(2, 1, 1117.04, '2025-08-04 00:00:00', 'failed', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 1281.7, '2025-03-12 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking'),
+(2, 1, 1054.73, '2025-11-21 00:00:00', 'pending', 'Scheduled Transfer Savings to Checking');
+
+INSERT INTO public.recurring_transfers (from_account, to_account, amount, frequency, start_date, next_transfer_date, status, description) VALUES
+(1, 2, 500.47, 'Weekly', '2025-02-27 00:00:00', '2025-03-28 00:00:00', 'active', 'Recurring Transfer Checking to Savings (Weekly)'),
+(2, 1, 1098.78, 'Weekly', '2025-02-23 00:00:00', '2025-03-13 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
+(2, 1, 569.95, 'Weekly', '2025-01-30 00:00:00', '2025-02-11 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)'),
+(1, 2, 1651.91, 'Weekly', '2025-02-02 00:00:00', '2025-03-01 00:00:00', 'active', 'Recurring Transfer Checking to Savings (Weekly)'),
+(2, 1, 1376.38, 'Monthly', '2025-01-30 00:00:00', '2025-02-23 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Monthly)'),
+(1, 2, 1424.06, 'Weekly', '2025-03-17 00:00:00', '2025-04-11 00:00:00', 'paused', 'Recurring Transfer Checking to Savings (Weekly)'),
+(1, 2, 1540.6, 'Weekly', '2025-01-18 00:00:00', '2025-02-10 00:00:00', 'active', 'Recurring Transfer Checking to Savings (Weekly)'),
+(2, 1, 1594.38, 'Weekly', '2025-02-20 00:00:00', '2025-03-16 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)'),
+(2, 1, 1494.96, 'Weekly', '2025-01-18 00:00:00', '2025-02-05 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
+(1, 2, 185.0, 'Weekly', '2025-01-06 00:00:00', '2025-01-13 00:00:00', 'paused', 'Recurring Transfer Checking to Savings (Weekly)'),
+(2, 1, 316.97, 'Weekly', '2025-01-18 00:00:00', '2025-02-07 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)'),
+(1, 2, 1751.51, 'Monthly', '2025-02-15 00:00:00', '2025-02-27 00:00:00', 'paused', 'Recurring Transfer Checking to Savings (Monthly)'),
+(1, 2, 1586.13, 'Monthly', '2025-01-16 00:00:00', '2025-01-30 00:00:00', 'paused', 'Recurring Transfer Checking to Savings (Monthly)'),
+(2, 1, 178.31, 'Weekly', '2025-03-19 00:00:00', '2025-04-06 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
+(2, 1, 1545.44, 'Weekly', '2025-01-15 00:00:00', '2025-01-23 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
+(2, 1, 447.67, 'Monthly', '2025-02-27 00:00:00', '2025-03-06 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Monthly)'),
+(1, 2, 978.49, 'Weekly', '2025-01-10 00:00:00', '2025-01-25 00:00:00', 'active', 'Recurring Transfer Checking to Savings (Weekly)'),
+(2, 1, 1672.74, 'Weekly', '2025-03-27 00:00:00', '2025-04-15 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
+(2, 1, 1807.78, 'Monthly', '2025-01-02 00:00:00', '2025-01-09 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Monthly)'),
+(2, 1, 1003.19, 'Weekly', '2025-01-05 00:00:00', '2025-01-13 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
