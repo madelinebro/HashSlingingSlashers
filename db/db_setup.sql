@@ -1,4 +1,3 @@
-
 -- Users Table
 CREATE TABLE IF NOT EXISTS public.users (
     user_id SERIAL PRIMARY KEY,
@@ -100,7 +99,7 @@ BEGIN
         SET balance = balance - NEW.amount
         WHERE accountnumber = NEW.accountnumber;
 
-    --  Handle TRANSFERS
+    --  Han TRANSFERS
     ELSIF NEW.transaction_type = 'Transfer' THEN
         -- Deduct from source account
         UPDATE accounts
@@ -449,7 +448,3 @@ INSERT INTO public.recurring_transfers (from_account, to_account, amount, freque
 (2, 1, 1672.74, 'Weekly', '2025-03-27 00:00:00', '2025-04-15 00:00:00', 'paused', 'Recurring Transfer Savings to Checking (Weekly)'),
 (2, 1, 1807.78, 'Monthly', '2025-01-02 00:00:00', '2025-01-09 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Monthly)'),
 (2, 1, 1003.19, 'Weekly', '2025-01-05 00:00:00', '2025-01-13 00:00:00', 'active', 'Recurring Transfer Savings to Checking (Weekly)');
-
-
-
-
