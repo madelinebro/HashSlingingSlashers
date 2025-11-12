@@ -109,6 +109,7 @@ def get_transaction_by_id(
 
     return {
         "transaction_id": tx.transaction_id,
+        "user_id": tx.user_id,
         "accountnumber": tx.accountnumber,
         "transaction_type": tx.transaction_type,
         "amount": float(tx.amount),
