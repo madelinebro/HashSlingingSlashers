@@ -66,3 +66,21 @@ system can handle an increasing number of users and data overtime
 - Backend Developer | AI Developer | [Madeline Brothers](https://github.com/madelinebro)
 - Documentation Lead | API Developer |  [Yasmin Hassan](***)
 - Frontend Developer | Prototype Developer | [Samantha Saunsaucie](https://github.com/ssaunsaucie)
+
+
+## Virtual Environment Setup (Windows, macOS, Linux)
+
+1. Create the virtual environment:
+   python -m venv .venv
+
+2. Activate it:
+   - Windows (PowerShell): .\.venv\Scripts\Activate.ps1
+   - macOS/Linux: source .venv/bin/activate
+
+3. Install dependencies:
+   pip install --upgrade pip
+   pip install -r requirements.txt
+
+Note for VS Code:
+A popup will appear in the bottom-right asking if you want to use the
+Python interpreter from .venv. Select **Yes**.
