@@ -1,46 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         Forgot Username
         Author: Samantha Saunsaucie
         Date: 10/11/2025
         -->
-        <!-- Setup and Title -->
-        <title>Forgot Username</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="forgot_username.js" defer></script>
-    </head>
-    <!-- Main area for Forgot Username Form -->
-    <body>
-        <main class="forgot-username-container">
-            <!-- Heading of the page -->
-            <h1>Forgot Username</h1>
-            <!-- Forgot Username Form -->
-            <form id="forgotUsernameForm">
-                <!-- Section for Full name and Email (for layout) -->
-                <div class="forgot-group">
-                    <!-- Input for full name -->
-                    <input type="text" id="fullname" placeholder="Full Name" required />
-                    <!-- Input for email  -->
-                    <input type="email" id="email" placeholder="Email" required />
+    <!-- Setup and Title -->
+    <title>Forgot Username</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/forgot_username.js" defer></script>
+</head>
+<!-- Main area for Forgot Username Form -->
+
+<body>
+    <!-- Floating Logo -->
+    <div class="floating-logo">
+        <img src="images/logo.svg" alt="BloomFi Logo" />
+    </div>
+
+    <main class="forgot-username-container">
+        <div class="forgot-username-card">
+            <!-- Left Panel -->
+            <div class="forgot-left-panel">
+                <div class="forgot-icon">❔</div>
+                <h2>Forgot Username?</h2>
+                <p>
+                    Easy! Enter your details and we'll send your BloomFi username straight to
+                    your inbox.
+                </p>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="forgot-right-panel">
+                <h1>Recover Username</h1>
+
+                <form id="forgotUsernameForm" class="forgot-form">
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullname" name="fullname" placeholder="👤 Full Name"
+                                autocomplete="name" required />
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" name="email" placeholder="📧 Email" autocomplete="email"
+                                required />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Send Username to Email
+                    </button>
+                </form>
+                <p id="message" class="message"></p>
+                <!-- Already have an account? -->
+                <div class="register-links">
+                    <p>Already have an account? <a href="login.html">Login</a></p>
                 </div>
-                <!-- Section for Password and Confirm Password (for layout) -->
-                <div class="forgot-group">
-                    <input type="password" id="password" placeholder="Password" required />
-                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-                </div>
-                <!-- Button to submit form and send verification email -->
-                <button type="submit" class="submit-btn">Send Customer Username to Email</button>
-            </form>
-            <p id="message" class="message"></p> <!-- Shows the error or success message -->
-            <!-- Button to redirect back to login -->
-            <button type="button" class="link-btn" onclick="window.location.href='login.html'">
-                Back to Login
-            </button>
-        </main>
-    </body>
+            </div>
+            <!-- /forgot-right-panel -->
+        </div>
+        <!-- /forgot-username-card -->
+    </main>
+</body>
+
 </html>

@@ -1,134 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         Payment Transfers
         Author: Samantha Saunsaucie
         Date: 10/11/2025
         -->
-         <!-- Setup and Title -->
-        <title>Payment Transfers</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="script.js" defer></script>
-        <script src="transfers.js" defer></script>
-    </head>
-    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
-    <body class="dashboard">
-        <header class="toparea">
-            <div class="space"></div>
-            <div class="user">
-                <!-- Placeholder for avatar -->
-                <img src="https://placehold.co/28x28" alt="Jane avatar">
-                <!-- Profile Toggle  -->
-                <button id="userToggle" class="user-name">Jane &#9662;</button>
-                <!-- Toggle options, hidden dropdown menu -->
-                <div id="userMenu" class="user-menu">
-                    <a href="profile.html">Profile</a>
-                    <a href="settings.html">Settings</a>
-                    <a href="login.html">Log Out</a>
+    <!-- Setup and Title -->
+    <title>Payment Transfers</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/transfers.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<body class="dashboard">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <!-- Logo Section -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item active" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User Profile at Bottom -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-container">
+        <header class="content-header">
+            <h1 class="page-title">Payment Transfers</h1>
+            <p class="page-subtitle">Move money between your BloomFi accounts</p>
         </header>
-        <!-- Main content area for Payment Transfers -->
-        <main class="transfer-container">
-            <h1>Payment Transfers</h1>
+        <section class="transfer-grid">
+            <!-- ==== Make a Transfer ==== -->
+            <article class="transfer-card make-transfer teal">
+                <header class="transfer-card-header">
+                    <h2>Make a Transfer</h2>
+                </header>
 
-            <!-- Make a Transfer Section -->
-            <section class="transfer-card">
-                <h2>Make a Transfer</h2>
-                <!-- Form for submitting a new transfer -->
-                <form id="makeTransferForm">
-                    <!-- Choose the account to transfer money from -->
-                    <label for="fromAccount">Transfer From:</label>
-                    <select id="fromAccount" required>
-                        <option value="">Select Account</option>
-                        <option>Checking</option>
-                        <option>Savings</option>
-                    </select>
-                    <!-- Choose the account to transfer money to -->
-                    <label for="toAccount">Transfer To:</label>
-                    <select id="toAccount" required>
-                        <option value="">Select Account</option>
-                        <option>Checking</option>
-                        <option>Savings</option>
-                    </select>
-                    <!-- Select the transfer date -->
-                    <label for="transferDate">Date:</label>
-                    <input type="date" id="transferDate" required>
-                    <!-- Enter the amount to transfer -->
-                    <label for="amount">Amount:</label>
-                    <input type="number" id="amount" placeholder="$0.00" required>
-                    <!-- Submit button to process the transfer -->
-                    <button type="submit" class="save-btn">Submit Transfer</button>
+                <form id="makeTransferForm" class="transfer-form" autocomplete="off">
+                    <div class="form-row form-row--auto">
+                        <div class="form-group">
+                            <label for="fromAccount">Transfer From</label>
+                            <select id="fromAccount" required>
+                                <option value="">Select Account</option>
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toAccount">Transfer To</label>
+                            <select id="toAccount" required>
+                                <option value="">Select Account</option>
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row form-row--auto">
+                        <div class="form-group">
+                            <label for="transferDate">Date</label>
+                            <div class="date-picker-trigger" onclick="openTransferDatePicker()">
+                                <span class="date-icon">📅</span>
+                                <span id="transferDateDisplay">Select date</span>
+                            </div>
+                            <input type="hidden" id="transferDate" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <div class="input-with-prefix">
+                                <span class="prefix">$</span>
+                                <input type="number" id="amount" min="0.01" step="0.01" placeholder="0.00" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Submit Transfer</button>
+                    </div>
                 </form>
-            </section>
+            </article>
 
-            <!-- Pending Transfers Section -->
-            <section class="transfer-card">
-                <h2>Pending Transfers</h2>
-                <!-- Example of a pending transfer waiting to be processed -->
-                <div class="transfer-item">
-                    <p><strong>Date:</strong> Dec 18, 2025</p>
-                    <p><strong>From:</strong> Checking ***4567</p>
-                    <p><strong>To:</strong> Savings ***9876</p>
-                    <p><strong>Amount:</strong> $598.00</p>
+            <!-- ==== Pending Transfers ==== -->
+            <article class="transfer-card blue">
+                <header class="transfer-card-header">
+                    <h2>Pending Transfers</h2>
+                </header>
+
+                <div class="transfer-list">
+                    <!-- Populated by JavaScript -->
                 </div>
-            </section>
+            </article>
 
-            <!-- Recurring Transfers Section -->
-            <section class="transfer-card">
-            <h2>Edit Recurring Transfers</h2>
-            <!-- Form for editing recurring transfers -->
-            <form id="recurringForm">
-                <label>Next Transfer:</label>
-                <input type="date" id="nextTransfer">
-                <!-- Enter the amount to transfer -->
-                <label>Amount:</label>
-                <input type="number" id="recurringAmount" placeholder="$0.00">
-                <!-- Choose the account to transfer money from -->
-                <label>From:</label>
-                <select id="recurringFrom">
-                    <option>Checking</option>
-                    <option>Savings</option>
-                </select>
-                <!-- Choose the account to transfer money to -->
-                <label>To:</label>
-                <select id="recurringTo">
-                    <option>Checking</option>
-                    <option>Savings</option>
-                </select>
-                <!-- Choose the frequency of the transfer -->
-                <label>Frequency:</label>
-                <select id="recurringFrequency">
-                    <option>Monthly</option>
-                    <option>Weekly</option>
-                    <option>Yearly</option>
-                </select>
-                <!-- Submit button to process the recurring transfer -->
-                <button type="submit" class="save-btn">Update Recurring</button>
-            </form>
-        </section>
+            <!-- ==== Edit Recurring Transfers ==== -->
+            <article class="transfer-card green">
+                <header class="transfer-card-header">
+                    <h2>Edit Recurring Transfers</h2>
+                </header>
 
-        <!-- Transfer History Section -->
-        <section class="transfer-card">
-        <h2>Transfer History</h2>
-            <!-- Example of a past completed transfer -->
-            <div class="transfer-item">
-                <p><strong>Date:</strong> Sep 18, 2025</p>
-                <p><strong>From:</strong> Checking ***4567</p>
-                <p><strong>To:</strong> Savings ***9876</p>
-                <p><strong>Amount:</strong> $598.00</p>
-            </div>
-            <!-- Example of a past completed transfer -->
-            <div class="transfer-item">
-                <p><strong>Date:</strong> Oct 18, 2025</p>
-                <p><strong>From:</strong> Checking ***4567</p>
-                <p><strong>To:</strong> Savings ***9876</p>
-                <p><strong>Amount:</strong> $598.00</p>
-            </div>
+                <form id="recurringForm" class="transfer-form" autocomplete="off">
+                    <div class="form-row form-row--auto">
+                        <div class="form-group">
+                            <label for="nextTransfer">Next Transfer</label>
+                            <div class="date-picker-trigger" onclick="openRecurringDatePicker()">
+                                <span class="date-icon">📅</span>
+                                <span id="recurringDateDisplay">Select date</span>
+                            </div>
+                            <input type="hidden" id="nextTransfer" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recurringAmount">Amount</label>
+                            <div class="input-with-prefix">
+                                <span class="prefix">$</span>
+                                <input type="number" id="recurringAmount" min="0.01" step="0.01" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row form-row--auto">
+                        <div class="form-group">
+                            <label for="recurringFrom">From</label>
+                            <select id="recurringFrom">
+                                <option value="">Select Account</option>
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recurringTo">To</label>
+                            <select id="recurringTo">
+                                <option value="">Select Account</option>
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recurringFrequency">Frequency</label>
+                            <select id="recurringFrequency">
+                                <option value="">Select Frequency</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Update Recurring</button>
+                    </div>
+                </form>
+            </article>
+
+            <!-- ==== Transfer History ==== -->
+            <article class="transfer-card purple">
+                <header class="transfer-card-header">
+                    <h2>Transfer History</h2>
+                </header>
+
+                <div class="transfer-list">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </article>
         </section>
     </main>
+
+    <!-- Date Picker Modal for Transfer Date -->
+    <div id="transferDatePickerModal" class="modal">
+        <div class="modal-content modal-content--single-date">
+            <div class="modal-header">
+                <h3>Select Transfer Date</h3>
+                <button class="modal-close" onclick="closeTransferDatePicker()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="single-date-display">
+                    <label>Selected Date</label>
+                    <div class="selected-date" id="selectedTransferDate">Select date</div>
+                </div>
+
+                <div class="custom-calendar">
+                    <div class="calendar-header">
+                        <button type="button" class="calendar-nav-btn" onclick="changeTransferMonth(-1)">‹</button>
+                        <div class="calendar-month-year" id="transferCalendarMonthYear">Month Year</div>
+                        <button type="button" class="calendar-nav-btn" onclick="changeTransferMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    <div class="calendar-days" id="transferCalendarDays">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeTransferDatePicker()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="applyTransferDate()">Select Date</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Modal for Recurring Transfer -->
+    <div id="recurringDatePickerModal" class="modal">
+        <div class="modal-content modal-content--single-date">
+            <div class="modal-header">
+                <h3>Select Recurring Transfer Date</h3>
+                <button class="modal-close" onclick="closeRecurringDatePicker()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="single-date-display">
+                    <label>Selected Date</label>
+                    <div class="selected-date" id="selectedRecurringDate">Select date</div>
+                </div>
+
+                <div class="custom-calendar">
+                    <div class="calendar-header">
+                        <button type="button" class="calendar-nav-btn" onclick="changeRecurringMonth(-1)">‹</button>
+                        <div class="calendar-month-year" id="recurringCalendarMonthYear">Month Year</div>
+                        <button type="button" class="calendar-nav-btn" onclick="changeRecurringMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    <div class="calendar-days" id="recurringCalendarDays">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeRecurringDatePicker()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="applyRecurringDate()">Select Date</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Footer -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
+
+</html>

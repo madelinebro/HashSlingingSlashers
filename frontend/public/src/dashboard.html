@@ -1,73 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         Dashboard 
         Author: Samantha Saunsaucie
         Date: 10/10/2025
         -->
-        <!-- Setup and Title -->
-        <title>Dashboard</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="script.js" defer></script>
-        <script src="dashboard.js" defer></script>
-    </head>
-    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
-    <body class="dashboard">
-        <!-- Header Section -->
-        <header class="toparea">
-            <div class="space"></div> <!-- Empty Space for layout of Profile Toggle -->
-            <div class="user">
-                <img src="https://placehold.co/28x28" alt="Jane avatar">
-                <!-- Profile Toggle  -->
-                <button id="userToggle" class="user-name">Jane &#9662;</button>
-                <!-- Toggle options, hidden dropdown menu -->
-                <div id="userMenu" class="user-menu">
-                    <a href="profile.html">Profile</a>
-                    <a href="settings.html">Settings</a>
-                    <a href="login.html">Log Out</a>
+    <!-- Setup and Title -->
+    <title>Dashboard</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/dashboard.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<body class="dashboard">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <!-- Logo Section -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item active" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User Profile at Bottom -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </aside>
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-container">
+        <!-- Header -->
+        <header class="content-header">
+            <div>
+                <h1 class="page-title" id="greetingTitle">Welcome</h1>
+                <p class="page-subtitle">Here's what's happening with your finances today</p>
+            </div>
         </header>
-        <!-- Dashboard Menu -->
-        <div class="menu">
-        <!-- Navigation links to other dashboard sections --> 
-        <nav class="side-menu">
-            <a class="dash" href="accounts.html">My Accounts</a>
-            <a class="dash" href="budgeting_month.html">Budgeting</a>
-            <a class="dash" href="transfers.html">Transfers</a>
-        </nav>
-        <!-- Main Dashboard Content -->
+
+        <!-- Top Section: Account Summary (LEFT) + Stats Cards (RIGHT) -->
+        <div class="dashboard-top-section">
+            <!-- LEFT: Account Summary Card -->
+            <section class="account-summary-card">
+                <h3 class="summary-title">Total Balance</h3>
+                <div class="total-balance" id="totalBalance">$0.00</div>
+                <div class="balance-label">from all accounts</div>
+
+                <!-- Account Chips -->
+                <div class="account-chips-list" id="accountChipsList">
+                    <!-- Populated by dashboard.js -->
+                </div>
+
+                <div class="summary-footer">
+                    <a href="accounts.html" class="see-accounts-btn">
+                        See all accounts →
+                    </a>
+                </div>
+            </section>
+
+            <!-- RIGHT: Stats Grid (2x2) -->
+            <section class="stats-grid">
+                <div class="stat-card income">
+                    <div class="stat-header">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-change positive" id="incomeChange">↑ 100%</div>
+                    </div>
+                    <div class="stat-label">Income</div>
+                    <div class="stat-value" id="incomeValue">$0.00</div>
+                </div>
+
+                <div class="stat-card expense">
+                    <div class="stat-header">
+                        <div class="stat-icon">💸</div>
+                        <div class="stat-change negative" id="expenseChange">↓ 0%</div>
+                    </div>
+                    <div class="stat-label">Expenses</div>
+                    <div class="stat-value" id="expenseValue">$0.00</div>
+                </div>
+
+                <div class="stat-card net">
+                    <div class="stat-header">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-change positive" id="netChange">↑ Positive</div>
+                    </div>
+                    <div class="stat-label">Net Change</div>
+                    <div class="stat-value" id="netValue">$0.00</div>
+                </div>
+
+                <div class="stat-card transactions">
+                    <div class="stat-header">
+                        <div class="stat-icon">🧾</div>
+                        <div class="stat-change neutral" id="transactionCount">0 new</div>
+                    </div>
+                    <div class="stat-label">Transactions</div>
+                    <div class="stat-value" id="transactionValue">0</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Transaction Section -->
         <main>
-            <h1>Welcome back!</h1>
-            <!-- Transaction Component -->
             <section class="transaction-card">
-                <h2>Transactions</h2>
-                <!-- Transaction table, which displays recent transactions and history -->
+                <div class="transaction-header">
+                    <div class="transaction-title">
+                        <h2>Recent Transactions</h2>
+                        <span class="transaction-badge" id="transactionBadge">0</span>
+                    </div>
+                    <div class="transaction-controls">
+                        <div class="date-range-picker" onclick="openDatePicker()" title="Click to change date range">
+                            <span class="date-icon">📅</span>
+                            <span class="date-range-dates" id="dateRange">Oct 17 - Oct 27, 2025</span>
+                        </div>
+                        <button class="filter-btn" onclick="openFilterModal()">
+                            <span>🔍</span>
+                            Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transaction table -->
                 <div class="transaction-table">
                     <table class="tt">
                         <thead>
-                            <!-- Column Headings -->
                             <tr>
                                 <th>Description</th>
-                                <th>Transaction Date</th>
+                                <th>Date</th>
                                 <th>Amount</th>
-                                <th>Account Number</th>
+                                <th>Account</th>
                             </tr>
                         </thead>
-                        <!-- Table is filled by dashboard.js -->
-                        <tbody id="txBody"></tbody>
+                        <tbody id="txBody">
+                            <!-- dashboard.js populates this -->
+                        </tbody>
                     </table>
                 </div>
-                <!-- link to show more transactions -->
-                <p class="view-more-t"><a href="#">View More Transactions</a></p>
+
+                <p class="view-more-t">
+                    <a href="accounts.html">
+                        View All Transactions →
+                    </a>
+                </p>
             </section>
         </main>
     </div>
-    <!-- chatbot -->
-    <button class="chatbot">AI Chatbot</button>
+
+    <!-- Date Picker Modal -->
+    <div id="datePickerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Date Range</h3>
+                <button class="modal-close" onclick="closeDatePicker()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-filters-top">
+                    <button class="quick-filter-btn" onclick="setQuickFilter('today')">Today</button>
+                    <button class="quick-filter-btn" onclick="setQuickFilter('week')">This Week</button>
+                    <button class="quick-filter-btn" onclick="setQuickFilter('month')">This Month</button>
+                    <button class="quick-filter-btn" onclick="setQuickFilter('all')">All Time</button>
+                </div>
+
+                <div class="date-range-display">
+                    <div class="date-display-box">
+                        <label>Start Date</label>
+                        <div class="selected-date" id="selectedStartDate">Select date</div>
+                    </div>
+                    <div class="date-range-arrow">→</div>
+                    <div class="date-display-box">
+                        <label>End Date</label>
+                        <div class="selected-date" id="selectedEndDate">Select date</div>
+                    </div>
+                </div>
+
+                <div class="custom-calendar">
+                    <div class="calendar-header">
+                        <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹</button>
+                        <div class="calendar-month-year" id="calendarMonthYear">Month Year</div>
+                        <button class="calendar-nav-btn" onclick="changeMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDatePicker()">Cancel</button>
+                <button class="btn-primary" onclick="applyDateFilter()">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Filter Transactions</h3>
+                <button class="modal-close" onclick="closeFilterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-group">
+                    <label>Account</label>
+                    <select id="filterAccount" class="filter-select">
+                        <option value="all">All Accounts</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Transaction Type</label>
+                    <select id="filterType" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="income">Income Only</option>
+                        <option value="expense">Expenses Only</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Amount Range</label>
+                    <div class="amount-range">
+                        <input type="number" id="minAmount" class="amount-input" placeholder="Min" />
+                        <span class="range-separator">to</span>
+                        <input type="number" id="maxAmount" class="amount-input" placeholder="Max" />
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>Search Description</label>
+                    <input type="text" id="searchDesc" class="filter-input" placeholder="Search transactions..." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="clearFilters()">Clear All</button>
+                <button class="btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Footer -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
+
 </html>

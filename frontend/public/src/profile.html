@@ -1,58 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         Profile
         Author: Samantha Saunsaucie
         Date: 10/11/2025
         -->
-         <!-- Setup and Title -->
-        <title>Profile</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="script.js" defer></script>
-        <script src="profile_settings.js" defer></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    </head>
-    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
-    <body class="dashboard">
-        <header class="toparea">
-            <div class="space"></div>
-            <div class="user">
-                <!-- Placeholder for avatar -->
-                <img src="https://placehold.co/28x28" alt="Jane avatar">
-                <!-- Profile Toggle  -->
-                <button id="userToggle" class="user-name">Jane &#9662;</button>
-                <!-- Toggle options, hidden dropdown menu -->
-                <div id="userMenu" class="user-menu">
-                    <a href="profile.html">Profile</a>
-                    <a href="settings.html">Settings</a>
-                    <a href="login.html">Log Out</a>
+    <!-- Setup and Title -->
+    <title>Profile</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/profile_settings.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<body class="dashboard">
+    <!-- ========== SIDEBAR (same markup you use on Dashboard) ========== -->
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <!-- Logo Section -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item active" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User Profile at Bottom -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
                 </div>
             </div>
-        </header>
-        <!-- Main content area for profile information -->
-        <main class="profile-container">
-        <!-- Heading -->
-        <h1>My Profile</h1>
-        <!-- Profile information Section -->
-        <div class="profile-card">
-            <div class="profile-info">
-                <p><strong>Full Name:</strong> Jane Doe</p>
-                <p><strong>Username:</strong> JaneDoe234</p>
-                <p><strong>Mobile Number:</strong> (605) 338-2167</p>
-                <p><strong>Email:</strong> jdoe@email.com</p>
-            </div>
-
-            <!-- Pencil Icon (link to settings) -->
-            <a href="settings.html" class="edit-icon" title="Edit Profile">
-                <i class="fa-solid fa-pen-to-square"></i>
-            </a>
         </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-container">
+        <header class="content-header">
+            <h1 class="page-title">My Profile</h1>
+            <p class="page-subtitle">Manage your personal info and account preferences</p>
+        </header>
+
+        <!-- Profile layout -->
+        <section class="settings-grid">
+            <!-- Left: big avatar + primary identity -->
+            <article class="settings-card teal">
+                <div class="profile-avatar">
+                    <img src="images/Generic avatar (1).svg" alt="User avatar" class="profile-avatar-img" />
+                    <button class="avatar-edit-btn" type="button" onclick="window.location.href='settings.html'">
+                        Edit Photo
+                    </button>
+                </div>
+
+                <div class="profile-identity">
+                    <h2 class="profile-name">—</h2>
+                    <p class="profile-username">@—</p>
+
+                    <ul class="profile-meta">
+                        <li><span class="meta-icon">📧</span> <span class="user-email">—</span></li>
+                        <li><span class="meta-icon">📱</span> <span class="user-mobile">—</span></li>
+                        <li><span class="meta-icon">🆔</span> Member since <span class="user-member-since">—</span></li>
+                    </ul>
+
+                    <div class="profile-actions">
+                        <a class="btn primary" href="settings.html">Edit Profile</a>
+                        <a class="btn subtle" href="settings.html">Security</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Personal Details -->
+            <article class="settings-card blue">
+                <div class="settings-card-header">
+                    <h2>Personal Details</h2>
+                    <span class="settings-badge">Profile</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value" data-field="fullName">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Username</span>
+                        <span class="info-value" data-field="username">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value" data-field="email">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mobile</span>
+                        <span class="info-value" data-field="mobile">—</span>
+                    </div>
+                    <div class="info-item full">
+                        <span class="info-label">Address</span>
+                        <span class="info-value" data-field="address">—</span>
+                    </div>
+                </div>
+            </article>
+        </section>
     </main>
-    <!-- chatbot -->
-    <button class="chatbot">AI Chatbot</button>
+
+    <!-- Mobile Footer -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
+
 </html>

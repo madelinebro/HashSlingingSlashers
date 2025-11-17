@@ -1,95 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         Monthly Budget
         Author: Samantha Saunsaucie
         Date: 10/11/2025
         -->
-        <title>Monthly Budget</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="script.js" defer></script>
-        <script src="budgeting.js" defer></script>
-    </head>
-    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
-    <body class="dashboard">
-        <header class="toparea">
-            <div class="space"></div>
-            <div class="user">
-                <img src="https://placehold.co/28x28" alt="Jane avatar">
-                <!-- Profile Toggle  -->
-                <button id="userToggle" class="user-name">Jane &#9662;</button>
-                <!-- Toggle options, hidden dropdown menu -->
-                <div id="userMenu" class="user-menu">
-                    <a href="profile.html">Profile</a>
-                    <a href="settings.html">Settings</a>
-                    <a href="login.html">Log Out</a>
+    <title>Monthly Budget</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/budgeting.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<body class="dashboard">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <!-- Logo Section -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item active" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User Profile at Bottom -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <header class="content-header">
+            <h1 class="page-title">Monthly Budget</h1>
+            <p class="page-subtitle">Track and manage your spending</p>
         </header>
-         <!-- Main content area for Monthly Budget Section -->
-        <main class="budget-container">
-            <h1>Monthly Budget</h1>
-            <!--Tab buttons for Week, Month, and Year Selection Tabs -->
-            <div class="budget-btn">
-            <button class="tab-btn" data-period="week">Week</button>
-            <button class="tab-btn-active" data-period="month">Month</button>
-            <button class="tab-btn" data-period="year">Year</button>
+
+        <!-- Tab Navigation for Week/Month/Year -->
+        <div class="budget-tabs">
+            <button class="budget-tab-btn" data-period="week">Week</button>
+            <button class="budget-tab-btn active" data-period="month">Month</button>
+            <button class="budget-tab-btn" data-period="year">Year</button>
+        </div>
+
+        <!-- SPENDING SUMMARY SECTION -->
+        <section class="budget-summary-card">
+            <h2>Monthly Spending Summary</h2>
+
+            <!-- Summary Stats -->
+            <div class="budget-summary-stats">
+                <div class="budget-stat-item total-spent">
+                    <span class="budget-stat-label">Total Spend in <span id="currentMonth"></span></span>
+                    <span class="budget-stat-value" id="totalSpent">$0</span>
+                </div>
+                <div class="budget-stat-item remaining">
+                    <span class="budget-stat-label">Left for Spending</span>
+                    <span class="budget-stat-value" id="remainingBudget">$0</span>
+                </div>
             </div>
 
-            <!-- Spending Summary for Month Section -->
-            <section class="budget-card" id="spendingSummary">
-                <h2>Monthly Spending Summary</h2>
-                <!-- Summary of Total Monthly Spending and remaining budget -->
-                <div class="summary">
-                    <p><strong>Total Spend in October:</strong> $2,567</p>
-                    <p><strong>Left for Spending:</strong> $1,138</p>
-                </div>
-                <!-- Spending Summary Table for Month, split each row by categories -->
-                <table class="spending-table">
-                    <tr><th>Category</th><th>Amount</th></tr>
-                    <tr><td>Bills & Utilities</td><td>$2,135</td></tr>
-                    <tr><td>Shopping</td><td>$58</td></tr>
-                    <tr><td>Car & Transportation</td><td>$71</td></tr>
-                    <tr><td>Groceries</td><td>$126</td></tr>
-                    <tr><td>Food & Drinks</td><td>$133</td></tr>
-                    <tr><td>Entertainment</td><td>$42</td></tr>
+            <!-- Category Breakdown Table -->
+            <div class="budget-table-wrapper">
+                <table class="budget-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>% of Budget</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                        <!-- Dynamically populated by JS -->
+                    </tbody>
                 </table>
-            </section>
+            </div>
+        </section>
 
-            <!-- Monthly Budget form section for editing budget -->
-            <section class="budget-card" id="monthlyBudget">
-                <h2>Monthly Budget</h2>
-                <!-- Allows for updating the category amounts -->
-                <form id="budgetForm">
-                    <!-- Total Monthly Spend input field-->
-                    <label>Monthly Spend</label>
-                    <input type="number" id="monthlySpend" value="3705">
-                    <!-- Total Monthly Spend on Bills & Utilities input field -->
-                    <label>Bills & Utilities</label>
-                    <input type="number" id="bills" value="2200">
-                    <!-- Total Monthly Spend on Shopping input field -->
-                    <label>Shopping</label>
-                    <input type="number" id="shopping" value="150">
-                    <!-- Total Monthly Spend on Car & Transportation input field -->
-                    <label>Car & Transportation</label>
-                    <input type="number" id="car" value="150">
-                    <!-- Total Monthly Spend on Groceries input field -->
-                    <label>Groceries</label>
-                    <input type="number" id="groceries" value="300">
-                    <!-- Total Monthly Spend on Food and Drinks input field -->
-                    <label>Food & Drinks</label>
-                    <input type="number" id="food" value="250">
-                    <!-- Total Monthly Spend on Entertainment input field -->
-                    <label>Entertainment</label>
-                    <input type="number" id="entertainment" value="100">
-                    <!-- Submit button to update and save options -->
-                    <button type="submit" class="save-btn">Update Budget</button>
-                </form>
-            </section>
-        </main>
-    </body>
+        <!-- BUDGET EDITOR SECTION -->
+        <section class="budget-editor-card">
+            <h2>Edit Monthly Budget</h2>
+            <p class="budget-editor-subtitle">Adjust your budget allocations for each category</p>
+
+            <form id="budgetForm" class="budget-form">
+                <div class="budget-form-grid" id="budgetFormGrid">
+                    <!-- Dynamically populated by JS -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="budget-form-actions">
+                    <button type="button" class="budget-btn-secondary" id="resetBtn">Reset to Default</button>
+                    <button type="submit" class="budget-btn-primary">
+                        <span>Update Budget</span>
+                        <span class="btn-icon-small">✓</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- Mobile Footer -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
+</body>
+
 </html>

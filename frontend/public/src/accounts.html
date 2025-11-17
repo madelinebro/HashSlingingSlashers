@@ -1,52 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!--
+
+<head>
+    <!--
         Financial Management Capstone Project
         My Accounts
         Author: Samantha Saunsaucie
         Date: 10/10/2025
         -->
-        <!-- Setup and Title -->
-        <title>My Accounts</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="style.css" rel="stylesheet" />
-        <script src="script.js" defer></script>
-        <script src="accounts.js" defer></script>
-    </head>
-    <!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
-    <body class="dashboard">
-        <header class="toparea">
-            <div class="space"></div>
-            <div class="user">
-                <!-- Placeholder for avatar -->
-                <img src="https://placehold.co/28x28" alt="Jane avatar">
-                <!-- Profile Toggle  -->
-                <button id="userToggle" class="user-name">Jane &#9662;</button>
-                <!-- Toggle options, hidden dropdown menu -->
-                <div id="userMenu" class="user-menu">
-                    <a href="profile.html">Profile</a>
-                    <a href="settings.html">Settings</a>
-                    <a href="login.html">Log Out</a>
+    <!-- Setup and Title -->
+    <title>My Accounts</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/accounts.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<body class="dashboard">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <!-- Logo Section -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+            <a class="sidebar-nav-item" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <a class="sidebar-nav-item active" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User Profile at Bottom -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-container">
+        <!-- Header -->
+        <header class="content-header">
+            <div>
+                <h1 class="page-title">My Accounts</h1>
+                <p class="page-subtitle">Manage and view all your financial accounts</p>
+            </div>
         </header>
-        <!-- Main content area for Account Summary -->
-        <main class="account-container">
-            <h1>My Accounts</h1>
-            
-            <!-- Account Summary Section -->
-             <section class="account-summary" aria-labelledby="account-summary-title">
-                <h2 id="account-summary-title">Account Summary</h2>
-                <!-- Description -->
-                <p class="account-sub">Personal Checking and Savings Accounts</p>
-                <!-- Table to Display account information -->
-                <table class="account-table">
-                    <!-- Table body, in which rows are added by accounts.js -->
-                    <tbody id="accountTbody"></tbody>
-                </table>
+
+        <!-- Account Summary Section -->
+        <section class="accounts-summary">
+            <div class="total-overview">
+                <div class="overview-item">
+                    <span class="overview-label">Total Balance</span>
+                    <span class="overview-value" id="totalBalanceOverview">$7,890.45</span>
+                </div>
+                <div class="overview-item">
+                    <span class="overview-label">Total Accounts</span>
+                    <span class="overview-value" id="totalAccounts">2</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accounts Grid -->
+        <main>
+            <section class="accounts-grid" id="accountsGrid">
+                <!-- Account cards will be dynamically inserted here -->
             </section>
         </main>
-    </body>
+
+        <!-- Transaction Modal -->
+        <div id="transactionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modalAccountName">Account Transactions</h2>
+                        <p class="modal-subtitle" id="modalAccountNumber"></p>
+                    </div>
+                    <button class="modal-close" onclick="closeTransactionModal()">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="modal-filters">
+                        <div class="date-range-picker" onclick="openDatePickerModal()"
+                            title="Click to change date range">
+                            <span class="date-icon">📅</span>
+                            <span class="date-range-dates" id="modalDateRange">Last 30 days</span>
+                        </div>
+                        <div class="modal-balance">
+                            <span class="modal-balance-label">Current Balance:</span>
+                            <span class="modal-balance-value" id="modalBalance">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="transaction-table">
+                        <table class="tt">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalTxBody">
+                                <!-- Transactions will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Footer -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
+</body>
+
 </html>
