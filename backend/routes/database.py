@@ -57,6 +57,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     accounts = relationship("Account", back_populates="user")
+    budgets = relationship("Budget", back_populates="user")   # ⬅️ add this line
 
 
 class Account(Base):
