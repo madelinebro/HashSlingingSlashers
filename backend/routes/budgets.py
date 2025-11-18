@@ -1,5 +1,5 @@
 """
-Budget Routes
+Budget Routes for Financial Management API
 """
 from datetime import datetime
 from typing import List, Optional
@@ -8,14 +8,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from .database import get_db, Budget  # ⬅️ import Budget from database
+from .database import get_db, Budget
 
 router = APIRouter()
 
 
-# --------------------------------------------------
-# Pydantic Models
-# --------------------------------------------------
+# -------------------------------
+# Pydantic Schemas
+# -------------------------------
 class BudgetCreate(BaseModel):
     category: str
     amount: float = Field(..., gt=0)
@@ -40,11 +40,11 @@ class BudgetResponse(BaseModel):
         orm_mode = True
 
 
-# --------------------------------------------------
-# Temporary auth (replace with real JWT later)
-# --------------------------------------------------
+# -------------------------------
+# Temporary auth (stub)
+# -------------------------------
 def get_current_user() -> int:
-    # TODO: plug this into your real auth
+    # TODO: replace with real JWT-based auth
     return 1
 
 
@@ -59,10 +59,9 @@ def _to_budget_response(budget: Budget) -> BudgetResponse:
     )
 
 
-# --------------------------------------------------
+# -------------------------------
 # Routes
-# --------------------------------------------------
-
+# -------------------------------
 @router.get(
     "/",
     response_model=List[BudgetResponse],
@@ -77,7 +76,7 @@ def get_budgets(
     Get all budgets for the current user.
 
     Optional query param:
-      - `period`: filter by 'weekly', 'monthly', 'yearly'
+      - `period`: 'weekly', 'monthly', 'yearly'
     """
     query = db.query(Budget).filter(Budget.user_id == user_id)
 
@@ -200,4 +199,3 @@ def delete_budget(
     db.delete(budget)
     db.commit()
     return
-
