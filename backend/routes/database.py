@@ -91,3 +91,16 @@ class Transaction(Base):
 
     account = relationship("Account", back_populates="transactions")
 
+class Budget(Base):
+    __tablename__ = "budgets"
+
+    budget_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    category = Column(String(50), nullable=False)
+    amount = Column(DECIMAL(12, 2), nullable=False)
+    period = Column(String(20), nullable=False, default="monthly")  # e.g. 'weekly', 'monthly', 'yearly'
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="budgets")
+
+
