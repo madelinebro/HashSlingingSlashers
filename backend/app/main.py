@@ -4,12 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # from config import settings  # not used yet
 
-from routes.database import engine, Base
+from backend.routes.database import engine, Base
 
-from routes import auth
-from routes import accounts
-from routes import transactions
-from routes import budgets
+# Import routes in dependency order
+from backend.routes import auth
+from backend.routes import accounts
+from backend.routes import transactions
+from backend.routes import budgets
 
 app = FastAPI(title="Financial Management API")
 
