@@ -1,43 +1,86 @@
-#update backend/app/main.py
+# backend/app/main.py
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from config import settings  # not used yet
-
+# Import SQLAlchemy engine + Base from your routes/database module
 from backend.routes.database import engine, Base
 
-# Import submodules directly
-import backend.routes.auth as auth
+# Import routers from backend.routes (all of these files must define `router = APIRouter()`)
 import backend.routes.accounts as accounts
 import backend.routes.transactions as transactions
 import backend.routes.budgets as budgets
 
-app = FastAPI(title="Financial Management API")
+app = FastAPI(title="BloomFi Financial Management API")
 
-# CORS
+# -------------------------------------------------
+# CORS CONFIG
+# -------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "*",  # you can tighten this later
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Create tables if they don't exist
+# -------------------------------------------------
+# STARTUP: CREATE TABLES
+# -------------------------------------------------
 @app.on_event("startup")
 def on_startup():
+    # Create all tables from SQLAlchemy models (User, Account, Transaction, Budget)
     Base.metadata.create_all(bind=engine)
 
-# Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
-app.include_router(accounts.router, prefix="/api/accounts", tags=["Accounts"])
-app.include_router(transactions.router, prefix="/api/transactions", tags=["Transactions"])
-app.include_router(budgets.router, prefix="/api/budgets", tags=["Budgets"])
+# -------------------------------------------------
+# ROUTERS
+# -------------------------------------------------
+# IMPORTANT:
+# - In backend/routes/accounts.py, router MUST be defined as: router = APIRouter()
+#   (no prefix there)
+# - Same for transactions.py and budgets.py
+#
+# Final paths:
+#   /api/accounts        -> list/create accounts
+#   /api/accounts/{id}   -> get a single account
+#   /api/transactions    -> list transactions
+#   /api/transactions/{id}
+#   /api/budgets         -> list/create budgets
+#   /api/budgets/{id}    -> get/update/delete a budget
 
+app.include_router(
+    accounts.router,
+    prefix="/api/accounts",
+    tags=["Accounts"],
+)
+
+app.include_router(
+    transactions.router,
+    prefix="/api/transactions",
+    tags=["Transactions"],
+)
+
+app.include_router(
+    budgets.router,
+    prefix="/api/budgets",
+    tags=["Budgets"],
+)
+
+# -------------------------------------------------
+# HEALTH CHECK
+# -------------------------------------------------
 @app.get("/")
 def root():
     return {"status": "healthy"}
 
+# -------------------------------------------------
+# DEV ENTRYPOINT (optional)
+# -------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
