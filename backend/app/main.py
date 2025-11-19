@@ -2,17 +2,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import config first (no dependencies)
-from config import settings
+# from config import settings  # not used yet
 
-# Import database (depends on config only)
 from routes.database import engine, Base
 
-# Import routes in dependency order
-from routes import auth          # auth has no dependencies on other routes
-from routes import accounts       # accounts depends on auth
-from routes import transactions   # transactions depends on auth
-from routes import budgets        # budgets depends on auth
+from routes import auth
+from routes import accounts
+from routes import transactions
+from routes import budgets
 
 app = FastAPI(title="Financial Management API")
 
@@ -24,6 +21,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ Create tables if they don't exist
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
