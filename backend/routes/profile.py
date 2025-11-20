@@ -80,4 +80,3 @@ def get_settings(
         "theme": "light",
         "language": "en"
     }
-EOF
