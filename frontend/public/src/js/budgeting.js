@@ -1,42 +1,35 @@
-document.addEventListener("DOMContentLoaded", () => {
+/* ======================================================================
+  BloomFi - Budgeting (budgeting.js)
+  Incorporates functionality for monthly, weekly, and yearly views
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+// Wait for DOM to be fully loaded before executing scripts
+document.addEventListener('DOMContentLoaded', () => {
   
-  // ========== TAB SWITCHING (Works on all pages) ==========
-  const budgetTabs = document.querySelectorAll(".budget-tab-btn");
-  
-  budgetTabs.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const period = btn.dataset.period;
-      const pages = {
-        week:  "budgeting_week.html",
-        month: "budgeting_month.html",
-        year:  "budgeting_year.html"
-      };
-      
-      // Navigate to selected page
-      if (pages[period]) {
-        window.location.href = pages[period];
-      }
-    });
-  });
-
-  // ========== USER MENU TOGGLE (Works on all pages) ==========
+  //  User Menu Toggle (Works on all pages) 
+  // Handles the dropdown menu in the user profile section
   const userToggle = document.getElementById("userToggle");
   const userMenu = document.getElementById("userMenu");
   
   if (userToggle && userMenu) {
+    // Toggle menu visibility when clicking the user button
     userToggle.addEventListener("click", (e) => {
-      e.stopPropagation();
+      e.stopPropagation(); // Prevent click from bubbling to document
+      
+      // Check current state and toggle
       const expanded = userToggle.getAttribute("aria-expanded") === "true";
       userToggle.setAttribute("aria-expanded", !expanded);
       userMenu.style.display = expanded ? "none" : "block";
       
+      // Rotate chevron icon to indicate menu state
       const chevron = userToggle.querySelector(".chev");
       if (chevron) {
         chevron.style.transform = expanded ? "rotate(0deg)" : "rotate(-90deg)";
       }
     });
 
-    // Close menu when clicking outside
+    // Close menu when clicking anywhere outside of it
     document.addEventListener("click", () => {
       userToggle.setAttribute("aria-expanded", "false");
       userMenu.style.display = "none";
@@ -47,18 +40,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === LOGOUT FUNCTIONALITY ===
+  // Log Out Functionality
+  // Clears the user session data and redirects them to login page
   const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
-      e.preventDefault();
+      e.preventDefault(); // Prevent default link navigation
+      
+      // Clear authentication data from localStorage
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("userName");
+      
+      // Redirect to login page
       window.location.href = "login.html";
     });
   }
   
-  // ========== CHATBOT BUTTON (Works on all pages) ==========
+  // Chatbot Button (Works on all pages) 
+  // Placeholder functionality for future chatbot feature
   const chatbotBtn = document.querySelector('.chatbot');
   if (chatbotBtn) {
     chatbotBtn.addEventListener('click', () => {
@@ -66,21 +65,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== MONTHLY BUDGET SPECIFIC ==========
+  
+  // Initialize the appropriate budget page based on current URL
   if (window.location.pathname.includes('budgeting_month')) {
     initMonthlyBudget();
   }
 
-  // ========== WEEKLY BUDGET SPECIFIC ==========
   if (window.location.pathname.includes('budgeting_week')) {
     initWeeklyBudget();
   }
 
-  // ========== YEARLY BUDGET SPECIFIC ==========
   if (window.location.pathname.includes('budgeting_year')) {
     initYearlyBudget();
   }
 });
+
 
 // ============================================
 // MONTHLY BUDGET FUNCTIONS
@@ -88,20 +87,22 @@ document.addEventListener("DOMContentLoaded", () => {
 function initMonthlyBudget() {
   console.log('Initializing Monthly Budget Page...');
   
-  // Load and render the monthly budget
+  // Load saved or default budget data and display it
   const budgetData = loadMonthlyBudgetData();
   renderMonthlyBudget(budgetData);
   
-  // Handle budget form submission
+  // Budget form submission
   const budgetForm = document.getElementById('budgetForm');
   
   if (budgetForm) {
+    // Handle save button click
     budgetForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+      e.preventDefault(); // Prevent page reload
       saveMonthlyBudget();
     });
 
-    // Real-time budget calculation
+    // Budget Calculation
+    // Update totals as user types in any input field
     const inputs = budgetForm.querySelectorAll('input[type="number"]');
     inputs.forEach(input => {
       input.addEventListener('input', () => {
@@ -111,10 +112,12 @@ function initMonthlyBudget() {
   }
 
   // Reset button
+  // Restore default budget values
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       if (confirm('Reset to default values?')) {
+        // Clear saved data and reload defaults
         localStorage.removeItem('monthlyBudget');
         const defaultData = getDefaultMonthlyBudget();
         renderMonthlyBudget(defaultData);
@@ -124,21 +127,18 @@ function initMonthlyBudget() {
   }
 }
 
-/**
- * Get default monthly budget structure
- * This simulates what would come from the database
- */
+// Gets default monthly budget structure
 function getDefaultMonthlyBudget() {
   return {
-    totalBudget: 3705,
+    totalBudget: 3705, // Total monthly budget allocation
     categories: [
       { 
         id: 'bills', 
         name: 'Bills & Utilities', 
-        budgeted: 2200, 
-        spent: 2135, 
+        budgeted: 2200, // Amount allocated for this category
+        spent: 2135,    // Amount actually spent
         icon: '💡',
-        colorClass: 'bills'
+        colorClass: 'bills' 
       },
       { 
         id: 'shopping', 
@@ -186,11 +186,8 @@ function getDefaultMonthlyBudget() {
   };
 }
 
-/**
- * Load monthly budget data
- * First checks localStorage, then falls back to defaults
- * In the future, this would fetch from your database
- */
+
+// Load monthly budget data
 function loadMonthlyBudgetData() {
   const savedBudget = localStorage.getItem('monthlyBudget');
   
@@ -203,14 +200,13 @@ function loadMonthlyBudgetData() {
     }
   }
   
+  // No saved data found, return defaults
   return getDefaultMonthlyBudget();
 }
 
-/**
- * Render the monthly budget to the page
- */
+// Render monthly budget to the page
 function renderMonthlyBudget(budgetData) {
-  // Update month display
+  // update month display
   const currentMonthEl = document.getElementById('currentMonth');
   if (currentMonthEl) {
     currentMonthEl.textContent = budgetData.month || 'October';
@@ -221,7 +217,7 @@ function renderMonthlyBudget(budgetData) {
   const totalBudgeted = budgetData.categories.reduce((sum, cat) => sum + cat.budgeted, 0);
   const remaining = budgetData.totalBudget - totalSpent;
   
-  // Update summary stats
+  // Update Summary statistics
   const totalSpentEl = document.getElementById('totalSpent');
   const remainingBudgetEl = document.getElementById('remainingBudget');
   
@@ -232,22 +228,19 @@ function renderMonthlyBudget(budgetData) {
     remainingBudgetEl.textContent = formatCurrency(remaining);
   }
   
-  // Render category table
-  renderCategoryTable(budgetData);
-  
-  // Render budget form
-  renderBudgetForm(budgetData);
+  // Render components
+  renderCategoryTable(budgetData);  // Spending breakdown table
+  renderBudgetForm(budgetData);     // Editable budget form
 }
 
-/**
- * Render the category breakdown table
- */
+// Render category breakdown table
 function renderCategoryTable(budgetData) {
   const tbody = document.getElementById('categoryTableBody');
   if (!tbody) return;
   
-  tbody.innerHTML = '';
+  tbody.innerHTML = ''; // Clear existing rows
   
+  // Create a row for each category
   budgetData.categories.forEach(category => {
     const percentage = calculatePercentage(category.spent, budgetData.totalBudget);
     const status = getSpendingStatus(category.spent, category.budgeted);
@@ -264,16 +257,14 @@ function renderCategoryTable(budgetData) {
   });
 }
 
-/**
- * Render the budget form inputs
- */
+// Render the budget form inputs
 function renderBudgetForm(budgetData) {
   const formGrid = document.getElementById('budgetFormGrid');
   if (!formGrid) return;
   
-  formGrid.innerHTML = '';
+  formGrid.innerHTML = ''; // Clear existing form fields
   
-  // Total Monthly Budget input
+  // Total Monthly budget input
   const totalBudgetGroup = document.createElement('div');
   totalBudgetGroup.className = 'budget-form-group total-budget';
   totalBudgetGroup.innerHTML = `
@@ -285,7 +276,7 @@ function renderBudgetForm(budgetData) {
   `;
   formGrid.appendChild(totalBudgetGroup);
   
-  // Category inputs
+  // Category budget inputs
   budgetData.categories.forEach(category => {
     const formGroup = document.createElement('div');
     formGroup.className = 'budget-form-group';
@@ -299,19 +290,18 @@ function renderBudgetForm(budgetData) {
     formGrid.appendChild(formGroup);
   });
   
-  // Add event listeners to new inputs
+  // Attach event listeners
+  // Add real-time calculation to all inputs
   const inputs = formGrid.querySelectorAll('input[type="number"]');
   inputs.forEach(input => {
     input.addEventListener('input', calculateAndUpdateMonthlyTotals);
   });
   
-  // Initial calculation
+  // Perform initial calculation
   calculateAndUpdateMonthlyTotals();
 }
 
-/**
- * Calculate and update monthly totals with visual feedback
- */
+// Calculate and update monthly totals with visual feedback
 function calculateAndUpdateMonthlyTotals() {
   const monthlySpendInput = document.getElementById('monthlySpend');
   const totalBudget = parseFloat(monthlySpendInput?.value) || 0;
@@ -319,7 +309,7 @@ function calculateAndUpdateMonthlyTotals() {
   // Get current budget data to access spent amounts
   const budgetData = loadMonthlyBudgetData();
   
-  // Calculate total allocated
+  // Calculate total allocated budget
   let totalAllocated = 0;
   budgetData.categories.forEach(category => {
     const input = document.getElementById(category.id);
@@ -330,25 +320,27 @@ function calculateAndUpdateMonthlyTotals() {
   
   const remaining = totalBudget - totalAllocated;
   
-  // Visual feedback on total budget input
+  // visual for total budget input
   if (monthlySpendInput) {
+    // Over-allocated: Red warning
     if (totalAllocated > totalBudget) {
       monthlySpendInput.style.borderColor = '#ef4444';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-    } else if (remaining < totalBudget * 0.1) {
+    } 
+    // Near limit: Orange warning
+    else if (remaining < totalBudget * 0.1) {
       monthlySpendInput.style.borderColor = '#f59e0b';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
-    } else {
+    } 
+    // Healthy: Green confirmation
+    else {
       monthlySpendInput.style.borderColor = '#10b981';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
     }
   }
 }
 
-/**
- * Save monthly budget to localStorage
- * In the future, this would save to your database
- */
+// Save monthly budget to localStorage
 function saveMonthlyBudget() {
   const budgetData = loadMonthlyBudgetData();
   
@@ -366,28 +358,26 @@ function saveMonthlyBudget() {
     }
   });
   
-  // Validate
+  // Validation
+  // Prevent saving if over-allocated
   if (totalAllocated > budgetData.totalBudget) {
     showNotification(
       `⚠️ Warning: Total allocated (${formatCurrency(totalAllocated)}) exceeds monthly budget (${formatCurrency(budgetData.totalBudget)})!`, 
       'warning'
     );
-    return;
+    return; // Don't save invalid data
   }
   
   // Save to localStorage
   budgetData.lastUpdated = new Date().toISOString();
   localStorage.setItem('monthlyBudget', JSON.stringify(budgetData));
   
-  // Re-render to show updates
+  // Render and notify
   renderMonthlyBudget(budgetData);
-  
   showNotification('✅ Budget updated successfully!', 'success');
 }
 
-/**
- * Determine spending status based on spent vs budgeted
- */
+// Determine spending status based on actual vs. budgeted
 function getSpendingStatus(spent, budgeted) {
   const percentUsed = (spent / budgeted) * 100;
   
@@ -406,7 +396,7 @@ function getSpendingStatus(spent, budgeted) {
 function initWeeklyBudget() {
   console.log('Initializing Weekly Budget Page...');
   
-  // Load and render the weekly budget
+  // Load and display the current week's budget
   const weeklyData = loadWeeklyBudgetData();
   renderWeeklyBudget(weeklyData);
   
@@ -414,6 +404,7 @@ function initWeeklyBudget() {
   const prevWeekBtn = document.getElementById('prevWeekBtn');
   const nextWeekBtn = document.getElementById('nextWeekBtn');
   
+  // Navigate to previous week
   if (prevWeekBtn) {
     prevWeekBtn.addEventListener('click', () => {
       navigateWeek(-1);
@@ -421,6 +412,7 @@ function initWeeklyBudget() {
     });
   }
   
+  // Navigate to next week
   if (nextWeekBtn) {
     nextWeekBtn.addEventListener('click', () => {
       navigateWeek(1);
@@ -431,18 +423,18 @@ function initWeeklyBudget() {
   console.log('Weekly budget initialized successfully!');
 }
 
-/**
- * Get default weekly budget structure
- * This simulates what would come from the database
- */
+
+// Get default weekly budget structure
 function getDefaultWeeklyBudget() {
   return {
-    weekStart: '2025-11-04',
-    weekEnd: '2025-11-10',
+    weekStart: '2025-11-04',      // ISO date for week start
+    weekEnd: '2025-11-10',        // ISO date for week end
     weekLabel: 'Current Week',
-    weeklyBudget: 850,
-    totalSpent: 592,
-    lastWeekSpent: 640,
+    weeklyBudget: 850,            // Total weekly budget
+    totalSpent: 592,              // Total spent this week
+    lastWeekSpent: 640,           // For comparison purposes
+    
+    // Daily Spending breakdown
     dailyData: [
       {
         day: 'Monday',
@@ -505,9 +497,11 @@ function getDefaultWeeklyBudget() {
         amount: 32.00,
         transactions: 2,
         topCategory: { name: 'Food & Drinks', amount: 32, colorClass: 'food' },
-        isToday: true
+        isToday: true // Highlighted as today
       }
     ],
+    
+    // CAtegory spending summary
     categoryData: [
       {
         id: 'groceries',
@@ -552,6 +546,8 @@ function getDefaultWeeklyBudget() {
         colorClass: 'bills'
       }
     ],
+    
+    // Weekly Insights and tips
     insights: [
       {
         type: 'success',
@@ -575,9 +571,7 @@ function getDefaultWeeklyBudget() {
   };
 }
 
-/**
- * Load weekly budget data
- */
+// Loads weekly budget data
 function loadWeeklyBudgetData(weekOffset = 0) {
   const savedWeeklyData = localStorage.getItem(`weeklyBudget_${weekOffset}`);
   
@@ -593,16 +587,17 @@ function loadWeeklyBudgetData(weekOffset = 0) {
   return getDefaultWeeklyBudget();
 }
 
-/**
- * Navigate to a different week
- */
+// NAvigates to a different week
 function navigateWeek(offset) {
+  // Get current week offset from localStorage (default 0 = current week)
   let currentOffset = parseInt(localStorage.getItem('currentWeekOffset') || '0');
   currentOffset += offset;
   localStorage.setItem('currentWeekOffset', currentOffset.toString());
   
+  // Load data for the new week
   const weeklyData = loadWeeklyBudgetData(currentOffset);
   
+  // Update week label based on offset
   if (currentOffset === 0) {
     weeklyData.weekLabel = 'Current Week';
   } else if (currentOffset === -1) {
@@ -615,13 +610,14 @@ function navigateWeek(offset) {
     weeklyData.weekLabel = `${currentOffset} Weeks Ahead`;
   }
   
+  // Render the updated week
   renderWeeklyBudget(weeklyData);
 }
 
-/**
- * Render the weekly budget to the page
- */
+
+// Render the weekly budget to the page
 function renderWeeklyBudget(weeklyData) {
+  // Update week header
   const weekLabelEl = document.getElementById('weekLabel');
   const weekDatesEl = document.getElementById('weekDates');
   
@@ -632,24 +628,26 @@ function renderWeeklyBudget(weeklyData) {
     weekDatesEl.textContent = formatWeekDateRange(weeklyData.weekStart, weeklyData.weekEnd);
   }
   
+  // Calculate statistics
   const dailyAverage = weeklyData.totalSpent / 7;
   const remaining = weeklyData.weeklyBudget - weeklyData.totalSpent;
   const percentRemaining = ((remaining / weeklyData.weeklyBudget) * 100).toFixed(0);
   const spendingDiff = weeklyData.totalSpent - weeklyData.lastWeekSpent;
   
+  // Render all the components
   renderWeeklyOverviewCards(weeklyData.totalSpent, dailyAverage, remaining, percentRemaining, spendingDiff);
   renderDailyBreakdown(weeklyData.dailyData);
   renderWeeklyCategoryBreakdown(weeklyData.categoryData);
   renderWeeklyInsights(weeklyData.insights);
 }
 
-/**
- * Render weekly overview cards
- */
+
+// Render weekly overview statistics cards
 function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentRemaining, spendingDiff) {
   const overviewGrid = document.getElementById('weeklyOverviewGrid');
   if (!overviewGrid) return;
   
+  // ========== DETERMINE SPENDING TREND ==========
   let trendClass = 'neutral';
   let trendText = 'Similar to usual';
   
@@ -661,6 +659,7 @@ function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentR
     trendText = `↑ ${formatCurrency(spendingDiff)} from last week`;
   }
   
+  // Create stat cards with html
   overviewGrid.innerHTML = `
     <div class="weekly-stat-card spent">
         <div class="weekly-stat-header">
@@ -695,18 +694,22 @@ function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentR
   `;
 }
 
-/**
- * Render daily breakdown
- */
+// render daily spending breakdown
 function renderDailyBreakdown(dailyData) {
   const daysGrid = document.getElementById('daysGrid');
   if (!daysGrid) return;
   
-  daysGrid.innerHTML = '';
+  daysGrid.innerHTML = ''; // Clear existing content
+  
+  // Find maximum amount for scaling the bars
   const maxAmount = Math.max(...dailyData.map(d => d.amount));
   
+  // Create card for each day
   dailyData.forEach(dayData => {
+    // Calculate bar width as percentage of max
     const barWidth = ((dayData.amount / maxAmount) * 100).toFixed(0);
+    
+    // Apply special styling for today
     const todayClass = dayData.isToday ? 'today' : '';
     const barFillClass = dayData.isToday ? 'today-fill' : '';
     const dateDisplay = dayData.isToday ? `${dayData.date} • Today` : dayData.date;
@@ -733,18 +736,19 @@ function renderDailyBreakdown(dailyData) {
   });
 }
 
-/**
- * Render weekly category breakdown
- */
+// Render weekly category breakdown
 function renderWeeklyCategoryBreakdown(categoryData) {
   const categoryGrid = document.getElementById('categoryBreakdownGrid');
   if (!categoryGrid) return;
   
-  categoryGrid.innerHTML = '';
+  categoryGrid.innerHTML = ''; // Clear existing content
   
+  // Create item for each category
   categoryData.forEach(category => {
     const percentUsed = ((category.spent / category.budget) * 100).toFixed(0);
     const remaining = category.budget - category.spent;
+    
+    // Determine if over or under budget
     const budgetText = remaining >= 0 
       ? `${formatCurrency(remaining)} under budget` 
       : `${formatCurrency(Math.abs(remaining))} over budget`;
@@ -767,15 +771,14 @@ function renderWeeklyCategoryBreakdown(categoryData) {
   });
 }
 
-/**
- * Render weekly insights
- */
+// render weekly insights section
 function renderWeeklyInsights(insights) {
   const tipsGrid = document.getElementById('tipsGrid');
   if (!tipsGrid) return;
   
-  tipsGrid.innerHTML = '';
+  tipsGrid.innerHTML = ''; // Clear existing content
   
+  // Create card for each insight
   insights.forEach(insight => {
     const tipItem = document.createElement('div');
     tipItem.className = `tip-item ${insight.type}`;
@@ -791,9 +794,7 @@ function renderWeeklyInsights(insights) {
   });
 }
 
-/**
- * Format week date range
- */
+// Formay week range for displaying
 function formatWeekDateRange(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -804,9 +805,12 @@ function formatWeekDateRange(startDate, endDate) {
   const endDay = end.getDate();
   const year = end.getFullYear();
   
+  // Same month: "Nov 4 - 10, 2025"
   if (startMonth === endMonth) {
     return `${startMonth} ${startDay} - ${endDay}, ${year}`;
-  } else {
+  } 
+  // Different months: "Oct 28 - Nov 3, 2025"
+  else {
     return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
   }
 }
@@ -814,15 +818,20 @@ function formatWeekDateRange(startDate, endDate) {
 // ============================================
 // YEARLY BUDGET FUNCTIONS
 // ============================================
+
+// Initialize yearly budget page
 function initYearlyBudget() {
   console.log('Initializing Yearly Budget Page...');
   
+  // Load and display the current year's budget
   const yearlyData = loadYearlyBudgetData();
   renderYearlyBudget(yearlyData);
   
+  // Year navigation buttons
   const prevYearBtn = document.getElementById('prevYearBtn');
   const nextYearBtn = document.getElementById('nextYearBtn');
   
+  // Navigate to previous year
   if (prevYearBtn) {
     prevYearBtn.addEventListener('click', () => {
       const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || 2025;
@@ -832,6 +841,7 @@ function initYearlyBudget() {
     });
   }
   
+  // Navigate to next year
   if (nextYearBtn) {
     nextYearBtn.addEventListener('click', () => {
       const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || 2025;
@@ -844,19 +854,19 @@ function initYearlyBudget() {
   console.log('Yearly budget initialized successfully!');
 }
 
-/**
- * Get default yearly budget structure
- */
+// Ge the default yearly budget structure
 function getDefaultYearlyBudget() {
   return {
     year: 2025,
-    totalYearlyBudget: 44436,
+    totalYearlyBudget: 44436,  // Total budget for the year
+    
+    // Category Annual Summary
     categories: [
       {
         id: 'bills',
         name: 'Bills & Utilities',
-        annualAmount: 25620,
-        monthlyAvg: 2135,
+        annualAmount: 25620,     // Total spent in category for the year
+        monthlyAvg: 2135,        // Average monthly spending
         colorClass: 'bills',
         trend: { type: 'stable', value: 0, label: 'Stable' }
       },
@@ -901,6 +911,8 @@ function getDefaultYearlyBudget() {
         trend: { type: 'decreasing', value: -5, label: '↓ 5%' }
       }
     ],
+    
+    // Monthly spending breakdown
     monthlyData: [
       { month: 'January', amount: 2890, isProjected: false },
       { month: 'February', amount: 2650, isProjected: false },
@@ -912,9 +924,11 @@ function getDefaultYearlyBudget() {
       { month: 'August', amount: 2490, isProjected: false },
       { month: 'September', amount: 2380, isProjected: false },
       { month: 'October', amount: 2567, isProjected: false },
-      { month: 'November', amount: 2600, isProjected: true },
+      { month: 'November', amount: 2600, isProjected: true },   // Future months marked as projected
       { month: 'December', amount: 2703, isProjected: true }
     ],
+    
+    // Yearly insights
     insights: [
       {
         type: 'positive',
@@ -938,9 +952,7 @@ function getDefaultYearlyBudget() {
   };
 }
 
-/**
- * Load yearly budget data
- */
+// Load yearly budget data from local storage
 function loadYearlyBudgetData(year = 2025) {
   const savedYearlyData = localStorage.getItem(`yearlyBudget_${year}`);
   
@@ -956,43 +968,40 @@ function loadYearlyBudgetData(year = 2025) {
   return getDefaultYearlyBudget();
 }
 
-/**
- * Load and render a specific year
- */
+// Load and render specified year
 function loadAndRenderYear(year) {
   const yearlyData = loadYearlyBudgetData(year);
-  yearlyData.year = year;
+  yearlyData.year = year; // Ensure year property is set
   renderYearlyBudget(yearlyData);
 }
 
-/**
- * Render the yearly budget to the page
- */
+// Render the yearly budget to the page
 function renderYearlyBudget(yearlyData) {
+  // Update year label
   const currentYearEl = document.getElementById('currentYear');
   if (currentYearEl) {
     currentYearEl.textContent = yearlyData.year;
   }
   
+  // Calculate statistics
   const totalSpent = yearlyData.categories.reduce((sum, cat) => sum + cat.annualAmount, 0);
   const remaining = yearlyData.totalYearlyBudget - totalSpent;
   const avgMonthly = totalSpent / 12;
   
+  // Render all the components
   renderYearlyOverviewCards(totalSpent, remaining, avgMonthly, yearlyData.year);
   renderYearlyCategoryTable(yearlyData, totalSpent);
   renderMonthlyBreakdown(yearlyData.monthlyData);
   renderInsights(yearlyData.insights);
 }
-
-/**
- * Render the yearly overview cards
- */
+// Render yearly overview statistics cards
 function renderYearlyOverviewCards(totalSpent, remaining, avgMonthly, year) {
   const overviewGrid = document.getElementById('yearlyOverviewGrid');
   if (!overviewGrid) return;
   
   const percentRemaining = ((remaining / (totalSpent + remaining)) * 100).toFixed(0);
   
+  // Create stat cards with HTML
   overviewGrid.innerHTML = `
     <div class="yearly-stat-card total">
         <div class="yearly-stat-icon">💵</div>
@@ -1021,17 +1030,16 @@ function renderYearlyOverviewCards(totalSpent, remaining, avgMonthly, year) {
   `;
 }
 
-/**
- * Render the yearly category table
- */
+// Render the yearly category table
 function renderYearlyCategoryTable(yearlyData, totalSpent) {
   const tbody = document.getElementById('yearlyTableBody');
   const tfoot = document.getElementById('yearlyTableFooter');
   
   if (!tbody) return;
   
-  tbody.innerHTML = '';
+  tbody.innerHTML = ''; // Clear existing rows
   
+  // Create row for each category
   yearlyData.categories.forEach(category => {
     const percentage = calculatePercentage(category.annualAmount, totalSpent);
     
@@ -1047,6 +1055,7 @@ function renderYearlyCategoryTable(yearlyData, totalSpent) {
     tbody.appendChild(row);
   });
   
+  // Add row at bottom for totals
   if (tfoot) {
     const avgMonthly = totalSpent / 12;
     tfoot.innerHTML = `
@@ -1061,18 +1070,22 @@ function renderYearlyCategoryTable(yearlyData, totalSpent) {
   }
 }
 
-/**
- * Render the monthly breakdown chart
- */
+// Render the monthly spending breakdown
 function renderMonthlyBreakdown(monthlyData) {
   const monthsGrid = document.getElementById('monthsGrid');
   if (!monthsGrid) return;
   
-  monthsGrid.innerHTML = '';
+  monthsGrid.innerHTML = ''; // Clear existing content
+  
+  // Find maximum amount for scaling the bars
   const maxAmount = Math.max(...monthlyData.map(m => m.amount));
   
+  // Create card for each month
   monthlyData.forEach(monthData => {
+    // Calculate bar width as percentage of max
     const barWidth = ((monthData.amount / maxAmount) * 100).toFixed(0);
+    
+    // Apply styling for projected (future) months
     const upcomingClass = monthData.isProjected ? 'upcoming' : '';
     const barFillClass = monthData.isProjected ? 'projected' : '';
     const amountPrefix = monthData.isProjected ? 'Est. ' : '';
@@ -1091,15 +1104,14 @@ function renderMonthlyBreakdown(monthlyData) {
   });
 }
 
-/**
- * Render insights section
- */
+// Render yearly insights and tips section
 function renderInsights(insights) {
   const insightsGrid = document.getElementById('insightsGrid');
   if (!insightsGrid) return;
   
-  insightsGrid.innerHTML = '';
+  insightsGrid.innerHTML = ''; // Clear existing content
   
+  // Create card for each insight
   insights.forEach(insight => {
     const insightItem = document.createElement('div');
     insightItem.className = `insight-item ${insight.type}`;
@@ -1119,17 +1131,18 @@ function renderInsights(insights) {
 // HELPER FUNCTIONS (Used by all pages)
 // ============================================
 
-/**
- * Show notification toast
- */
+ //Displays a temporary notification 
 function showNotification(message, type = 'info') {
+  // Remove any existing notifications first
   const existing = document.querySelector('.budget-notification');
   if (existing) existing.remove();
   
+  // Create new notification element
   const notification = document.createElement('div');
   notification.className = `budget-notification ${type}`;
   notification.textContent = message;
   
+  // Apply inline styles for positioning and animation
   notification.style.cssText = `
     position: fixed;
     top: 120px;
@@ -1146,6 +1159,7 @@ function showNotification(message, type = 'info') {
     max-width: 400px;
   `;
   
+  // Set color based on notification type
   const colors = {
     success: '#10b981',
     warning: '#f59e0b',
@@ -1154,30 +1168,30 @@ function showNotification(message, type = 'info') {
   };
   notification.style.borderLeftColor = colors[type] || colors.info;
   
+  // Add to page
   document.body.appendChild(notification);
   
+  // Auto-remove after 3 seconds with fade-out animation
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s ease';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
-
-/**
- * Format currency
- */
+// Format number as currency 
 function formatCurrency(amount) {
   return '$' + parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/**
- * Calculate percentage
- */
+// Calculate percentage
 function calculatePercentage(part, total) {
   if (total === 0) return 0;
   return ((part / total) * 100).toFixed(1);
 }
 
-// Add CSS animations
+// ============================================
+// CSS ANIMATIONS
+// ============================================
+// Add keyframe animations for notification slide-in/out effects
 const style = document.createElement('style');
 style.textContent = `
   @keyframes slideIn {
@@ -1204,5 +1218,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// Initialization is complete messages
 console.log('Budgeting.js loaded successfully!');
 console.log('Current page:', window.location.pathname);
