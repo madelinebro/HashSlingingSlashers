@@ -8,6 +8,8 @@ from routes.database import engine, Base
 import routes.accounts as accounts
 import routes.transactions as transactions
 import routes.budgets as budgets
+import routes.dashboard as dashboard
+import routes.profile as profile
 
 app = FastAPI(title="BloomFi Financial Management API")
 
@@ -37,18 +39,6 @@ def on_startup():
 # -------------------------------------------------
 # ROUTERS
 # -------------------------------------------------
-# IMPORTANT:
-# - In backend/routes/accounts.py, router MUST be defined as: router = APIRouter()
-#   (no prefix there)
-# - Same for transactions.py and budgets.py
-#
-# Final paths:
-#   /api/accounts        -> list/create accounts
-#   /api/accounts/{id}   -> get a single account
-#   /api/transactions    -> list transactions
-#   /api/transactions/{id}
-#   /api/budgets         -> list/create budgets
-#   /api/budgets/{id}    -> get/update/delete a budget
 
 app.include_router(
     accounts.router,
@@ -66,6 +56,18 @@ app.include_router(
     budgets.router,
     prefix="/api/budgets",
     tags=["Budgets"],
+)
+
+app.include_router(
+    dashboard.router,
+    prefix="/api/dashboard",
+    tags=["Dashboard"],
+)
+
+app.include_router(
+    profile.router,
+    prefix="/api/profile",
+    tags=["Profile"],
 )
 
 # -------------------------------------------------
