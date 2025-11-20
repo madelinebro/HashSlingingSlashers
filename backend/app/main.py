@@ -3,13 +3,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import SQLAlchemy engine + Base from your routes/database module
-from backend.routes.database import engine, Base
+from routes.database import engine, Base
 
-# Import routers from backend.routes (all of these files must define `router = APIRouter()`)
-import backend.routes.accounts as accounts
-import backend.routes.transactions as transactions
-import backend.routes.budgets as budgets
+import routes.accounts as accounts
+import routes.transactions as transactions
+import routes.budgets as budgets
 
 app = FastAPI(title="BloomFi Financial Management API")
 
@@ -83,4 +81,4 @@ def root():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
