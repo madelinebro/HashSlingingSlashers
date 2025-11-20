@@ -1,4 +1,4 @@
-// === GLOBAL STATE ===
+// ========== GLOBAL STATE ==========
 let allTransactions = []; // Store all transactions
 let filteredTransactions = []; // Store filtered transactions
 let userData = {}; // Store user data
@@ -18,32 +18,40 @@ let selectingStartDate = true; // Toggle between selecting start and end date
 let tempStartDate = null;
 let tempEndDate = null;
 
+// ========== PAGE INITIALIZATION ==========
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // === LOAD USER DATA ===
-  userData = await loadUserData();
-  
-  if (!userData) {
-    // If no user data, redirect to login
-    window.location.href = "login.html";
-    return;
+  try {
+    // === LOAD USER DATA ===
+    userData = await loadUserData();
+    
+    if (!userData) {
+      // If no user data, redirect to login
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Store transactions globally
+    allTransactions = [...userData.transactions];
+    filteredTransactions = [...userData.transactions];
+
+    // === INITIALIZE UI ===
+    initializeGreeting();
+    initializeUserProfile();
+    calculateAndDisplayBalance();
+    updateStats();
+    renderAccountChips();
+    renderTransactions();
+    populateAccountDropdown();
+    setupEventListeners();
+    
+    // === SET DEFAULT DATE RANGE (Last 30 days) ===
+    initializeDateRange();
+    
+  } catch (error) {
+    console.error('Dashboard initialization error:', error);
+    showErrorState("Failed to load dashboard data. Please try again.");
   }
-
-  // Store transactions globally
-  allTransactions = [...userData.transactions];
-  filteredTransactions = [...userData.transactions];
-
-  // === INITIALIZE UI ===
-  initializeGreeting();
-  initializeUserProfile();
-  calculateAndDisplayBalance();
-  updateStats();
-  renderAccountChips();
-  renderTransactions();
-  populateAccountDropdown();
-  setupEventListeners();
-  
-  // === SET DEFAULT DATE RANGE (Last 30 days) ===
-  initializeDateRange();
 });
 
 // ========== DATA LOADING (Backend Ready) ==========
@@ -53,56 +61,81 @@ document.addEventListener("DOMContentLoaded", async () => {
  * @returns {Promise<Object>} User data object
  */
 async function loadUserData() {
-  // RIGHT NOW: Use hardcoded mock data
-  // LATER: Replace with actual API call
-
-  /* FUTURE IMPLEMENTATION:
   try {
+    // DEVELOPMENT MODE: Check if we're using mock data
+    const useMockData = true; // SET TO FALSE WHEN BACKEND IS READY
+    
+    if (useMockData) {
+      // Get user name from localStorage if available, otherwise use default
+      const storedUserName = localStorage.getItem('userName') || "Jane";
+      
+      // Return mock data for development
+      return {
+        name: storedUserName,
+        accounts: [
+          { id: 1, type: "Checking", number: "****3456", balance: 4890.25, color: "teal" },
+          { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
+        ],
+        transactions: [
+          { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1 },
+          { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1 },
+          { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2 },
+          { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2 },
+          { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1 },
+          { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1 },
+          { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2 },
+          { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2 },
+          { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1 },
+          { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1 },
+        ],
+        previousPeriod: {
+          income: 0,
+          expenses: 245.00
+        }
+      };
+    }
+    
+    // ========== PRODUCTION MODE: Backend API Call ==========
+    // Check for auth token
+    const authToken = localStorage.getItem('authToken');
+    
+    if (!authToken) {
+      console.warn('No authentication token found');
+      return null;
+    }
+
     const response = await fetch('/api/user/dashboard', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Authorization': `Bearer ${authToken}`
       }
     });
 
     if (!response.ok) {
-      console.error('Failed to load user data');
-      return null;
+      if (response.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userName');
+        return null;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    
+    // Validate data structure
+    if (!data.accounts || !data.transactions) {
+      console.error('Invalid data structure from API');
+      return null;
+    }
+    
     return data;
+    
   } catch (error) {
-    console.error('Network error:', error);
+    console.error('Failed to load user data:', error);
     return null;
   }
-  */
-
-  // MOCK DATA - Replace this entire section when backend is ready
-  return {
-    name: localStorage.getItem("userName") || "Jane",
-    accounts: [
-      { id: 1, type: "Checking", number: "****3456", balance: 4890.25, color: "teal" },
-      { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
-    ],
-    transactions: [
-      { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1 },
-      { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1 },
-      { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2 },
-      { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2 },
-      { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1 },
-      { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1 },
-      { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2 },
-      { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2 },
-      { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1 },
-      { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1 },
-    ],
-    previousPeriod: {
-      income: 0,
-      expenses: 245.00
-    }
-  };
 }
 
 // ========== UI INITIALIZATION ==========
@@ -127,12 +160,29 @@ function initializeGreeting() {
 
 /**
  * Initialize user profile in sidebar
+ * Updates the user's name dynamically in the sidebar menu
  */
 function initializeUserProfile() {
-  const sidebarUserName = document.getElementById("sidebarUserName");
-  if (sidebarUserName) {
-    sidebarUserName.textContent = userData.name;
+  const userToggleBtn = document.getElementById("userToggle");
+  if (!userToggleBtn) return;
+
+  // The button contains text and an image
+  // We need to update only the text node, keeping the chevron image
+  // Clear existing content
+  while (userToggleBtn.firstChild) {
+    userToggleBtn.removeChild(userToggleBtn.firstChild);
   }
+  
+  // Add user's name as text node
+  const nameText = document.createTextNode(userData.name + ' ');
+  userToggleBtn.appendChild(nameText);
+  
+  // Re-add the chevron image
+  const chevron = document.createElement('img');
+  chevron.className = 'chev';
+  chevron.src = 'images/Chevron left.svg';
+  chevron.alt = '';
+  userToggleBtn.appendChild(chevron);
 }
 
 /**
@@ -172,6 +222,9 @@ function renderAccountChips() {
 function populateAccountDropdown() {
   const filterAccountSelect = document.getElementById("filterAccount");
   if (!filterAccountSelect) return;
+
+  // Clear existing options except "All Accounts"
+  filterAccountSelect.innerHTML = '<option value="all">All Accounts</option>';
 
   userData.accounts.forEach(acc => {
     const option = document.createElement("option");
@@ -248,6 +301,28 @@ function handleLogout(e) {
   window.location.href = "login.html";
 }
 
+/**
+ * Show error message to user
+ * @param {string} message - Error message to display
+ */
+function showErrorState(message) {
+  const mainContainer = document.querySelector('.main-container');
+  if (!mainContainer) return;
+  
+  mainContainer.innerHTML = `
+    <div style="text-align: center; padding: 100px; color: white;">
+      <div style="font-size: 3rem; margin-bottom: 20px;">⚠️</div>
+      <div style="font-size: 1.5rem; margin-bottom: 30px;">${message}</div>
+      <button onclick="location.reload()" 
+              style="padding: 15px 30px; font-size: 1.2rem; background: white; 
+                     color: var(--primary); border: none; border-radius: 10px; 
+                     cursor: pointer; font-weight: 700;">
+        Retry
+      </button>
+    </div>
+  `;
+}
+
 // ========== STATS CALCULATION ==========
 
 /**
@@ -287,6 +362,9 @@ function updateStats() {
 
 /**
  * Calculate percentage change between two values
+ * @param {number} current - Current period value
+ * @param {number} previous - Previous period value
+ * @returns {number} Percentage change
  */
 function calculatePercentageChange(current, previous) {
   if (previous === 0) {
@@ -303,7 +381,10 @@ function calculatePercentageChange(current, previous) {
  */
 function updateStatChange(elementId, change, higherIsBetter) {
   const element = document.getElementById(elementId);
-  if (!element) return;
+  if (!element) {
+    console.warn(`Stat change element '${elementId}' not found`);
+    return;
+  }
 
   const isPositive = higherIsBetter ? change >= 0 : change < 0;
   const arrow = change >= 0 ? '↑' : '↓';
@@ -314,10 +395,14 @@ function updateStatChange(elementId, change, higherIsBetter) {
 
 /**
  * Update net change indicator
+ * @param {number} netValue - Net change value
  */
 function updateNetChange(netValue) {
   const element = document.getElementById("netChange");
-  if (!element) return;
+  if (!element) {
+    console.warn("Net change element not found");
+    return;
+  }
 
   const isPositive = netValue >= 0;
   element.textContent = isPositive ? '↑ Positive' : '↓ Negative';
@@ -357,7 +442,7 @@ function renderTransactions() {
   txBody.innerHTML = sortedTransactions
     .map(t => `
       <tr>
-        <td>${t.desc}</td>
+        <td>${escapeHtml(t.desc)}</td>
         <td>${formatDate(t.date)}</td>
         <td class="${t.amount < 0 ? 'neg' : 'pos'}">${formatCurrency(t.amount)}</td>
         <td>${accountMap[t.accountId] || 'Unknown'}</td>
@@ -373,6 +458,7 @@ function renderTransactions() {
  */
 function initializeDateRange() {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 30);
   
@@ -389,7 +475,7 @@ function applyAllFilters() {
   filteredTransactions = allTransactions.filter(transaction => {
     // Date filter
     if (currentFilters.startDate || currentFilters.endDate) {
-      const txDate = new Date(transaction.date);
+      const txDate = normalizeDate(transaction.date);
       if (currentFilters.startDate && txDate < currentFilters.startDate) return false;
       if (currentFilters.endDate && txDate > currentFilters.endDate) return false;
     }
@@ -426,6 +512,7 @@ function applyAllFilters() {
  */
 function openFilterModal() {
   const modal = document.getElementById("filterModal");
+  if (!modal) return;
   
   // Set current filter values
   document.getElementById("filterAccount").value = currentFilters.account;
@@ -442,6 +529,7 @@ function openFilterModal() {
  */
 function closeFilterModal() {
   const modal = document.getElementById("filterModal");
+  if (!modal) return;
   modal.style.display = "none";
 }
 
@@ -484,7 +572,7 @@ function clearFilters() {
   document.getElementById("maxAmount").value = '';
   document.getElementById("searchDesc").value = '';
   
-  updateDateRangeDisplay();
+  initializeDateRange(); // Reset to default 30-day range
   applyAllFilters();
 }
 
@@ -495,6 +583,7 @@ function clearFilters() {
  */
 function openDatePicker() {
   const modal = document.getElementById("datePickerModal");
+  if (!modal) return;
   
   tempStartDate = currentFilters.startDate;
   tempEndDate = currentFilters.endDate;
@@ -513,11 +602,13 @@ function openDatePicker() {
  */
 function closeDatePicker() {
   const modal = document.getElementById("datePickerModal");
+  if (!modal) return;
   modal.style.display = "none";
 }
 
 /**
  * Set quick date filter
+ * @param {string} period - 'today', 'week', 'month', or 'all'
  */
 function setQuickFilter(period) {
   const today = new Date();
@@ -651,6 +742,9 @@ function renderCalendar() {
 
 /**
  * Create a calendar day element
+ * @param {number} dayNumber - Day of the month
+ * @param {string} className - CSS class to apply
+ * @returns {HTMLElement} Calendar day element
  */
 function createDayElement(dayNumber, className) {
   const dayEl = document.createElement('div');
@@ -661,6 +755,7 @@ function createDayElement(dayNumber, className) {
 
 /**
  * Handle date selection in calendar
+ * @param {Date} date - Selected date
  */
 function selectDate(date) {
   if (selectingStartDate) {
@@ -711,6 +806,7 @@ function updateDateDisplay() {
 
 /**
  * Change calendar month
+ * @param {number} direction - 1 for next month, -1 for previous month
  */
 function changeMonth(direction) {
   currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + direction);
@@ -721,6 +817,8 @@ function changeMonth(direction) {
 
 /**
  * Format number as currency
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted currency string
  */
 function formatCurrency(amount) {
   return new Intl.NumberFormat("en-US", { 
@@ -730,10 +828,13 @@ function formatCurrency(amount) {
 }
 
 /**
- * Format date string for display
+ * Format date string or Date object for display
+ * @param {string|Date} dateInput - Date to format
+ * @returns {string} Formatted date string
  */
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('en-US', { 
+function formatDate(dateInput) {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  return date.toLocaleDateString('en-US', { 
     month: 'short', 
     day: 'numeric', 
     year: 'numeric' 
@@ -741,9 +842,39 @@ function formatDate(dateString) {
 }
 
 /**
- * Update text content of an element
+ * Normalize date to midnight local time for consistent comparison
+ * @param {string} dateString - ISO date string
+ * @returns {Date} Normalized date object
+ */
+function normalizeDate(dateString) {
+  const date = new Date(dateString);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+/**
+ * Update text content of an element safely
+ * @param {string} id - Element ID
+ * @param {string} text - Text content to set
+ * @returns {boolean} Success status
  */
 function updateElement(id, text) {
   const el = document.getElementById(id);
-  if (el) el.textContent = text;
+  if (!el) {
+    console.warn(`Element with id '${id}' not found`);
+    return false;
+  }
+  el.textContent = text;
+  return true;
+}
+
+/**
+ * Escape HTML to prevent XSS attacks
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }

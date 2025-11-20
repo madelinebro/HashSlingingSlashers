@@ -53,8 +53,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // If the form is not found, stop running
   if (!form) return; // Prevents this from running on other pages
 
+  // Extract reset token from URL (typically sent in password reset email)
+  const urlParams = new URLSearchParams(window.location.search);
+  const resetToken = urlParams.get('token');
+
+  // If no token is present, show error
+  if (!resetToken) {
+    showMessage("Invalid or missing reset link. Please request a new password reset.", "var(--warning)");
+    form.querySelector('.submit-btn').disabled = true;
+    return;
+  }
+
   // Form Submission
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const newPassword = passwordInput.value.trim();
@@ -64,24 +75,86 @@ document.addEventListener("DOMContentLoaded", () => {
     message.textContent = "";
     message.style.color = "";
 
+    // VALIDATION - Client-side checks
+    if (!validatePasswords(newPassword, confirmPassword)) {
+      return; // Validation failed, message already shown
+    }
+
+    // BACKEND COMMUNICATION - Send to API
+    await resetPasswordAPI(resetToken, newPassword);
+  });
+
+  // ========================================
+  // VALIDATION LOGIC (Separated for clarity)
+  // ========================================
+  function validatePasswords(newPassword, confirmPassword) {
     if (!newPassword || !confirmPassword) {
       showMessage("Please fill out both fields.", "var(--warning)");
-      return;
+      return false;
     }
 
     if (newPassword.length < 8) {
       showMessage("Password must be at least 8 characters long.", "var(--warning)");
-      return;
+      return false;
     }
 
     if (newPassword !== confirmPassword) {
       showMessage("Passwords do not match.", "var(--warning)");
-      return;
+      return false;
     }
 
-    showMessage("Updating your password...", "var(--secondary)");
-  });
+    return true;
+  }
 
+  // ========================================
+  // BACKEND API CALL (Placeholder for backend team)
+  // ========================================
+  async function resetPasswordAPI(token, password) {
+    showMessage("Updating your password...", "var(--secondary)");
+    
+    // Disable submit button during API call
+    const submitBtn = form.querySelector('.submit-btn');
+    submitBtn.disabled = true;
+
+    try {
+      // TODO: Replace with actual API endpoint from backend team
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: token,
+          new_password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // SUCCESS - Password reset successful
+        showMessage("Password reset successful! Redirecting to login...", "var(--success)");
+        
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+      } else {
+        // ERROR - Backend returned an error
+        showMessage(data.message || "Failed to reset password. Please try again.", "var(--warning)");
+        submitBtn.disabled = false;
+      }
+    } catch (error) {
+      // NETWORK ERROR - Couldn't reach backend
+      console.error('Password reset error:', error);
+      showMessage("Network error. Please check your connection and try again.", "var(--warning)");
+      submitBtn.disabled = false;
+    }
+  }
+
+  // ========================================
+  // UI UPDATE HELPER
+  // ========================================
   function showMessage(text, color) {
     message.textContent = text;
     message.style.color = color;

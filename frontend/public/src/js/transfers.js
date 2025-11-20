@@ -89,7 +89,7 @@ function populateAccountDropdowns() {
 }
 
 function renderPendingTransfers() {
-  const listContainer = document.querySelector(".transfer-card:nth-of-type(2) .transfer-list");
+  const listContainer = document.querySelector('[data-section="pending"] .transfer-list');
   if (!listContainer) return;
 
   listContainer.innerHTML = '';

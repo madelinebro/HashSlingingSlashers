@@ -62,7 +62,7 @@ function createMenuPanel() {
           <span class="menu-nav-icon">💳</span>
           My Accounts
         </a>
-        <a class="menu-nav-item ${currentPage === 'budgeting_month' ? 'active' : ''}" href="budgeting_month.html">
+        <a class="menu-nav-item ${currentPage.includes('budgeting') ? 'active' : ''}" href="budgeting_month.html">
           <span class="menu-nav-icon">📊</span>
           Budgeting
         </a>

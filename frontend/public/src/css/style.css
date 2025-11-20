@@ -41,6 +41,21 @@
   --page-max: clamp(1600px, 96vw, 2100px);
   /* Gutter spacing */
   --gutter: clamp(40px, 5.5vw, 96px);
+
+  /* MOBILE DESIGN SYSTEM */
+  /* Typography for mobile */
+  --mobile-h1: 1.75rem;
+  --mobile-h2: 1.5rem;
+  --mobile-h3: 1.25rem;
+  --mobile-label: 0.95rem;
+  --mobile-body: 0.95rem;
+  --mobile-small: 0.8rem;
+
+  /* Spacing for mobile */
+  --mobile-padding: 16px;
+  --mobile-gap: 12px;
+  --mobile-margin: 16px;
+  --mobile-radius: 12px;
 }
 
 /* Hide footer on desktop */
@@ -49,6 +64,44 @@
     display: none !important;
   }
 }
+
+/* ============== MOBILE DESIGN SYSTEM - UNIVERSAL MOBILE STYLES ============== */
+@media (max-width: 768px) {
+  /* Base mobile typography */
+  h1 { font-size: var(--mobile-h1); }
+  h2 { font-size: var(--mobile-h2); }
+  h3 { font-size: var(--mobile-h3); }
+  label { font-size: var(--mobile-label); }
+  body { font-size: var(--mobile-body); }
+  
+  /* Consistent card padding across all cards */
+  [class*="card"] {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+  
+  /* Consistent gap spacing */
+  [class*="grid"],
+  [class*="flex"],
+  [class*="list"] {
+    gap: var(--mobile-gap);
+  }
+  
+  /* Consistent button sizing */
+  button, .btn {
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    border-radius: var(--mobile-radius);
+  }
+  
+  /* Consistent input sizing */
+  input, select, textarea {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+}
+
 
 /* Set base font size */
 html {
@@ -291,6 +344,22 @@ body::after {
   box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
 }
 
+/* Error state for inputs */
+.form-group input[aria-invalid="true"],
+.login-form input[aria-invalid="true"] {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 4px rgba(207, 94, 68, 0.1);
+}
+
+/* Error message styling */
+.error-message {
+  color: var(--warning);
+  font-size: 14px;
+  margin-top: 8px;
+  display: block;
+  font-weight: 500;
+}
+
 /* Placeholder text color inside input fields */
 .form-group input::placeholder,
 .login-form input::placeholder {
@@ -483,7 +552,7 @@ body::after {
   /* Make the login container take more horizontal space */
   .login-container {
     padding: 20px;                  
-    padding-top: 90px; 
+    padding-top: 70px; 
     padding-bottom: 20px !important;
     
   }
@@ -492,7 +561,7 @@ body::after {
   .login-card {
     width: 100%;
     max-width: 520px;               /* comfortable mobile card width */
-    min-height: calc(100vh - 140px);
+    min-height: 70vh;
     border-radius: 16px !important;
     box-shadow: 0 12px 36px var(--secondary);
     margin: 0 auto;                 /* center horizontally */
@@ -508,43 +577,50 @@ body::after {
 
   /* Right panel — spacing and typography tweaks */
   .right-panel {
-    padding: 36px;                  /* gives the card breathing room */
+    padding: var(--mobile-padding);
     background: var(--background);
-    border-radius: 16px;
+    border-radius: var(--mobile-radius);
   }
   .login-header {
-    margin-bottom: 30px;
-    margin-top: 5px;
+    margin-bottom: 32px;
+    margin-top: 0;
   }
   .login-icon {
     width: 60px;
     height: 60px;
     font-size: 24px;
-    margin-bottom: 15px;
+    margin-bottom: var(--mobile-gap);
   }
   .login-header h1 { 
-    font-size: 36px; 
+    font-size: var(--mobile-h2); 
     margin-bottom: 8px; 
   }
   .login-header p { 
-    font-size: 18px; 
+    font-size: var(--mobile-body); 
   }
 
   /* Form spacing */
   .form-group {
-    margin-bottom: 20px; 
+    margin-bottom: var(--mobile-margin); 
   }
   .form-group label {
-    font-size: 16px;
+    font-size: var(--mobile-label);
     margin-bottom: 8px;
   }
 
   /* Inputs */
   .form-group input,
   .login-form input {
-    font-size: 18px;
-    padding: 16px 52px 16px 16px;   
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    padding-right: 52px;
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Error messaging on mobile */
+  .error-message {
+    font-size: var(--mobile-small);
+    margin-top: 6px;
   }
 
   /* Toggle button placement & size */
@@ -580,11 +656,11 @@ body::after {
   /* Login button adjustments */
   .login-form .btn,
   .btn {
-    font-size: 18px;
-    padding: 14px;
-    margin-top: 10px;
-    gap: 8px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
   }
   .btn-icon {
     width: 24px;
@@ -594,8 +670,8 @@ body::after {
 
   /* Links adjustments */
   .links { 
-    font-size: 14px; 
-    margin-top: 20px; 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
     text-align: center; 
   }
   .links span { 
@@ -706,18 +782,6 @@ body::after {
   margin: 0;
 }
 
-.register-left-panel .register-icon {
-  font-size: 160px;
-  margin-bottom: 40px;
-  opacity: 0.9;
-  z-index: 1;
-  /* Override the header icon styles for the left panel icon */
-  width: auto;
-  height: auto;
-  background: none;
-  border-radius: 0;
-}
-
 /* =========================================================================== Right Panel (Form) for Register ==========================================================*/
 .register-right-panel {
   flex: 1;
@@ -792,7 +856,7 @@ body::after {
 /* Register form input fields */
 .register-form input {
   width: 100%;
-  padding: 20px 60px 20px 22px;
+  padding: 20px 22px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   font-size: 25px;
@@ -801,6 +865,11 @@ body::after {
   background: white;
   color: var(--text);
   box-sizing: border-box;
+}
+
+/* Register form inputs with toggle buttons (password fields) */
+.register-form .input-wrapper input {
+  padding: 20px 60px 20px 22px;
 }
 
 .register-form input:focus {
@@ -825,6 +894,11 @@ body::after {
   font-size: 35px;
   font-weight: 600;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 14px;
 }
 
 /* Activate Account Button Hover highlight */
@@ -1328,11 +1402,12 @@ main {
 
 .transaction-card {
   background: white;
-  border-radius: 20px;
-  border: 1px solid var(--background);
-  padding: 28px 32px;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  border-left: 10px solid var(--highlight);
+  padding: 36px 32px;
   margin-bottom: 50px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
 }
 
 .transaction-header {
@@ -1358,8 +1433,8 @@ main {
 }
 
 .transaction-badge {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+  background: var(--background);
+  color: var(--text);
   font-size: 1.3rem;
   padding: 8px 18px;
   border-radius: 14px;
@@ -1370,51 +1445,53 @@ main {
 .transaction-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.date-range-picker,
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 34px;
+  height: 64px;
+  background: var(--background);
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  justify-content: center;
 }
 
 .date-range-picker {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 26px;
-  background: var(--background);
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 1.3rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.date-range-picker:hover {
-  background: var(--highlight);
-  transform: translateY(-2px);
-}
-
-.date-icon {
-  font-size: 1.2rem;
+  min-width: 260px;
 }
 
 .filter-btn {
-  padding: 12px 24px;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 1.3rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
+  min-width: 150px;
+  background: var(--background);
 }
 
+.date-range-picker:hover,
 .filter-btn:hover {
   background: var(--highlight);
   transform: translateY(-2px);
+  color: white;
+}
+
+.date-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.date-range-dates {
+  font-size: 1.5rem;
 }
 
 /* Transaction Table */
@@ -1492,8 +1569,8 @@ main {
   right: 40px;
   bottom: 40px;
   background: white;
-  color: var(--primary);
-  border: 3px solid var(--primary);
+  color: var(--secondary);
+  border: 3px solid var(--secondary);
   padding: 24px 48px;
   border-radius: 999px;
   font-weight: 700;
@@ -1508,9 +1585,8 @@ main {
 }
 
 .chatbot:hover {
-  background: var(--secondary);
+  background: var(--highlight);
   color: white;
-  border-color: var(--secondary);
   transform: translateY(-4px);
   box-shadow: 0 14px 36px rgba(102, 145, 241, 0.45);
 }
@@ -1520,8 +1596,8 @@ main {
   position: fixed;
   right: 40px;
   bottom: 40px;
-  width: 420px;
-  height: 600px;
+  width: 800px;
+  height: 800px;
   background: white;
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -1538,7 +1614,7 @@ main {
 /* Chatbot Header */
 .chatbot-header {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  padding: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1552,25 +1628,25 @@ main {
 }
 
 .chatbot-avatar {
-  width: 45px;
-  height: 45px;
+  width: 55px;
+  height: 55px;
   background: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 2rem;
 }
 
 .chatbot-header h3 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   font-weight: 700;
 }
 
 .chatbot-status {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   opacity: 0.9;
 }
 
@@ -1578,9 +1654,9 @@ main {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  font-size: 2.4rem;
-  width: 36px;
-  height: 36px;
+  font-size: 3rem;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -1598,12 +1674,12 @@ main {
 /* Messages Area */
 .chatbot-messages {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   background: #f8f9fa;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .chatbot-message {
@@ -1624,14 +1700,14 @@ main {
 }
 
 .message-avatar {
-  width: 35px;
-  height: 35px;
+  width: 48px;
+  height: 48px;
   background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   flex-shrink: 0;
 }
 
@@ -1645,10 +1721,10 @@ main {
 
 .message-content p {
   margin: 0;
-  padding: 12px 16px;
+  padding: 18px 20px;
   background: white;
   border-radius: 12px;
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   line-height: 1.5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -1659,7 +1735,7 @@ main {
 }
 
 .message-time {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   color: #6c757d;
   margin-top: 4px;
   display: block;
@@ -1678,19 +1754,19 @@ main {
 
 /* Input Area */
 .chatbot-input-area {
-  padding: 20px;
+  padding: 24px;
   background: white;
   border-top: 1px solid #e9ecef;
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .chatbot-input {
   flex: 1;
-  padding: 14px 18px;
+  padding: 16px 20px;
   border: 2px solid #e9ecef;
   border-radius: 25px;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   outline: none;
   transition: all 0.3s;
 }
@@ -1701,13 +1777,13 @@ main {
 }
 
 .chatbot-send {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   background: var(--primary);
   color: white;
   border: none;
   border-radius: 50%;
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1859,21 +1935,25 @@ main {
 .quick-filters-top {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 28px;
 }
 
 .quick-filter-btn {
-  padding: 16px 20px;
+  padding: 12px 16px;
   background: var(--background);
   border: 2px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--text);
-  font-weight: 700;
-  font-size: 1.3rem;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 55px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .quick-filter-btn:hover {
@@ -1888,73 +1968,79 @@ main {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
 }
 
 /* Date Range Display */
 .date-range-display {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-  padding: 20px;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 16px;
   background: #f9fafb;
-  border-radius: 14px;
+  border-radius: 12px;
+  flex-wrap: wrap;
 }
 
 .date-display-box {
   flex: 1;
+  min-width: 120px;
 }
 
 .date-display-box label {
   display: block;
-  font-size: 1.2rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #6b7280;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .selected-date {
-  font-size: 1.6rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary);
   padding: 8px 12px;
   background: white;
   border-radius: 8px;
-  min-height: 45px;
+  min-height: 38px;
   display: flex;
   align-items: center;
+  border: 1px solid #e5e7eb;
 }
 
 .date-range-arrow {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #d1d5db;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 /* Custom Calendar */
 .custom-calendar {
   background: white;
   border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 16px;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  gap: 8px;
 }
 
 .calendar-nav-btn {
   background: var(--background);
   border: 2px solid #e5e7eb;
-  width: 45px;
-  height: 45px;
-  border-radius: 12px;
-  font-size: 2rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--text);
   cursor: pointer;
@@ -1962,6 +2048,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .calendar-nav-btn:hover {
@@ -1972,32 +2059,34 @@ main {
 }
 
 .calendar-month-year {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text);
+  text-align: center;
+  flex: 1;
 }
 
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 4px;
+  margin-bottom: 8px;
 }
 
 .weekday {
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #6b7280;
-  padding: 12px 0;
+  padding: 8px 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
 }
 
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 4px;
 }
 
 .calendar-day {
@@ -2005,15 +2094,15 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text);
   background: white;
   border: 2px solid transparent;
-  min-height: 50px;
+  min-height: 40px;
 }
 
 .calendar-day:hover:not(.disabled):not(.other-month) {
@@ -2056,28 +2145,30 @@ main {
 
 /* ============== FILTER MODAL ============== */
 .filter-group {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .filter-group label {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .filter-select,
 .filter-input {
   width: 100%;
-  padding: 14px 18px;
-  font-size: 1.3rem;
+  padding: 10px 14px;
+  font-size: 1rem;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--text);
   font-weight: 500;
   background: white;
   transition: all 0.2s ease;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .filter-select:focus,
@@ -2090,18 +2181,20 @@ main {
 .amount-range {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .amount-input {
   flex: 1;
-  padding: 14px 18px;
-  font-size: 1.3rem;
+  padding: 10px 14px;
+  font-size: 1rem;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--text);
   font-weight: 500;
   transition: all 0.2s ease;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .amount-input:focus {
@@ -2111,31 +2204,37 @@ main {
 }
 
 .range-separator {
-  font-size: 1.3rem;
+  font-size: 0.95rem;
   color: #6b7280;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ============== MODAL BUTTONS ============== */
 .btn-primary,
 .btn-secondary {
-  padding: 16px 32px;
-  font-size: 1.5rem;
+  padding: 12px 24px;
+  font-size: 1rem;
   font-weight: 700;
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
-  min-height: 58px;
+  border: 2px solid;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary {
   background: var(--primary);
   color: white;
+  border-color: var(--primary);
 }
 
 .btn-primary:hover {
   background: #0a7c72;
+  border-color: #0a7c72;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 148, 136, 0.3);
 }
@@ -2143,7 +2242,7 @@ main {
 .btn-secondary {
   background: white;
   color: var(--text);
-  border: 2px solid #e5e7eb;
+  border-color: #e5e7eb;
 }
 
 .btn-secondary:hover {
@@ -2162,62 +2261,65 @@ body.dashboard .floating-logo {
   .modal-content {
     width: 95%;
     max-width: none;
-    margin: 20px;
+    margin: var(--mobile-margin);
   }
 
   .modal-header {
-    padding: 20px;
+    padding: var(--mobile-padding);
   }
 
   .modal-header h3 {
-    font-size: 1.5rem;
+    font-size: var(--mobile-h2);
   }
 
   .modal-close {
-    font-size: 2rem;
+    font-size: var(--mobile-h3);
     width: 35px;
     height: 35px;
   }
 
   .modal-body {
-    padding: 20px;
+    padding: var(--mobile-padding);
   }
 
   .modal-footer {
-    padding: 16px 20px;
+    padding: var(--mobile-padding);
     flex-direction: column-reverse;
   }
 
   .btn-primary,
   .btn-secondary {
     width: 100%;
-    padding: 12px 20px;
-    font-size: 1.2rem;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
   }
 
   .date-input-group label,
   .filter-group label {
-    font-size: 1.2rem;
+    font-size: var(--mobile-label);
   }
 
   .date-input,
   .filter-select,
   .filter-input,
   .amount-input {
-    font-size: 1.1rem;
-    padding: 12px 16px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
   }
 
-  .quick-filters {
-    grid-template-columns: 1fr;
+  .quick-filters-top {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
   }
 
   .quick-filter-btn {
-    font-size: 1.1rem;
-    padding: 12px 16px;
+    font-size: var(--mobile-body);
+    padding: 10px 12px;
+    height: 40px;
+    font-size: 0.9rem;
   }
 }
-
 
 /* ========================================
    MOBILE RESPONSIVE STYLES
@@ -2234,19 +2336,19 @@ body.dashboard .floating-logo {
   }
 
   .page-title {
-    font-size: 1.8rem;
+    font-size: var(--mobile-h1);
     margin-bottom: 8px;
   }
 
   .page-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--mobile-h3);
     opacity: 0.9;
   }
 
   .dashboard-top-section {
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin-bottom: 32px;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
   }
 
   .stats-grid {
@@ -2254,44 +2356,44 @@ body.dashboard .floating-logo {
   }
 
   .account-summary-card {
-    padding: 18px 16px;
-    border-radius: 16px;
+    padding: 20px;  /* Increased from 16px */
+    border-radius: var(--mobile-radius);
     min-height: auto;
     box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
   }
 
   .summary-title {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 12px;  /* Increased from 8px */
     opacity: 0.9;
   }
 
-  .total-balance {
-    font-size: 2.4rem;
+  .dashboard .total-balance {
+    font-size: 2rem;
     text-align: center;
     font-weight: 700;
-    margin: 0 0 6px 0;
+    margin: 0 0 10px 0;  /* Increased from 6px */
     letter-spacing: -0.03em;
   }
 
-  .balance-label {
+  .dashboard .balance-label {
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     opacity: 0.8;
-    margin-bottom: 16px;
+    margin-bottom: 20px;  /* Increased from var(--mobile-margin) for more space */
   }
 
-  /* Account Chips - Compact */
+  /* Account Chips - More breathing room */
   .account-chips-list {
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 10px;  /* Increased from var(--mobile-gap) */
+    margin-bottom: 20px;  /* Increased from var(--mobile-margin) */
   }
 
   .account-chip-item {
-    padding: 12px 14px;
-    border-radius: 12px;
-    gap: 10px;
+    padding: 14px;  /* Increased from var(--mobile-padding) */
+    border-radius: var(--mobile-radius);
+    gap: 10px;  /* Increased from var(--mobile-gap) */
   }
 
   .account-dot {
@@ -2300,84 +2402,109 @@ body.dashboard .floating-logo {
   }
 
   .chip-label {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 4px;  /* Increased from 2px */
   }
 
   .chip-number {
-    font-size: 0.95rem;
+    font-size: 1rem;
     opacity: 0.85;
   }
 
   .see-accounts-btn {
-    font-size: 0.95rem;
-    padding: 10px 0;
-    border-radius: 10px;
+    font-size: var(--mobile-body);
+    padding: 12px 0;  /* Increased from 10px */
+    border-radius: var(--mobile-radius);
     font-weight: 600;
+    margin-top: 4px;  /* Added small top margin */
   }
 
+  .see-accounts-btn:hover {
+    background: var(--highlight);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* TRANSACTION CARD - More internal spacing */
   .transaction-card {
-    padding: 20px 16px;
-    border-radius: 16px;
-    margin-bottom: 32px;
+    padding: 20px;  /* Increased from var(--mobile-padding) */
+    border-radius: var(--mobile-radius);
+    margin-bottom: var(--mobile-margin);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   }
 
   .transaction-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 16px;  /* Increased from var(--mobile-gap) for more separation */
+    margin-bottom: 20px;  /* Increased from var(--mobile-margin) */
   }
 
   .transaction-title h2 {
-    font-size: 1.5rem;
+    font-size: var(--mobile-h2);
+    margin-bottom: 8px;  /* Added space between title and badge */
   }
 
   .transaction-badge {
-    font-size: 0.8rem;
+    font-size: var(--mobile-small);
     padding: 6px 12px;
-    border-radius: 10px;
+    border-radius: var(--mobile-radius);
   }
 
   .transaction-controls {
     width: 100%;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    gap: 10px;  /* Increased from 8px */
+    flex-wrap: wrap;
+  }
+
+  .date-range-picker,
+  .filter-btn {
+    padding: 10px 14px;  /* Increased padding */
+    font-size: 1rem;
+    height: 40px;  /* Increased from 38px */
+    border-radius: var(--mobile-radius);
+    gap: 6px;
+    flex: 1 1 calc(50% - 5px);  /* Adjusted for new gap */
+    min-width: 120px;
   }
 
   .date-range-picker {
-    width: auto;
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    border-radius: 10px;
+    flex: 1 1 100%;
+    margin-bottom: 2px;  /* Small space before filter buttons */
   }
 
   .filter-btn {
-    width: auto;
-    justify-content: center;
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    border-radius: 10px;
+    flex: 1 1 auto;
+  }
+
+  .date-icon {
+    font-size: 0.9rem;
+  }
+
+  .date-range-dates {
+  font-size: 1rem;
   }
 
   /* ============== TRANSACTION TABLE (MOBILE-FRIENDLY) ============== */
   .transaction-table {
     overflow-x: auto;
-    border-radius: 12px;
+    border-radius: var(--mobile-radius);
     border: 1px solid #e5e7eb;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;  /* Added space before "View All" link */
+    margin-top: 20px;
   }
 
   .tt {
-    font-size: 0.875rem;
+    font-size: var(--mobile-small);
     table-layout: auto;
   }
 
   .tt th {
-    padding: 14px 12px;
-    font-size: 0.75rem;
+    padding: 12px;  /* Increased from var(--mobile-padding) */
+    font-size: 1rem;
     letter-spacing: 0.03em;
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
@@ -2387,8 +2514,8 @@ body.dashboard .floating-logo {
   }
 
   .tt td {
-    padding: 16px 12px;
-    font-size: 0.8rem;
+    padding: 12px;  /* Increased from var(--mobile-padding) */
+    font-size: 1rem;
     font-weight: 500;
     border-bottom: 1px solid #f1f5f9;
     white-space: nowrap;
@@ -2402,26 +2529,30 @@ body.dashboard .floating-logo {
   .tt .pos { color: #16a34a; }
 
   /* View more link */
+  .view-more-t {
+    margin-top: 4px;  /* Added explicit top margin */
+  }
+
   .view-more-t a {
-    font-size: 0.95rem;
+    font-size: var(--mobile-body);
     font-weight: 600;
   }
 
   .calendar-days {
     width: 30px;        
     height: 30px;
-    font-size: 1rem; 
+    font-size: var(--mobile-label); 
   }
+  
   /* ============== CHATBOT (Smaller) ============== */
   .chatbot {
     right: 16px;
     bottom: 16px;
-    padding: 12px 20px;
-    font-size: 0.9rem;
-    gap: 8px;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    gap: var(--mobile-gap);
   }
 }
-
 
 /* ===============================================================================Forgot username form Styling======================================================================*/
 /* Page container */
@@ -2732,14 +2863,14 @@ body.dashboard .floating-logo {
 
   /* Right panel — spacing and typography tweaks */
   .forgot-right-panel {
-    padding: 36px;
+    padding: var(--mobile-padding);
     background: var(--background);
-    border-radius: 16px;
+    border-radius: var(--mobile-radius);
   }
 
   /* Header section */
   .forgot-header {
-    margin-bottom: 30px;
+    margin-bottom: var(--mobile-margin);
     margin-top: 5px;
   }
 
@@ -2747,65 +2878,65 @@ body.dashboard .floating-logo {
     width: 60px;
     height: 60px;
     font-size: 24px;
-    margin-bottom: 15px;
+    margin-bottom: var(--mobile-gap);
   }
 
   .forgot-right-panel h1 { 
-    font-size: 36px; 
+    font-size: var(--mobile-h2); 
     margin-bottom: 8px; 
   }
 
   .forgot-right-panel p { 
-    font-size: 18px; 
+    font-size: var(--mobile-body); 
   }
 
   /* Form spacing */
   .forgot-right-panel .form-group {
-    margin-bottom: 20px; 
+    margin-bottom: var(--mobile-margin); 
   }
 
   .forgot-right-panel label {
-    font-size: 16px;
+    font-size: var(--mobile-label);
     margin-bottom: 8px;
   }
 
   /* Inputs */
   .forgot-right-panel input {
-    font-size: 18px;
-    padding: 16px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
   }
 
   /* Submit button adjustments */
   .forgot-right-panel .submit-btn {
-    font-size: 18px;
-    padding: 14px;
-    margin-top: 10px;
-    gap: 8px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
   }
 
   /* Message styling */
   .forgot-right-panel .message {
-    font-size: 16px;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+    margin-bottom: var(--mobile-margin);
   }
 
   /* Links adjustments */
   .forgot-right-panel .register-links { 
-    font-size: 14px; 
-    margin-top: 20px; 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
     text-align: center; 
   }
 
   .forgot-right-panel .register-links p {
-    font-size: 14px;
+    font-size: var(--mobile-small);
   }
 
   .link-btn {
-    font-size: 14px;
+    font-size: var(--mobile-small);
   }
 
 }
@@ -2943,14 +3074,14 @@ body.dashboard .floating-logo {
 
   /* Right panel — spacing and typography tweaks */
   .forgot-password-right-panel {
-    padding: 36px;
+    padding: var(--mobile-padding);
     background: var(--background);
-    border-radius: 16px;
+    border-radius: var(--mobile-radius);
   }
 
   /* Header section */
   .forgot-password-header {
-    margin-bottom: 30px;
+    margin-bottom: var(--mobile-margin);
     margin-top: 5px;
   }
 
@@ -2958,73 +3089,73 @@ body.dashboard .floating-logo {
     width: 60px;
     height: 60px;
     font-size: 24px;
-    margin-bottom: 15px;
+    margin-bottom: var(--mobile-gap);
   }
 
   .forgot-password-right-panel h1 { 
-    font-size: 36px; 
+    font-size: var(--mobile-h2); 
     margin-bottom: 8px; 
   }
 
   .forgot-password-right-panel p { 
-    font-size: 18px; 
+    font-size: var(--mobile-body); 
   }
 
   /* Form spacing */
   .forgot-password-right-panel .form-group {
-    margin-bottom: 20px; 
+    margin-bottom: var(--mobile-margin); 
   }
 
   .forgot-password-right-panel label {
-    font-size: 16px;
+    font-size: var(--mobile-label);
     margin-bottom: 8px;
   }
 
   /* Inputs */
   .forgot-password-right-panel input {
-    font-size: 18px;
-    padding: 16px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
   }
 
   /* Submit button adjustments */
   .forgot-password-right-panel .submit-btn,
   .forgot-password-right-panel .btn {
-    font-size: 18px;
-    padding: 14px;
-    margin-top: 10px;
-    gap: 8px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
   }
 
   /* Message styling */
   .message {
-    font-size: 16px;
-    padding: 12px;
-    border-radius: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
     margin-top: 15px;
-    margin-bottom: 20px;
+    margin-bottom: var(--mobile-margin);
   }
 
   .forgot-password-right-panel .message {
-    font-size: 16px;
-    padding: 12px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
   }
 
   /* Links adjustments */
   .forgot-password-right-panel .register-links,
   .links { 
-    font-size: 14px; 
-    margin-top: 20px; 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
     text-align: center; 
   }
 
   .forgot-password-right-panel .register-links p {
-    font-size: 14px;
+    font-size: var(--mobile-small);
   }
 
   .link-btn {
-    font-size: 14px;
+    font-size: var(--mobile-small);
   }
 
 }
@@ -3225,22 +3356,23 @@ body.dashboard .floating-logo {
   }
 
   .confirm-right-panel {
-    padding: 40px 30px;
+    padding: var(--mobile-padding);
   }
 
   .confirm-right-panel h1 {
-    font-size: 32px;
-    margin-bottom: 30px;
+    font-size: var(--mobile-h2);
+    margin-bottom: var(--mobile-margin);
   }
 
   .confirm-right-panel input {
-    font-size: 18px;
-    padding: 14px 50px 14px 16px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    padding-right: 50px;
   }
 
   .confirm-right-panel .submit-btn {
-    font-size: 20px;
-    padding: 16px;
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
   }
 
   .confirm-icon {
@@ -3254,7 +3386,7 @@ body.dashboard .floating-logo {
   }
 
   .message {
-    font-size: 16px;
+    font-size: var(--mobile-body);
     margin-top: 15px;
   }
 }
@@ -3346,7 +3478,14 @@ body.dashboard .floating-logo {
     align-items: center;
     gap: 15px;
 }
-
+.account-card-balance .balance-label {
+    font-size: 1.8rem;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    color: var(--text);
+    font-weight: 500;
+    text-align: left;
+}
 .account-card-icon {
     width: 80px;
     height: 80px;
@@ -3404,8 +3543,9 @@ body.dashboard .floating-logo {
 }
 
 .balance-label {
-    font-size: 1.7rem;
-    color: #64748b;
+    font-size: 0.75rem;
+    color: var(--text);
+    text-align: center;
 }
 
 .balance-amount {
@@ -3666,7 +3806,7 @@ body.dashboard .floating-logo {
 }
 
 #transactionModal .badge-income {
-    background-color: #dcfce7;
+    background-color: #d1fae5;
     color: #16a34a;
 }
 
@@ -3701,55 +3841,61 @@ body.dashboard .floating-logo {
 
     .total-overview {
         grid-template-columns: 1fr;
-        padding: 25px;
+        padding: var(--mobile-padding);
     }
 
     .overview-label {
-        font-size: 1.2rem;  
+        font-size: 1.5rem;  
     }
 
     .overview-value {
-        font-size: 2rem;  
+        font-size: var(--mobile-h1);  
     }
 
     .account-card {
-        padding: 20px;  
+        padding: var(--mobile-padding);  
     }
 
     .account-card-icon {
         width: 50px;  
         height: 50px;
-        font-size: 1.8rem;  
+        font-size: 1.78rem; 
     }
-
+    
     .account-card-name {
-        font-size: 1.2rem;  
-    }
-
-    .account-card-number {
-        font-size: 1.1rem;  
-    }
-
-    .balance-label {
+        margin-top: 15px;
+        margin-bottom: 4px;
+        margin-left: 0;
         font-size: 1rem;
         text-align: left;  
     }
 
+    .account-card-header .account-card-number {
+        font-size: 1rem;
+        color: rgba(103, 102, 102, 0.499); 
+    }
+
+    .account-card-balance .balance-label {
+        font-size: 1rem;
+        text-align: left;
+        color: var(--text);
+    }
+
     .balance-amount {
-        font-size: 1.6rem;  
+        font-size: var(--mobile-h2);  
     }
 
     .account-stat .stat-label {
-        font-size: 1.1rem;  
+        font-size: 1rem;  
     }
 
     .account-stat .stat-value {
-        font-size: 1.3rem;  
+        font-size: 1rem;  
     }
 
     .account-card-btn {
-        padding: 8px 12px;  
-        font-size: 1rem;  
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
     }
 
     .modal-content {
@@ -3759,49 +3905,49 @@ body.dashboard .floating-logo {
 
     .modal-header,
     .modal-body {
-        padding: 20px 25px;
+        padding: var(--mobile-padding);
     }
 
     .modal-header h2 {
-        font-size: 1.6rem;  
+        font-size: var(--mobile-h2);  
     }
 
     .modal-subtitle {
-        font-size: 1rem;  
+        font-size: var(--mobile-body);  
     }
 
     .modal-balance-label {
-        font-size: 1rem; 
+        font-size: var(--mobile-body); 
     }
 
     .modal-balance-value {
-        font-size: 1.3rem;  
+        font-size: var(--mobile-label);  
     }
 
     #transactionModal .date-range-dates {
-        font-size: 1.2rem;  
+        font-size: var(--mobile-label);  
     }
 
     #transactionModal .modal-body .tt th {
-        padding: 12px 15px;  
-        font-size: 0.9rem;  
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
     }
 
     #transactionModal .modal-body .tt td {
-        padding: 14px 15px;  
-        font-size: 0.9rem;  
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
     }
 
     #transactionModal .transaction-badge {
-        font-size: 0.7rem;  
+        font-size: var(--mobile-small);  
         padding: 3px 10px;  
     }
 
     .modal-filters {
         flex-direction: column;
         align-items: stretch;
-        padding: 15px;  
-        gap: 12px; 
+        padding: var(--mobile-padding);  
+        gap: var(--mobile-gap); 
     }
 
     .modal-balance {
@@ -3809,14 +3955,14 @@ body.dashboard .floating-logo {
     }
 
     #transactionModal .modal-body {
-        padding: 20px 15px; 
+        padding: var(--mobile-padding); 
         overflow-x: hidden; 
     }
 
     #transactionModal .modal-body .transaction-table {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch; 
-        border-radius: 12px;
+        border-radius: var(--mobile-radius);
         box-shadow: inset 0 0 0 1px #e2e8f0; 
     }
 
@@ -3871,7 +4017,14 @@ body.dashboard .floating-logo {
     border-left-color: #9333ea;
 }
 
-/* Optional: Fine-tune individual card heights if needed (not required) */
+.no-transfers {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 24px;
+    font-size: 1.4rem;
+}
+
 
 /* Card Header */
 .transfer-card-header {
@@ -3972,7 +4125,7 @@ body.dashboard .floating-logo {
 
 .date-picker-trigger:hover,
 .date-picker-trigger:focus {
-    border-color: var(--primary);
+    border-color: var(--secondary);
     box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
 }
 
@@ -3990,8 +4143,8 @@ body.dashboard .floating-logo {
 
 .btn-primary {
     padding: 16px 22px;
-    background: var(--button);
-    color: var(--text);
+    background: var(--secondary);
+    color: white;
     border: none;
     border-radius: 12px;
     font-size: 1.7rem;
@@ -4040,40 +4193,40 @@ body.dashboard .floating-logo {
     /* 1 column layout */
     .transfer-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: var(--mobile-gap);
     }
 
     /* Smaller cards, no forced height */
     .transfer-card {
-        padding: 14px 16px;
-        min-height: unset;   /* REMOVE TALL HEIGHTS */
+        padding: var(--mobile-padding);
+        min-height: unset;
         height: auto;
     }
 
     /* Reduce header size */
     .transfer-card h2 {
-        font-size: 1.6rem;
-        margin-bottom: 16px;
+        font-size: var(--mobile-h2);
+        margin-bottom: var(--mobile-gap);
     }
 
     /* Fix oversized form labels */
     .transfer-form label {
-        font-size: 1.4rem;
+        font-size: var(--mobile-label);
     }
 
     /* Inputs smaller + tighter */
     .transfer-form input[type="date"],
     .transfer-form input[type="number"],
     .transfer-form select {
-        padding: 12px 14px;
-        font-size: 1rem;
-        border-radius: 10px;
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-body);
+        border-radius: var(--mobile-radius);
     }
 
     /* Adjust prefix input */
     .input-with-prefix .prefix {
         left: 10px;
-        font-size: 1rem;
+        font-size: var(--mobile-body);
     }
 
     .input-with-prefix input {
@@ -4082,23 +4235,23 @@ body.dashboard .floating-logo {
 
     /* Date trigger smaller */
     .date-picker-trigger {
-        padding: 12px 14px;
-        font-size: 1rem;
-        gap: 8px;
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-body);
+        gap: var(--mobile-gap);
     }
 
     /* Buttons smaller */
     .btn-primary {
-        padding: 12px 16px;
-        font-size: 1.2rem;
-        border-radius: 10px;
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-label);
+        border-radius: var(--mobile-radius);
     }
 
     /* Transfer list items compact */
     .transfer-item {
-        padding: 12px 14px;
-        gap: 8px;
-        font-size: 1rem;
+        padding: var(--mobile-padding);
+        gap: var(--mobile-gap);
+        font-size: var(--mobile-body);
         grid-template-columns: 1fr;
     }
 
@@ -4112,7 +4265,7 @@ body.dashboard .floating-logo {
 
 /* lightweight "card" look consistent with your transaction/transfer cards */
 .cardish {
-  background: #fff;
+  background: var(--background);
   border-radius: 22px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
@@ -4296,14 +4449,7 @@ body.dashboard .floating-logo {
 .pref-value { font-weight: 800; color: var(--text); }
 
 /* Responsive */
-@media (max-width: 1200px) {
-  .profile-grid { grid-template-columns: 1fr; }
-  .profile-hero { grid-template-columns: 1fr; text-align: center; }
-  .profile-identity { align-items: center; }
-  .profile-grid .profile-card:nth-of-type(1),
-  .profile-grid .profile-card:nth-of-type(2) { grid-column: 1 / -1; }
-}
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .info-grid { grid-template-columns: 1fr; }
 }
 
@@ -4535,15 +4681,170 @@ body.dashboard .floating-logo {
 }
 
 /* Responsive */
-@media (max-width: 1200px) {
-  .settings-grid { grid-template-columns: 1fr; }
-  .avatar-tile { grid-template-columns: 1fr; text-align: center; }
-}
+@media (max-width: 768px) {
+  .settings-grid {
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
+  }
 
-@media (max-width: 640px) {
-  .settings-card { padding: 24px 20px; }
-  .settings-card h2 { font-size: 1.5rem; }
-  .settings-form .form-row { grid-template-columns: 1fr; }
+  .settings-grid .settings-card {
+    min-height: auto;
+  }
+
+  .settings-card {
+    padding: var(--mobile-padding);
+    padding-bottom: 40px;
+    border-radius: var(--mobile-radius);
+    min-height: auto;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .settings-card:has(.profile-identity) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mobile-gap);
+  }
+
+  .settings-card .profile-avatar {
+    flex-direction: row;
+    gap: var(--mobile-gap);
+    align-items: center;
+  }
+
+  .settings-card .profile-identity {
+    gap: var(--mobile-gap);
+  }
+
+  .avatar-edit-btn {
+    padding: 6px 10px;
+    font-size: var(--mobile-small);
+  }
+
+  .settings-card .profile-name {
+    font-size: var(--mobile-h2);
+  }
+
+  .profile-username {
+    font-size: var(--mobile-label);
+  }
+
+  .profile-meta {
+    font-size: var(--mobile-body);
+    gap: var(--mobile-gap);
+  }
+
+  .profile-actions {
+    gap: var(--mobile-gap);
+    margin-top: 0;
+  }
+
+  .btn.primary,
+  .btn.subtle {
+    padding: 8px 28px;
+    font-size: 0.9rem;
+    flex: 1;
+  }
+
+  .settings-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 12px;
+  }
+
+  .settings-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-top: 60px;
+    margin-left: -8px;
+  }
+
+  .settings-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: var(--mobile-small);
+    padding: 6px 12px;
+  }
+
+  .info-item {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  .info-label {
+    font-size: var(--mobile-small);
+  }
+
+  .info-value {
+    font-size: var(--mobile-label);
+  }
+
+  .avatar-tile {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .avatar-photo {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .settings-card .profile-avatar-img {
+    width: 140px;
+    height: 140px;
+    border-width: 4px;
+  }
+
+  .avatar-controls {
+    gap: 8px;
+  }
+
+  .avatar-upload-btn, .avatar-remove-btn {
+    padding: 10px 14px;
+    font-size: var(--mobile-body);
+    flex: 1;
+  }
+
+  .settings-form .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .settings-form .form-group {
+    gap: 8px;
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .settings-form label {
+    font-size: var(--mobile-label);
+    font-weight: 600;
+  }
+
+  .settings-form input {
+    padding: 12px 16px;
+    font-size: var(--mobile-body);
+    border-radius: var(--mobile-radius);
+  }
+
+  .settings-form .toggle-btn {
+    right: 10px;
+  }
+
+  .form-actions {
+    margin-top: 16px;
+    justify-content: stretch;
+  }
+
+  .save-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: var(--mobile-body);
+  }
 }
 
 /*======================================== Monthly Budgeting Styling ============================================ */
@@ -4562,7 +4863,7 @@ body.dashboard .floating-logo {
 .budget-tab-btn {
   padding: 16px 48px;
   background: transparent;
-  border: none;
+  border: 2px solid var(--secondary);
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 600;
@@ -4573,7 +4874,7 @@ body.dashboard .floating-logo {
 
 .budget-tab-btn:hover {
   background: var(--highlight);
-  color: var(--text);
+  color: white;
 }
 
 .budget-tab-btn.active {
@@ -4881,66 +5182,181 @@ body.dashboard .floating-logo {
 
 /* Mobile Responsive Styles for Budget Page */
 @media (max-width: 768px) {
+  /* Tab Navigation */
   .budget-tabs {
-    width: 100%;
+    width: fit-content;
+    gap: 6px;
+    margin: 0 auto 20px;
+    display: flex;
   }
 
   .budget-tab-btn {
-    flex: 1;
-    padding: 14px 20px;
-    font-size: 1rem;
+    padding: 10px 12px;
+    font-size: 1.3rem;
+    border-width: 1px;
   }
 
+  .budget-tab-btn:hover {
+    background: var(--highlight);
+    color: white;
+  }
+
+  /* Summary Card */
+  .budget-summary-card {
+    padding: 20px 16px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+  }
+
+  .budget-summary-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+
+  /* Summary Stats */
   .budget-summary-stats {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .budget-stat-item {
+    padding: 16px 14px;
+    border-radius: 10px;
+  }
+
+  .budget-stat-label {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
   }
 
   .budget-stat-value {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
 
+  /* Budget Table */
+  .budget-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--mobile-radius);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .budget-table {
+    font-size: var(--mobile-small);
+    table-layout: auto;
+  }
+
+  .budget-table th {
+    padding: 12px;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .budget-table td {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+
+  .budget-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .budget-table .amount {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .category-dot {
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 1.0rem;
+  }
+
+  /* Budget Editor Card */
+  .budget-editor-card {
+    padding: 16px;
+    margin-bottom: 100px; /* Extra space for mobile footer */
+    border-radius: var(--mobile-radius);
+  }
+
+  .budget-editor-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 4px;
+  }
+
+  .budget-editor-subtitle {
+    font-size: var(--mobile-body);
+    margin-bottom: 20px;
+  }
+
+  /* Budget Form */
   .budget-form-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 20px;
   }
 
   .budget-form-group.total-budget {
     grid-column: span 1;
   }
 
+  .budget-form-group label {
+    font-size: var(--mobile-body);
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .label-icon {
+    font-size: 1.2rem;
+  }
+
+  .budget-form-group input {
+    padding: 12px;
+    font-size: var(--mobile-body);
+    border-width: 1px;
+  }
+
+  .budget-form-group.total-budget input {
+    padding: 12px;
+    font-size: var(--mobile-body);
+  }
+
+  /* Form Buttons */
   .budget-form-actions {
     flex-direction: column;
+    gap: 10px;
   }
 
   .budget-btn-primary,
   .budget-btn-secondary {
     width: 100%;
     justify-content: center;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    border-width: 2px;
+  }
+
+  .btn-icon-small {
+    font-size: 1rem;
   }
 }
 
-@media (max-width: 480px) {
-  .budget-summary-card,
-  .budget-editor-card {
-    padding: 28px 24px;
-  }
-
-  .budget-summary-card h2,
-  .budget-editor-card h2 {
-    font-size: 1.75rem;
-  }
-
-  .budget-stat-value {
-    font-size: 2rem;
-  }
-
-  .budget-table th,
-  .budget-table td {
-    padding: 14px 16px;
-    font-size: 0.95rem;
-  }
-}
 
 /* ================================================== Yearly Budgeting Styling ===================================================== */
 /* Yearly Overview Grid */
@@ -5109,7 +5525,7 @@ body.dashboard .floating-logo {
   border-radius: 22px;
   padding: 48px 44px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 1px solid #e5e7eb;
 }
 
@@ -5195,7 +5611,7 @@ body.dashboard .floating-logo {
   border-radius: 22px;
   padding: 48px 44px;
   margin-bottom: 50px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 1px solid #e5e7eb;
 }
 
@@ -5256,71 +5672,19 @@ body.dashboard .floating-logo {
 
 .insight-content strong {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 700;
 }
 
 .insight-content p {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #374151;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
-/* Yearly Budget Mobile Responsive */
-@media (max-width: 1200px) {
-  .months-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .yearly-overview-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .yearly-stat-card {
-    padding: 28px 24px;
-  }
-
-  .yearly-stat-value {
-    font-size: 2rem;
-  }
-
-  .section-header-with-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .year-selector {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .months-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .insights-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .monthly-breakdown-card,
-  .insights-card {
-    padding: 28px 24px;
-  }
-
-  .monthly-breakdown-card h2,
-  .insights-card h2 {
-    font-size: 1.75rem;
-  }
-}
 
 /* ================================================ Weekly Budgeting Styling =============================================== */
 /* Week Selector Card */
@@ -5329,7 +5693,7 @@ body.dashboard .floating-logo {
   border-radius: 20px;
   padding: 28px 40px;
   margin-bottom: 40px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 2px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
@@ -5480,7 +5844,7 @@ body.dashboard .floating-logo {
   border-radius: 22px;
   padding: 48px 44px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 1px solid #e5e7eb;
 }
 
@@ -5590,7 +5954,7 @@ body.dashboard .floating-logo {
   border-radius: 22px;
   padding: 48px 44px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 1px solid #e5e7eb;
 }
 
@@ -5691,7 +6055,7 @@ body.dashboard .floating-logo {
   border-radius: 22px;
   padding: 48px 44px;
   margin-bottom: 50px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--secondary);
   border: 1px solid #e5e7eb;
 }
 
@@ -5765,90 +6129,321 @@ body.dashboard .floating-logo {
   line-height: 1.4;
 }
 
-/* Weekly Budget Mobile Responsive */
-@media (max-width: 1200px) {
-  .days-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
 
 @media (max-width: 768px) {
   .week-selector-card {
     flex-direction: column;
-    gap: 20px;
-    padding: 24px;
+    gap: var(--mobile-margin);
+    padding: var(--mobile-padding);
   }
 
   .week-nav-btn {
     width: 100%;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+
+  .week-label {
+    font-size: 1rem;
+  }
+
+  .week-dates {
+    font-size: 1.35rem;
   }
 
   .weekly-overview-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: var(--mobile-margin);
+    margin-bottom: 20px;
   }
 
   .weekly-stat-card {
-    padding: 24px;
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
   }
 
   .weekly-stat-value {
-    font-size: 2.2rem;
+    font-size: var(--mobile-h2);
+  }
+
+  .weekly-stat-label {
+    font-size: 1.1rem;
+  }
+
+  .weekly-trend {
+    font-size: 0.9rem;
+  }
+
+  .weekly-progress-text {
+    font-size: 0.85rem;
+  }
+
+  .daily-breakdown-card {
+    display: none;
   }
 
   .days-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
   }
 
   .day-card {
-    padding: 20px 16px;
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
   }
 
   .category-breakdown-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: block;
+    overflow-x: auto;
+    border-radius: var(--mobile-radius);
+    border: 1px solid #e5e7eb;
+  }
+
+  .category-breakdown-item {
+    display: table;
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    border-bottom: 1px solid #f3f4f6;
+    background: white;
+    table-layout: fixed;
+  }
+
+  .category-breakdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .category-breakdown-item:hover {
+    background: #f9fafb;
+  }
+
+  .category-breakdown-header {
+    display: table-cell;
+    padding: 18px 16px;
+    vertical-align: middle;
+    gap: 0;
+    margin-bottom: 0;
+    width: 60%;
+  }
+
+  .category-breakdown-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .category-breakdown-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .category-progress-bar {
+    display: none;
+  }
+
+  .category-budget-info {
+    display: table-cell;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 18px 16px;
+    vertical-align: middle;
+    text-align: right;
+    width: 40%;
+    color: #065f46;
+    font-weight: 600;
   }
 
   .tips-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 12px;
   }
 
-  .daily-breakdown-card,
+  .tip-item {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
   .weekly-category-card,
   .weekly-tips-card {
-    padding: 28px 24px;
+    padding: 24px 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
   }
 
-  .daily-breakdown-card h2,
   .weekly-category-card h2,
   .weekly-tips-card h2 {
-    font-size: 1.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .days-grid {
-    grid-template-columns: 1fr;
+    font-size: var(--mobile-h2);
+    margin-bottom: 16px;
+    margin-top: 0;
   }
 
-  .day-card {
-    padding: 20px;
-  }
-
-  .day-amount {
-    font-size: 1.4rem;
-  }
-
-  .weekly-stat-icon {
+  .tip-icon {
     font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
   }
 
-  .weekly-stat-value {
-    font-size: 2rem;
+  .tip-content strong {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .tip-content p {
+    font-size: 1.05rem;
+  }
+
+  .weekly-tips-card {
+    margin-bottom: 100px;
   }
 }
+
+
+@media (max-width: 768px) {
+  /* Yearly Overview Cards */
+  .yearly-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .yearly-stat-card {
+    padding: 16px 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .yearly-stat-icon {
+    font-size: 32px;
+  }
+
+  .yearly-stat-label {
+    font-size: 1.2rem;
+  }
+
+  .yearly-stat-value {
+    font-size: 2.2rem;
+  }
+
+  .yearly-stat-subtitle {
+    font-size: 1.1rem;
+  }
+
+  /* Spending Summary Section */
+  .budget-summary-card {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .section-header-with-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-header-with-actions h2 {
+    font-size: var(--mobile-h2);
+    margin: 0;
+  }
+
+  .year-selector {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 0px;
+    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .year-nav-btn {
+    width: 30px;         /* slightly smaller so they fit on narrow screens */
+    height: 30px;
+    font-size: 1rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border-color: var(--secondary);
+  }
+
+  .current-year {
+    font-size: 1.3rem;
+    min-width: 56px;
+    max-width: calc(100% - 104px); /* reserves space for nav buttons and possible action buttons */
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* HIDE the yearly spending breakdown table on mobile */
+  .budget-summary-card .budget-table-wrapper {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .trend-badge {
+    font-size: 0.85rem;
+  }  
+
+  /* Monthly Breakdown Section */
+  .monthly-breakdown-card {
+    display: none;
+  }
+
+  /* Insights Section */
+  .insights-card {
+    padding: 16px;
+    margin-bottom: 100px; /* Extra space for mobile footer */
+    border-radius: var(--mobile-radius);
+  }
+
+  .insights-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 16px;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .insight-item {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .insight-icon {
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .insight-content strong {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .insight-content p {
+    font-size: 1.05rem;
+  }
+}
+
 
 
 /* ================================================== Mobile Footer Styling =============================================================== */

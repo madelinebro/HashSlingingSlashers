@@ -1,5 +1,5 @@
 <!-- Chatbot Button -->
-<button class="chatbot">
+<button class="chatbot" aria-label="Open AI Chatbot">
     <span>💬</span>
     AI Chatbot
 </button>
@@ -14,23 +14,17 @@
                 <p class="chatbot-status">Online</p>
             </div>
         </div>
-        <button class="chatbot-close">&times;</button>
+        <button class="chatbot-close" aria-label="Close chatbot">&times;</button>
     </div>
 
     <div class="chatbot-messages" id="chatbotMessages">
-        <div class="chatbot-message bot-message">
-            <div class="message-avatar">🤖</div>
-            <div class="message-content">
-                <p>Hello! I'm your BloomFi assistant. How can I help you manage your finances today?</p>
-                <span class="message-time">Just now</span>
-            </div>
-        </div>
+        <!-- Messages will be dynamically inserted here -->
     </div>
 
     <div class="chatbot-input-area">
-        <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..."
-            autocomplete="off">
-        <button class="chatbot-send" id="chatbotSend">
+        <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." autocomplete="off"
+            aria-label="Chat message input">
+        <button class="chatbot-send" id="chatbotSend" aria-label="Send message">
             <span>➤</span>
         </button>
     </div>

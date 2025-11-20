@@ -16,6 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
     avatarUrl: "images/Generic avatar (1).svg"
   };
 
+  // === LOCAL AVATAR STORAGE (until backend is ready) ===
+  const AVATAR_STORAGE_KEY = 'userProfilePicture';
+  
+  function getStoredAvatar() {
+    return localStorage.getItem(AVATAR_STORAGE_KEY);
+  }
+  
+  function saveAvatarLocally(imageData) {
+    localStorage.setItem(AVATAR_STORAGE_KEY, imageData);
+  }
+  
+  function removeStoredAvatar() {
+    localStorage.removeItem(AVATAR_STORAGE_KEY);
+  }
+
   // === UTILITY: FETCH USER DATA FROM BACKEND ===
   async function fetchUserData() {
     try {
@@ -28,7 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // const userData = await response.json();
       // return userData;
       
-      // For now, return mock data
+      // For now, return mock data with stored avatar
+      const storedAvatar = getStoredAvatar();
+      if (storedAvatar) {
+        currentUser.avatarUrl = storedAvatar;
+      }
       return currentUser;
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -81,13 +100,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // === UTILITY: UPDATE ALL AVATARS ON PAGE ===
+  function updateAllAvatars(avatarUrl) {
+    document.querySelectorAll('.profile-avatar-img, .sidebar-user-info > img').forEach(img => {
+      img.src = avatarUrl;
+    });
+  }
+
   // === POPULATE PROFILE PAGE ===
   function populateProfilePage(userData) {
     // Update all avatar images
-    document.querySelectorAll('.profile-avatar-img, .sidebar-user-info > img').forEach(img => {
-      img.src = userData.avatarUrl;
-      img.alt = `${userData.fullName} avatar`;
-    });
+    updateAllAvatars(userData.avatarUrl);
 
     // Update profile identity section
     const profileName = document.querySelector('.profile-name');
@@ -141,10 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // === POPULATE SETTINGS PAGE ===
   function populateSettingsPage(userData) {
     // Update avatar
-    document.querySelectorAll('.profile-avatar-img, .sidebar-user-info > img').forEach(img => {
-      img.src = userData.avatarUrl;
-      img.alt = `${userData.fullName} avatar`;
-    });
+    updateAllAvatars(userData.avatarUrl);
 
     // Populate form fields
     const fullNameInput = document.getElementById('fullName');
@@ -206,12 +226,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Close menu when clicking outside
-    document.addEventListener("click", () => {
-      userToggle.setAttribute("aria-expanded", "false");
-      userMenu.style.display = "none";
-      const chevron = userToggle.querySelector(".chev");
-      if (chevron) {
-        chevron.style.transform = "rotate(0deg)";
+    document.addEventListener("click", (e) => {
+      if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
+        userToggle.setAttribute("aria-expanded", "false");
+        userMenu.style.display = "none";
+        const chevron = userToggle.querySelector(".chev");
+        if (chevron) {
+          chevron.style.transform = "rotate(0deg)";
+        }
       }
     });
   }
@@ -224,7 +246,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear authentication data
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("userName");
-      localStorage.removeItem("authToken"); // Add this for backend integration
+      localStorage.removeItem("authToken");
+      removeStoredAvatar();
       window.location.href = "login.html";
     });
   }
@@ -251,20 +274,61 @@ document.addEventListener("DOMContentLoaded", () => {
       // Preview the image
       const reader = new FileReader();
       reader.onload = (event) => {
-        document.querySelectorAll('.profile-avatar-img').forEach(img => {
-          img.src = event.target.result;
-        });
+        const newImageURL = event.target.result;
+        
+        // Store locally until backend is ready
+        saveAvatarLocally(newImageURL);
+        
+        // Update the current user data
+        currentUser.avatarUrl = newImageURL;
+        
+        // Update all profile pictures on the current page
+        updateAllAvatars(newImageURL);
       };
       reader.readAsDataURL(file);
 
       // TODO: Upload to backend
       // const formData = new FormData();
       // formData.append('avatar', file);
-      // await fetch('/api/user/avatar', {
+      // const response = await fetch('/api/user/avatar', {
       //   method: 'POST',
       //   headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
       //   body: formData
       // });
+      // const result = await response.json();
+      // currentUser.avatarUrl = result.avatarUrl;
+      // updateAllAvatars(result.avatarUrl);
+    });
+  }
+
+  // === AVATAR REMOVE BUTTON (SETTINGS PAGE) ===
+  const avatarRemoveBtn = document.querySelector('.avatar-remove-btn');
+  if (avatarRemoveBtn) {
+    avatarRemoveBtn.addEventListener('click', async () => {
+      if (confirm('Are you sure you want to remove your profile picture?')) {
+        const defaultAvatar = 'images/Generic avatar (1).svg';
+        
+        // Remove from local storage
+        removeStoredAvatar();
+        
+        // Update the current user data
+        currentUser.avatarUrl = defaultAvatar;
+        
+        // Update all avatars on page
+        updateAllAvatars(defaultAvatar);
+        
+        // Clear the file input
+        const avatarInput = document.getElementById('avatarInput');
+        if (avatarInput) {
+          avatarInput.value = '';
+        }
+        
+        // TODO: Send removal request to backend
+        // await fetch('/api/user/avatar', {
+        //   method: 'DELETE',
+        //   headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        // });
+      }
     });
   }
 

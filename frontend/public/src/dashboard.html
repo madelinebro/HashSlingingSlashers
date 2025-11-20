@@ -7,18 +7,16 @@
         Dashboard 
         Author: Samantha Saunsaucie
         Date: 10/10/2025
-        -->
-    <!-- Setup and Title -->
-    <title>Dashboard</title>
+    -->
+    <title>Dashboard - BloomFi</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="css/style.css" rel="stylesheet" />
-    <script src="js/script.js" defer></script>
     <script src="js/dashboard.js" defer></script>
+    <script src="js/script.js" defer></script>
     <script src="js/mobile_footer.js" defer></script>
-    <script src="js/chatbot.js"></script>
+    <script src="js/chatbot.js" defer></script>
 </head>
-<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
 
 <body class="dashboard">
     <!-- LEFT SIDEBAR NAVIGATION -->
@@ -51,10 +49,10 @@
         <!-- User Profile at Bottom -->
         <div class="sidebar-user">
             <div class="sidebar-user-info">
-                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <img src="images/Generic avatar (1).svg" alt="User avatar" />
                 <div class="sidebar-user-details">
                     <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
-                        Jane
+                        <span id="userNameText">Loading...</span>
                         <img class="chev" src="images/Chevron left.svg" alt="" />
                     </button>
                     <div id="userMenu" class="sidebar-user-menu" role="menu">
@@ -66,6 +64,7 @@
             </div>
         </div>
     </aside>
+
     <!-- MAIN CONTENT AREA -->
     <div class="main-container">
         <!-- Header -->
@@ -76,7 +75,7 @@
             </div>
         </header>
 
-        <!-- Top Section: Account Summary (LEFT) + Stats Cards (RIGHT) -->
+        <!-- Top Section: Account Summary + Stats Cards -->
         <div class="dashboard-top-section">
             <!-- LEFT: Account Summary Card -->
             <section class="account-summary-card">
@@ -145,10 +144,10 @@
                         <span class="transaction-badge" id="transactionBadge">0</span>
                     </div>
                     <div class="transaction-controls">
-                        <div class="date-range-picker" onclick="openDatePicker()" title="Click to change date range">
+                        <button class="date-range-picker" onclick="openDatePicker()" title="Click to change date range">
                             <span class="date-icon">📅</span>
-                            <span class="date-range-dates" id="dateRange">Oct 17 - Oct 27, 2025</span>
-                        </div>
+                            <span class="date-range-dates" id="dateRange">Last 30 days</span>
+                        </button>
                         <button class="filter-btn" onclick="openFilterModal()">
                             <span>🔍</span>
                             Filter
@@ -168,7 +167,11 @@
                             </tr>
                         </thead>
                         <tbody id="txBody">
-                            <!-- dashboard.js populates this -->
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 40px;">
+                                    Loading transactions...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -278,7 +281,6 @@
             </div>
         </div>
     </div>
-
     <!-- Mobile Footer -->
     <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
