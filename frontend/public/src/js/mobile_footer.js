@@ -1,15 +1,19 @@
-// footer.js - Mobile Footer Navigation
-// Author: Samantha Saunsaucie
+/* ======================================================================
+  BloomFi - Mobile Footer (mobile_footer.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
 
+   // Initializes the mobile footer navigation bar
 function initMobileFooter() {
   const footerContainer = document.getElementById('mobile-footer');
-  
+  // Exit if footer container doesn't exist on this page
   if (!footerContainer) return;
 
   // Determine current page for active state
   const currentPage = getCurrentPage();
 
-  // Create footer HTML with 4 icons - CORRECTED PATHS
+  // Create footer with 4 navigation icons
   footerContainer.innerHTML = `
     <button class="footer-icon" id="footer-menu" title="Menu">
       <img src="images/Menu.svg" alt="Menu" />
@@ -107,14 +111,29 @@ function closeMenu() {
   panel.classList.remove('active');
 }
 
-// Show notifications (placeholder)
+// Show notifications--placeholder message
 function showNotifications() {
   alert('Notifications feature coming soon!');
 }
 
-// Show AI chatbot messages (placeholder)
+// Show AI chatbot messages 
+// Show AI chatbot messages - opens the chatbot window
 function showMessages() {
-  alert('AI Chatbot feature coming soon!');
+  const chatbotWindow = document.querySelector('.chatbot-window');
+  const chatbotBtn = document.querySelector('.chatbot');
+  
+  if (chatbotWindow && chatbotBtn) {
+    chatbotWindow.classList.add('active');
+    chatbotBtn.style.display = 'none';
+    
+    // Focus on input field for better UX
+    const chatbotInput = document.getElementById('chatbotInput');
+    if (chatbotInput) {
+      chatbotInput.focus();
+    }
+  } else {
+    console.error('Chatbot elements not found. Make sure chatbot.js is loaded.');
+  }
 }
 
 // Navigate to profile page

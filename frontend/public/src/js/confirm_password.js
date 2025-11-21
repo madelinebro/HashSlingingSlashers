@@ -1,15 +1,22 @@
-// Wait until html document is loaded before running
+/* ======================================================================
+  BloomFi - Confirm Password (confirm_password.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+
+// Wait until HTML document is loaded before running
 document.addEventListener("DOMContentLoaded", () => {
-  // get references to the confirm password form and message elements
+  // Get references to form and message elements
   const form = document.getElementById("confirmPasswordForm");
   const message = document.getElementById("message");
 
-  // Password visibility toggle - SHOW ON HOVER (Password field)
+  // Password field visibility toggle on hover
   const passwordToggle = document.getElementById("passwordToggle");
   const passwordInput = document.getElementById("password");
   const eyeIcon = passwordToggle?.querySelector(".eye-icon");
 
   if (passwordToggle && passwordInput) {
+    // Show password on mouse enter
     passwordToggle.addEventListener("mouseenter", () => {
       passwordInput.type = "text";
       if (eyeIcon) {
@@ -18,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // Hide password on mouse leave
     passwordToggle.addEventListener("mouseleave", () => {
       passwordInput.type = "password";
       if (eyeIcon) {
@@ -27,12 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Password visibility toggle - SHOW ON HOVER (Confirm Password field)
+  // Confirm password field visibility toggle on hover
   const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
   const confirmPasswordInput = document.getElementById("confirmPassword");
   const confirmEyeIcon = confirmPasswordToggle?.querySelector(".eye-icon");
 
   if (confirmPasswordToggle && confirmPasswordInput) {
+    // Show confirm password on mouse enter
     confirmPasswordToggle.addEventListener("mouseenter", () => {
       confirmPasswordInput.type = "text";
       if (confirmEyeIcon) {
@@ -41,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // Hide confirm password on mouse leave
     confirmPasswordToggle.addEventListener("mouseleave", () => {
       confirmPasswordInput.type = "password";
       if (confirmEyeIcon) {
@@ -50,43 +60,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // If the form is not found, stop running
-  if (!form) return; // Prevents this from running on other pages
+  // Exit if form not found (prevents errors on other pages)
+  if (!form) return;
 
-  // Extract reset token from URL (typically sent in password reset email)
+  // Extract reset token from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const resetToken = urlParams.get('token');
 
-  // If no token is present, show error
+  // Validate token presence
   if (!resetToken) {
     showMessage("Invalid or missing reset link. Please request a new password reset.", "var(--warning)");
     form.querySelector('.submit-btn').disabled = true;
     return;
   }
 
-  // Form Submission
+  // Handle form submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const newPassword = passwordInput.value.trim();
     const confirmPassword = confirmPasswordInput.value.trim();
 
-    // Reset message
+    // Clear previous messages
     message.textContent = "";
     message.style.color = "";
 
-    // VALIDATION - Client-side checks
+    // Validate passwords before API call
     if (!validatePasswords(newPassword, confirmPassword)) {
-      return; // Validation failed, message already shown
+      return; // Stop if validation fails
     }
 
-    // BACKEND COMMUNICATION - Send to API
+    // Send password reset request to backend
     await resetPasswordAPI(resetToken, newPassword);
   });
 
-  // ========================================
-  // VALIDATION LOGIC (Separated for clarity)
-  // ========================================
+  // Validate password requirements and matching
   function validatePasswords(newPassword, confirmPassword) {
     if (!newPassword || !confirmPassword) {
       showMessage("Please fill out both fields.", "var(--warning)");
@@ -106,18 +114,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-  // ========================================
-  // BACKEND API CALL (Placeholder for backend team)
-  // ========================================
+  // Send password reset request to backend API
   async function resetPasswordAPI(token, password) {
     showMessage("Updating your password...", "var(--secondary)");
     
-    // Disable submit button during API call
+    // Disable submit button to prevent duplicate requests
     const submitBtn = form.querySelector('.submit-btn');
     submitBtn.disabled = true;
 
     try {
-      // TODO: Replace with actual API endpoint from backend team
+      // Replace with actual API endpoint from backend
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: {
@@ -132,29 +138,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        // SUCCESS - Password reset successful
+        // Password reset successful
         showMessage("Password reset successful! Redirecting to login...", "var(--success)");
         
-        // Redirect to login after 2 seconds
+        // Redirect to login page after 2 seconds
         setTimeout(() => {
           window.location.href = 'login.html';
         }, 2000);
       } else {
-        // ERROR - Backend returned an error
+        // Backend returned an error
         showMessage(data.message || "Failed to reset password. Please try again.", "var(--warning)");
         submitBtn.disabled = false;
       }
     } catch (error) {
-      // NETWORK ERROR - Couldn't reach backend
+      // Network or connection error
       console.error('Password reset error:', error);
       showMessage("Network error. Please check your connection and try again.", "var(--warning)");
       submitBtn.disabled = false;
     }
   }
 
-  // ========================================
-  // UI UPDATE HELPER
-  // ========================================
+  // Display message to user with specified color
   function showMessage(text, color) {
     message.textContent = text;
     message.style.color = color;

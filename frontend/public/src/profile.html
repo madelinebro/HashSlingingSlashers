@@ -18,46 +18,53 @@
     <script src="js/mobile_footer.js" defer></script>
     <script src="js/chatbot.js"></script>
 </head>
-<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<!-- Sets up the page body for profile page-->
 
 <body class="dashboard">
-    <!-- ========== SIDEBAR (same markup you use on Dashboard) ========== -->
-    <!-- LEFT SIDEBAR NAVIGATION -->
+    <!-- Left sidebar navigation section -->
     <aside class="sidebar">
-        <!-- Logo Section -->
+        <!-- Logo area at the top of the sidebar -->
         <div class="sidebar-logo">
             <img src="images/logo.svg" alt="BloomFi Logo" />
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- Main navigation links in the sidebar -->
         <nav class="sidebar-nav">
-            <a class="sidebar-nav-item active" href="dashboard.html">
+            <!-- Dashboard link -->
+            <a class="sidebar-nav-item" href="dashboard.html">
                 <span class="nav-icon">🏠</span>
                 Dashboard
             </a>
+            <!-- Accounts link -->
             <a class="sidebar-nav-item" href="accounts.html">
                 <span class="nav-icon">💳</span>
                 My Accounts
             </a>
+            <!-- Budgeting link -->
             <a class="sidebar-nav-item" href="budgeting_month.html">
                 <span class="nav-icon">📊</span>
                 Budgeting
             </a>
+            <!-- Transfers link-->
             <a class="sidebar-nav-item" href="transfers.html">
                 <span class="nav-icon">🔄</span>
                 Transfers
             </a>
         </nav>
 
-        <!-- User Profile at Bottom -->
+        <!-- User profile section at the bottom of the sidebar -->
         <div class="sidebar-user">
             <div class="sidebar-user-info">
+                <!-- User avatar image -->
                 <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
                 <div class="sidebar-user-details">
+                    <!-- User name button and chevron that toggles the dropdown menu -->
                     <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
                         Jane
                         <img class="chev" src="images/Chevron left.svg" alt="" />
                     </button>
+                    <!-- Dropdown menu that appears when clicking the chveron -->
                     <div id="userMenu" class="sidebar-user-menu" role="menu">
                         <a href="profile.html" role="menuitem">Profile</a>
                         <a href="settings.html" role="menuitem">Settings</a>
@@ -68,64 +75,84 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- Main content area where the profile information displays -->
     <main class="main-container">
+        <!-- Page header with title and subtitle -->
         <header class="content-header">
             <h1 class="page-title">My Profile</h1>
             <p class="page-subtitle">Manage your personal info and account preferences</p>
         </header>
 
-        <!-- Profile layout -->
+        <!-- Grid layout container for the profile cards -->
         <section class="settings-grid">
-            <!-- Left: big avatar + primary identity -->
+            <!-- Left card: Large avatar display and user information -->
             <article class="settings-card teal">
+                <!-- Avatar section with the user's profile picture -->
                 <div class="profile-avatar">
                     <img src="images/Generic avatar (1).svg" alt="User avatar" class="profile-avatar-img" />
+                    <!-- Button to change profile photo, redirects user to the to settings page -->
                     <button class="avatar-edit-btn" type="button" onclick="window.location.href='settings.html'">
                         Edit Photo
                     </button>
                 </div>
 
+                <!-- User identity information section -->
                 <div class="profile-identity">
+                    <!-- User's full name -->
                     <h2 class="profile-name">—</h2>
+                    <!-- Username with the @ symbol-->
                     <p class="profile-username">@—</p>
 
+                    <!-- List of user info with icons -->
                     <ul class="profile-meta">
+                        <!-- Email address line with mail icon -->
                         <li><span class="meta-icon">📧</span> <span class="user-email">—</span></li>
+                        <!-- Mobile phone line with phone icon -->
                         <li><span class="meta-icon">📱</span> <span class="user-mobile">—</span></li>
+                        <!-- Member since date line with ID icon -->
                         <li><span class="meta-icon">🆔</span> Member since <span class="user-member-since">—</span></li>
                     </ul>
 
+                    <!-- Buttons for profile management -->
                     <div class="profile-actions">
+                        <!-- Primary button to edit profile, links to settings page -->
                         <a class="btn primary" href="settings.html">Edit Profile</a>
+                        <!-- Secondary button to change password, also links to settings page -->
                         <a class="btn subtle" href="settings.html">Change Password</a>
                     </div>
                 </div>
             </article>
 
-            <!-- Personal Details -->
+            <!-- Right card: Personal information breakdown that is editable -->
             <article class="settings-card blue">
+                <!-- Card header with title and Profile badge -->
                 <div class="settings-card-header">
                     <h2>Personal Details</h2>
                     <span class="settings-badge">Profile</span>
                 </div>
+                <!-- Grid layout for displaying the pairs of user information-- text fields and labels -->
                 <div class="info-grid">
+                    <!-- Full name field -->
                     <div class="info-item">
                         <span class="info-label">Full Name</span>
                         <span class="info-value" data-field="fullName">—</span>
                     </div>
+                    <!-- Username field -->
                     <div class="info-item">
                         <span class="info-label">Username</span>
                         <span class="info-value" data-field="username">—</span>
                     </div>
+                    <!-- Email address field -->
                     <div class="info-item">
                         <span class="info-label">Email</span>
                         <span class="info-value" data-field="email">—</span>
                     </div>
+                    <!-- Mobile phone number field -->
                     <div class="info-item">
                         <span class="info-label">Mobile</span>
                         <span class="info-value" data-field="mobile">—</span>
                     </div>
+                    <!-- Address field (full width across the grid) -->
                     <div class="info-item full">
                         <span class="info-label">Address</span>
                         <span class="info-value" data-field="address">—</span>
@@ -135,7 +162,7 @@
         </section>
     </main>
 
-    <!-- Mobile Footer -->
+    <!-- Mobile navigation footer -->
     <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
 

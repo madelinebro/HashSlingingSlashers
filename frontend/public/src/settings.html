@@ -18,45 +18,52 @@
     <script src="js/mobile_footer.js" defer></script>
     <script src="js/chatbot.js"></script>
 </head>
-<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<!-- Sets up the page body -->
 
 <body class="dashboard">
-    <!-- LEFT SIDEBAR NAVIGATION -->
+    <!-- Left sidebar navigation menu -->
     <aside class="sidebar">
-        <!-- Logo Section -->
+        <!-- Logo section at the top of the sidebar -->
         <div class="sidebar-logo">
             <img src="images/logo.svg" alt="BloomFi Logo" />
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- Navigation menu with links to different pages -->
         <nav class="sidebar-nav">
+            <!-- Dashboard link -->
             <a class="sidebar-nav-item active" href="dashboard.html">
                 <span class="nav-icon">🏠</span>
                 Dashboard
             </a>
+            <!-- My Accounts link  -->
             <a class="sidebar-nav-item" href="accounts.html">
                 <span class="nav-icon">💳</span>
                 My Accounts
             </a>
+            <!-- Budgeting link-->
             <a class="sidebar-nav-item" href="budgeting_month.html">
                 <span class="nav-icon">📊</span>
                 Budgeting
             </a>
+            <!-- Transfers link-->
             <a class="sidebar-nav-item" href="transfers.html">
                 <span class="nav-icon">🔄</span>
                 Transfers
             </a>
         </nav>
 
-        <!-- User Profile at Bottom -->
+        <!-- User profile section at the bottom of sidebar -->
         <div class="sidebar-user">
             <div class="sidebar-user-info">
                 <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
                 <div class="sidebar-user-details">
+                    <!-- Button that toggles the dropdown menu -->
                     <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
                         Jane
                         <img class="chev" src="images/Chevron left.svg" alt="" />
                     </button>
+                    <!-- Dropdown menu with profile options -->
                     <div id="userMenu" class="sidebar-user-menu" role="menu">
                         <a href="profile.html" role="menuitem">Profile</a>
                         <a href="settings.html" role="menuitem">Settings</a>
@@ -67,26 +74,30 @@
         </div>
     </aside>
 
-    <!-- Main content -->
+    <!-- Main content area for the settings page -->
     <main class="main-container">
+        <!-- Page header with title and subtitle -->
         <header class="content-header">
             <h1 class="page-title">Settings</h1>
             <p class="page-subtitle">Manage your profile details and password</p>
         </header>
 
-        <!-- Settings grid (2 columns on desktop) -->
+        <!-- Settings grid layout -->
         <section class="settings-grid">
-            <!-- LEFT: Profile information (with avatar tile) -->
+            <!-- Left column: Profile information card-->
             <article class="settings-card green">
+                <!-- Card header with title and Profile badge -->
                 <div class="settings-card-header">
                     <h2>Update Profile Information</h2>
                     <span class="settings-badge">Profile</span>
                 </div>
 
+                <!-- Avatar section where user can change their profile photo -->
                 <div class="avatar-tile">
                     <div class="avatar-photo">
                         <img class="profile-avatar-img" src="images/Generic avatar (1).svg" alt="User avatar" />
                     </div>
+                    <!-- Buttons to change or remove avatar -->
                     <div class="avatar-controls">
                         <label class="avatar-upload-btn">
                             Change Photo
@@ -96,8 +107,11 @@
                     </div>
                 </div>
 
+                <!-- Form to update profile information -->
                 <form id="profileForm" class="settings-form">
+                    <!-- First row: Full name and username side by side -->
                     <div class="form-row">
+                        <!-- Full name input field -->
                         <div class="form-group">
                             <label for="fullName">Full Name</label>
                             <div class="input-wrapper">
@@ -105,6 +119,7 @@
                             </div>
                         </div>
 
+                        <!-- Username input field -->
                         <div class="form-group">
                             <label for="username">Username</label>
                             <div class="input-wrapper">
@@ -113,37 +128,45 @@
                         </div>
                     </div>
 
+                    <!-- Second row: Mobile number and email side by side -->
                     <div class="form-row">
+                        <!-- Mobile number input field -->
                         <div class="form-group">
                             <label for="mobile">Mobile Number</label>
                             <input type="tel" id="mobile" placeholder="📱 Phone Number" required>
                         </div>
 
+                        <!-- Email input field -->
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="email" id="email" placeholder="📧 Email" required>
                         </div>
                     </div>
 
+                    <!-- Button to save profile changes -->
                     <div class="form-actions">
                         <button type="submit" class="save-btn">Save Changes</button>
                     </div>
                 </form>
             </article>
 
-            <!-- RIGHT: Change Password -->
+            <!-- Right column: Change password card -->
             <article class="settings-card purple">
+                <!-- Card header with title and security badge -->
                 <div class="settings-card-header">
                     <h2>Change Password</h2>
                     <span class="settings-badge alt">Security</span>
                 </div>
 
+                <!-- Form to change user password -->
                 <form id="passwordForm" class="settings-form">
+                    <!-- Current password field with show/hide eye button -->
                     <div class="form-group">
                         <label for="currentPassword">Current Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="currentPassword" placeholder="🔒 Current Password"
                                 autocomplete="current-password" required>
+                            <!-- Button to toggle password visibility -->
                             <button type="button" class="toggle-btn" data-target="currentPassword"
                                 aria-label="Show password">
                                 <img class="eye-icon" src="images/Eye Off.svg" alt="">
@@ -151,6 +174,7 @@
                         </div>
                     </div>
 
+                    <!-- Email field for verification -->
                     <div class="form-group">
                         <label for="changeEmail">Email</label>
                         <div class="input-wrapper">
@@ -158,11 +182,13 @@
                         </div>
                     </div>
 
+                    <!-- New password field with show/hide eye button -->
                     <div class="form-group">
                         <label for="newPassword">New Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="newPassword" placeholder="🔒 Password"
                                 autocomplete="new-password" required>
+                            <!-- Button to toggle password visibility -->
                             <button type="button" class="toggle-btn" data-target="newPassword"
                                 aria-label="Show password">
                                 <img class="eye-icon" src="images/Eye Off.svg" alt="">
@@ -170,11 +196,13 @@
                         </div>
                     </div>
 
+                    <!-- Confirm new password field with show/hide eye button -->
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="confirmPassword" placeholder="🔒 Confirm Password"
                                 autocomplete="new-password" required>
+                            <!-- Button to toggle password visibility -->
                             <button type="button" class="toggle-btn" data-target="confirmPassword"
                                 aria-label="Show password">
                                 <img class="eye-icon" src="images/Eye Off.svg" alt="">
@@ -182,6 +210,7 @@
                         </div>
                     </div>
 
+                    <!-- Button to update password -->
                     <div class="form-actions">
                         <button type="submit" class="save-btn">Update Password</button>
                     </div>
@@ -190,7 +219,7 @@
         </section>
     </main>
 
-    <!-- Mobile Footer -->
+    <!-- Mobile footer navigation -->
     <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
 

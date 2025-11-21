@@ -1,64 +1,56 @@
-// ============================================================================
-// REGISTER.JS - Complete Registration System
-// ============================================================================
-// This file handles user registration with comprehensive validation,
-// async backend communication, and clean separation of concerns.
-// ============================================================================
+/* ======================================================================
+  BloomFi - Create Account Page/Register (register.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
 
-// Wait until HTML document is fully loaded before running
+   // Wait until HTML document is fully loaded before running
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registerForm");
   if (!form) return;
 
   // Listen for when user submits registration form
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // Prevent default form submission (page reload)
+    e.preventDefault(); // Stop the form from reloading the page
 
-    // ===== STEP 1: COLLECT FORM DATA =====
+    // First, grab all the data from the form fields
     const formData = collectFormData();
 
-    // ===== STEP 2: VALIDATE ALL INPUTS =====
+    // Then, Check if everything looks good 
     const validationError = validateRegistration(formData);
     if (validationError) {
       alert(validationError);
-      return; // Stop here if validation fails
+      return; // Stop here if something is wrong
     }
 
-    // ===== STEP 3: DISABLE FORM DURING SUBMISSION =====
-    // Prevents double-submission while waiting for backend response
+    // After, disable the submit button so user cannot click it multiple times
     const submitButton = form.querySelector('.btn');
     const originalButtonText = submitButton.textContent;
     submitButton.disabled = true;
     submitButton.textContent = 'Creating Account...';
 
-    // ===== STEP 4: SUBMIT TO BACKEND =====
+    // Send the data to the backend server
     const success = await registerUser(formData);
     
-    // ===== STEP 5: HANDLE RESPONSE =====
+    // Handle what happens after the server responds
     if (success) {
       alert("Account created successfully! Redirecting to login...");
       window.location.href = "login.html";
     } else {
-      // Re-enable form if registration failed
+      // Turn the button back on if registration did not work
       submitButton.disabled = false;
       submitButton.textContent = originalButtonText;
       alert("Registration failed. Please try again.");
     }
   });
 
-  // Setup password visibility toggles for both password fields
+  // Set up the eye icons that show/hide passwords when you hover over them
   setupPasswordToggle('passwordToggle', 'password');
   setupPasswordToggle('confirmPasswordToggle', 'confirmPassword');
 });
 
 
-// ============================================================================
-// DATA COLLECTION
-// ============================================================================
-/**
- * Collects all form data into a clean object
- * @returns {Object} Form data with trimmed values
- */
+// Grab all the form values and organize them into one object
 function collectFormData() {
   return {
     fullName: document.getElementById("fullName").value.trim(),
@@ -71,81 +63,72 @@ function collectFormData() {
 }
 
 
-// ============================================================================
-// VALIDATION LOGIC (Client-side validation before sending to backend)
-// ============================================================================
-/**
- * Comprehensive validation for registration data
- * This catches errors BEFORE sending to backend, saving network requests
- * @param {Object} data - The form data to validate
- * @returns {string|null} Error message if validation fails, null if all valid
- */
+// Check all the form data to make sure everything is valid
 function validateRegistration(data) {
-  // ----- CHECK 1: Empty Fields -----
+  //  Make sure no fields are empty
   if (!data.fullName || !data.phone || !data.username || 
       !data.email || !data.password || !data.confirmPassword) {
     return "Please fill in all fields.";
   }
 
-  // ----- CHECK 2: Full Name Validation -----
-  // Ensure user enters both first and last name
+  // Make sure they entered both first and last name
   const nameParts = data.fullName.split(' ').filter(part => part.length > 0);
   if (nameParts.length < 2) {
     return "Please enter your full name (first and last name).";
   }
 
-  // Check for numbers in name (optional but good practice)
+  // Make sure there are no numbers in the name
   if (/\d/.test(data.fullName)) {
     return "Name cannot contain numbers.";
   }
 
-  // ----- CHECK 3: Phone Number Validation -----
-  // Remove all non-digit characters for validation
+  // Validate phone number format
+  // Strip out everything except digits to count them
   const digitsOnly = data.phone.replace(/\D/g, '');
   
-  // Check if it's exactly 10 digits (adjust for your country's format)
+  // Make sure we have exactly 10 digits
   if (digitsOnly.length !== 10) {
     return "Please enter a valid 10-digit phone number.";
   }
 
-  // ----- CHECK 4: Username Validation -----
-  // Minimum length check
+  // Validate username
+  // Must be at least 3 characters
   if (data.username.length < 3) {
     return "Username must be at least 3 characters long.";
   }
 
-  // Maximum length check (prevents database issues)
+  // Cannot be too long
   if (data.username.length > 20) {
     return "Username must be 20 characters or less.";
   }
 
-  // No spaces allowed in username
+  // No spaces allowed
   if (/\s/.test(data.username)) {
     return "Username cannot contain spaces.";
   }
 
-  // Only allow alphanumeric and underscores (common username pattern)
+  // Only letters, numbers, and underscores allowed
   if (!/^[a-zA-Z0-9_]+$/.test(data.username)) {
     return "Username can only contain letters, numbers, and underscores.";
   }
 
-  // ----- CHECK 5: Email Validation -----
+  // Validate email format
   if (!isValidEmail(data.email)) {
     return "Please enter a valid email address.";
   }
 
-  // ----- CHECK 6: Password Strength -----
-  // Minimum length
+  // Make sure password is strong enough
+  // Must be at least 8 characters
   if (data.password.length < 8) {
     return "Password must be at least 8 characters long.";
   }
 
-  // Maximum length (prevents buffer overflow attacks)
+  // Cannot be too long 
   if (data.password.length > 128) {
     return "Password must be 128 characters or less.";
   }
 
-  // Password complexity requirements (optional but recommended)
+  // Check for password strength requirements
   const hasUpperCase = /[A-Z]/.test(data.password);
   const hasLowerCase = /[a-z]/.test(data.password);
   const hasNumber = /\d/.test(data.password);
@@ -155,83 +138,65 @@ function validateRegistration(data) {
     return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
   }
 
-  // ----- CHECK 7: Password Match -----
+  // Make sure both password fields match
   if (data.password !== data.confirmPassword) {
     return "Passwords do not match.";
   }
 
-  // ----- ALL CHECKS PASSED -----
-  return null; // No errors found
+  // Everything looks good
+  return null;
 }
 
 
-/**
- * Email validation using regex pattern
- * @param {string} email - Email address to validate
- * @returns {boolean} True if valid email format
- */
+// Check if an email address has a valid format
 function isValidEmail(email) {
-  // Standard email regex pattern
+  // This pattern checks for basic email structure: something@something.something
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
 
-// ============================================================================
-// BACKEND COMMUNICATION (Async function for API calls)
-// ============================================================================
-/**
- * Registers a new user by sending data to the backend
- * This is an ASYNC function - it waits for the server response
- * 
- * WHY ASYNC?
- * - Network requests take time (could be milliseconds to seconds)
- * - We don't want to freeze the entire page while waiting
- * - The 'await' keyword pauses THIS function while allowing other code to run
- * 
- * @param {Object} userData - Validated user data to send to backend
- * @returns {Promise<boolean>} True if registration successful, false otherwise
- */
+// Send the registration data to the backend server
 async function registerUser(userData) {
-  // RIGHT NOW: Simulate successful registration with mock data
-  // LATER: Uncomment the try-catch block below for real API integration
+  // Right now we're just simulating a successful registration
+  // When the backend is ready, we'll uncomment the code below
   
-  /* ========== FUTURE IMPLEMENTATION (When Backend is Ready) ========== */
+  // Future implementation for when FastAPI backend is connected:
   /*
   try {
-    // Send POST request to your FastAPI backend
+    // Send the registration data to the backend API
     const response = await fetch('http://localhost:8000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // Map frontend field names to backend expected format
-        // Adjust these based on your FastAPI model (might use snake_case)
+        // Match the field names to what the backend expects
+        // You might need to use snake_case like full_name instead of fullName
         full_name: userData.fullName,
         phone: userData.phone,
         username: userData.username,
         email: userData.email,
         password: userData.password
-        // Note: Don't send confirmPassword to backend (only needed for client validation)
+        // Don't send confirmPassword - we only needed it for validation
       })
     });
     
-    // Check if response was successful (status 200-299)
+    // Check if the server sent back a success response
     if (!response.ok) {
-      // Parse error message from backend
+      // Get the error message from the server
       const error = await response.json();
       console.error('Registration error:', error);
       
-      // Show specific error message from backend if available
+      // Show the error message to the user
       alert(error.detail || error.message || 'Registration failed. Please try again.');
       return false;
     }
     
-    // Parse successful response
+    // Get the success response from the server
     const result = await response.json();
     
-    // Optional: Store authentication token if backend returns one
+    // If the backend sends back a login token, save it for later use
     // if (result.token) {
     //   localStorage.setItem('authToken', result.token);
     // }
@@ -239,136 +204,59 @@ async function registerUser(userData) {
     return true;
     
   } catch (error) {
-    // This catches network errors (no internet, server down, etc.)
+    // This catches problems like no internet connection or server being down
     console.error('Network error:', error);
     alert('Network error. Please check your connection and try again.');
     return false;
   }
   */
   
-  // ===== TEMPORARY MOCK IMPLEMENTATION =====
-  // Simulate network delay (remove this when using real backend)
+  // Temporary placeholder code until backend is ready
+  // Simulate a 1 second delay like a real server would have
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  // Log the data (for testing purposes)
+  // Show the registration data in the console for testing
+  // Hide the passwords for security
   console.log('User registration data:', {
     ...userData,
     password: '[REDACTED]',
     confirmPassword: '[REDACTED]'
   });
   
-  // Simulate random success/failure for testing
-  // return Math.random() > 0.2; // 80% success rate for testing
+  // For testing: randomly succeed or fail
+  // return Math.random() > 0.2; // 80% chance of success
   
-  // For now, always return success
+  // For now, always pretend registration worked
   return true;
 }
 
 
-// ============================================================================
-// UI HELPER FUNCTIONS
-// ============================================================================
-/**
- * Sets up password visibility toggle on hover
- * 
- * HOW IT WORKS:
- * - When mouse enters the eye icon, password becomes visible
- * - When mouse leaves, password is hidden again
- * - Icon image switches between "eye" and "eye off"
- * 
- * @param {string} toggleId - ID of the toggle button element
- * @param {string} inputId - ID of the password input field
- */
+// Set up the eye icon button that shows and hides passwords when you hover
+// When your mouse is over the eye, the password becomes visible
+// When your mouse moves away, it hides again
 function setupPasswordToggle(toggleId, inputId) {
   const toggle = document.getElementById(toggleId);
   const input = document.getElementById(inputId);
   const eyeIcon = toggle?.querySelector('.eye-icon');
 
-  // Exit if elements don't exist (prevents errors)
+  // If the elements don not exist, just exit to avoid any errors
   if (!toggle || !input) return;
 
-  // Show password on mouse enter
+  // Show the password when mouse hovers over the eye icon
   toggle.addEventListener('mouseenter', () => {
-    input.type = 'text'; // Change input type to show password
+    input.type = 'text'; // Switch from dots to actual letters
     if (eyeIcon) {
       eyeIcon.alt = 'Hiding password';
-      eyeIcon.src = 'images/Eye.svg'; // Eye open icon
+      eyeIcon.src = 'images/Eye.svg'; // Show the open eye icon
     }
   });
 
-  // Hide password on mouse leave
+  // Hide the password when mouse moves away from the eye icon
   toggle.addEventListener('mouseleave', () => {
-    input.type = 'password'; // Change back to password type
+    input.type = 'password'; // Switch back to showing dots
     if (eyeIcon) {
       eyeIcon.alt = 'Show password';
-      eyeIcon.src = 'images/Eye off.svg'; // Eye closed icon (with space as you mentioned)
+      eyeIcon.src = 'images/Eye off.svg'; // Show the closed eye icon
     }
   });
 }
-
-
-// ============================================================================
-// EXPLANATION OF ASYNC/AWAIT AND WHY IT DOESN'T "MESS WITH ANYTHING"
-// ============================================================================
-/*
-
-WHAT IS ASYNC/AWAIT?
--------------------
-Async/await is JavaScript's modern way of handling operations that take time
-(like network requests, file reading, database queries, etc.)
-
-WHY WE NEED IT:
---------------
-1. Network requests aren't instant - they can take 100ms to several seconds
-2. We don't want to freeze the entire webpage while waiting
-3. JavaScript is "single-threaded" - it can only do one thing at a time
-
-HOW IT WORKS:
-------------
-- `async` keyword: Marks a function as asynchronous
-  - Always returns a Promise (a placeholder for a future value)
-  
-- `await` keyword: Pauses the function until the Promise resolves
-  - Only works inside async functions
-  - Doesn't freeze the browser - other code can still run
-
-EXAMPLE FLOW:
-------------
-1. User clicks "Create Account"
-2. Form submission handler runs (async function)
-3. Validation happens immediately (synchronous)
-4. registerUser() is called with `await`
-   - This sends the fetch request
-   - Function PAUSES here (but browser doesn't freeze)
-   - User can still interact with other parts of the page
-   - After server responds, function RESUMES
-5. We check if registration was successful
-6. Redirect to login or show error
-
-DOES IT "MESS WITH ANYTHING"?
------------------------------
-NO! Here's why:
-
-✅ Form submission is prevented (e.preventDefault()) so page doesn't reload
-✅ Button is disabled during submission (prevents double-clicks)
-✅ Validation happens BEFORE async operation (instant feedback)
-✅ If backend takes 3 seconds, user sees "Creating Account..." message
-✅ Other JavaScript on the page still works fine
-✅ Browser remains responsive
-
-ALTERNATIVE WITHOUT ASYNC/AWAIT (Old Way):
------------------------------------------
-// This is harder to read and maintain:
-fetch('/api/register', {...})
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert("Success!");
-      window.location.href = "login.html";
-    }
-  })
-  .catch(error => {
-    alert("Failed!");
-  });
-
-*/

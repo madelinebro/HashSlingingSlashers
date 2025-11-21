@@ -1,30 +1,47 @@
-<!-- Chatbot Button -->
+<!--/* ======================================================================
+  BloomFi - Chatbot (chatbot.html)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+-->
+
+<!-- Button that appears on the page to open the chatbot -->
 <button class="chatbot" aria-label="Open AI Chatbot">
     <span>💬</span>
     AI Chatbot
 </button>
 
-<!-- Chatbot Window -->
+<!-- The chatbot pop up window that appears when user clicks the button -->
 <div class="chatbot-window">
+
+    <!-- Top bar of the chatbot with the AI's info and close button -->
     <div class="chatbot-header">
         <div class="chatbot-header-content">
+            <!-- Robot emoji representing the AI assistant -->
             <div class="chatbot-avatar">🤖</div>
+            <!-- Assistant name and status indicator -->
             <div>
                 <h3>BloomFi Assistant</h3>
+                <!-- Shows whether the chatbot is available to respond -->
                 <p class="chatbot-status">Online</p>
             </div>
         </div>
+        <!-- X button to close out of the chatbot window -->
         <button class="chatbot-close" aria-label="Close chatbot">&times;</button>
     </div>
 
+    <!-- Main area where the conversation messages appear as you chat -->
     <div class="chatbot-messages" id="chatbotMessages">
-        <!-- Messages will be dynamically inserted here -->
     </div>
 
+    <!-- Bottom section where you type and send messages -->
     <div class="chatbot-input-area">
+        <!-- Text input field where you type your message -->
         <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." autocomplete="off"
             aria-label="Chat message input">
+        <!-- Button to send your typed message to the chatbot -->
         <button class="chatbot-send" id="chatbotSend" aria-label="Send message">
+            <!-- Arrow icon indicating sending/submitting -->
             <span>➤</span>
         </button>
     </div>

@@ -5,6 +5,9 @@
  
   /* Secondary / Info */
   --secondary: #6691F1;
+
+  /* Success / Positive */
+  --success: #10b981;
   
   /* Accent / Highlight */
   --highlight: #84cc16;
@@ -65,7 +68,7 @@
   }
 }
 
-/* ============== MOBILE DESIGN SYSTEM - UNIVERSAL MOBILE STYLES ============== */
+/* ============== Universal Mobile Styles ============== */
 @media (max-width: 768px) {
   /* Base mobile typography */
   h1 { font-size: var(--mobile-h1); }
@@ -103,14 +106,14 @@
 }
 
 
-/* Set base font size */
+/* Set base font size for all pages */
 html {
   font-size: 18px;
 }
 
 /*================================== Styling for Logo =====================================*/
 
-/* Floating logo in top-left corner */
+/* Floating BloomFi logo in top-left corner */
 .floating-logo {
   position: absolute;
   top: 20px;
@@ -295,7 +298,7 @@ body::after {
   margin-bottom: 50px;
 }
 
-/* Main title inside the header */
+/* Main title and subtitle inside the header */
 .login-header h1 {
   font-size: 60px;
   color: var(--text);
@@ -419,7 +422,7 @@ body::after {
   transition: filter 0.3s ease;
 }
 
-/* Hover effect-- change color to warmer highlight color */
+/* Hover effect-- change color to warmer highlight color-- hard to change color of imported icon */
 .toggle-btn:hover .eye-icon,
 .toggle-btn:hover .toggle-icon {
   filter: brightness(0) saturate(100%) invert(70%) sepia(65%) saturate(450%) hue-rotate(40deg) brightness(95%) contrast(87%);
@@ -514,10 +517,10 @@ body::after {
   color: var(--highlight);
 }
 
-/* Mobile responsive adjustments */
+/* ====================== Login Mobile Styling ==================== */
 @media (max-width: 768px) {
 
-  /* Page / logo adjustments */
+  /* Page and logo adjustments */
   header { 
     height: 70px; 
   }
@@ -533,7 +536,7 @@ body::after {
     height: 85px;
   }
 
-  /* Simplify background decorations for performance */
+  /* Simplify background decorations bc smaller screen */
   body::before {
     width: 300px;
     height: 300px;
@@ -560,7 +563,7 @@ body::after {
   /* Card sizing & appearance */
   .login-card {
     width: 100%;
-    max-width: 520px;               /* comfortable mobile card width */
+    max-width: 520px;              
     min-height: 70vh;
     border-radius: 16px !important;
     box-shadow: 0 12px 36px var(--secondary);
@@ -575,7 +578,7 @@ body::after {
   .left-panel h2,
   .left-panel p { display: none; }
 
-  /* Right panel — spacing and typography tweaks */
+  /* ===== Right panel Styling ===== */
   .right-panel {
     padding: var(--mobile-padding);
     background: var(--background);
@@ -623,7 +626,7 @@ body::after {
     margin-top: 6px;
   }
 
-  /* Toggle button placement & size */
+  /* Toggle button placement and size */
   .toggle-btn {
     -webkit-tap-highlight-color: transparent;
     outline: none;
@@ -636,7 +639,7 @@ body::after {
     border: none;
   }
 
-  /* Force identical sizes for toggle images (eye + switch) */
+  /* Force identical sizes for toggle images */
   .toggle-btn img,
   .eye-icon,
   .toggle-icon {
@@ -683,7 +686,7 @@ body::after {
 
 }
 
-/*============================================================================Create Account (Register) Styling===================================================================================== */
+/*============================================================================Create Account (Register) Styling ===================================================================================== */
 /* Layout similar to Log In, centered on the screen */
 
 /* Additional decorative circles on login container */
@@ -795,17 +798,16 @@ body::after {
   /* allows scrolling inside flex item */
 }
 
-/* Allow full-width rows (Full Name and Email) to span both columns */
+/* Allow full-width rows (Full Name and Email) to span on both columns */
 .form-row .form-group.full {
   grid-column: span 2;
 }
 
 .form-group.full input {
   width: 100%;
-  /* makes it fill the full row nicely */
 }
 
-/* Right-side helper line above the form */
+/* Right-side line above the form */
 .register-header {
   text-align: center;
   margin-top: 0;
@@ -932,6 +934,7 @@ body::after {
 }
 
 /*=========================================================================Dashboard Settings================================================================================================= */
+/* Main Dashboard Body Style */
 body.dashboard {
   margin: 0;
   padding: 0;
@@ -982,7 +985,7 @@ body.dashboard::after {
   }
 }
 
-/* ============== LEFT SIDEBAR ============== */
+/* ============== Left Navivation Sidebar Styling  ============== */
 .sidebar {
   width: 450px;
   background: white;
@@ -997,11 +1000,7 @@ body.dashboard::after {
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
 }
 
-
-
-/* Sidebar Navigation */
-
-/* Floating logo in top-left corner */
+/* Floating BloomFi logo in top-left corner */
 .sidebar-logo {
   padding: 40px 24px 36px;
   text-align: left;
@@ -1040,6 +1039,7 @@ body.dashboard::after {
   color: var(--text);
 }
 
+/* For active page display */
 .sidebar-nav-item.active {
   background: rgba(13, 148, 136, 0.12);
   color: var(--primary);
@@ -1054,7 +1054,7 @@ body.dashboard::after {
   justify-content: center;
 }
 
-/* Sidebar User Profile at Bottom */
+/* ========= Sidebar User Profile at Bottom ======== */
 .sidebar-user {
   padding: 28px 24px;
   border-top: 1px solid #e5e7eb;
@@ -1131,7 +1131,7 @@ body.dashboard::after {
   color: var(--primary);
 }
 
-/* ============== MAIN CONTENT AREA ============== */
+/* =================== Main Content Area ================= */
 .main-container {
   margin-left: 470px;
   flex: 1;
@@ -1164,7 +1164,7 @@ body.dashboard::after {
   font-weight: 400;
 }
 
-/* ============== TOP SECTION: Stats + Account Summary ============== */
+/* ============== TOP SECTION: Stats and Account Summary ============== */
 .dashboard-top-section {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -1172,7 +1172,8 @@ body.dashboard::after {
   margin-bottom: 60px;
 }
 
-/* Stats Grid (2x2) - Made smaller */
+/* ============================= Stats Styling -- the 4 cards that display stats like income, expense, net change etc. ========================*/
+/* Stats Grid (2x2) */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1285,7 +1286,7 @@ body.dashboard::after {
   color: #1e40af;
 }
 
-/* ============== ACCOUNT SUMMARY CARD ============== */
+/* ============== Account Summary Card-- Shows user's combinded totals for each account and user can navigate to their accounts from this card ============== */
 .account-summary-card {
   background: var(--secondary);
   color: white;
@@ -1299,8 +1300,10 @@ body.dashboard::after {
 }
 
 .summary-title {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
   margin: 0 0 20px 0;
+  color: var(--background);
+  text-align: left;
   opacity: 0.92;
   font-weight: 500;
 }
@@ -1309,6 +1312,8 @@ body.dashboard::after {
   font-size: 3.75rem;
   font-weight: 700;
   margin: 0 0 12px 0;
+  text-align: left;
+  color: var(--background);
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -1316,12 +1321,13 @@ body.dashboard::after {
 .dashboard .balance-label {
   font-size: 1.7rem;
   opacity: 0.85;
-  color: white;
+  text-align: left;
+  color: var(--background);
   margin-bottom: 32px;
 }
 
 
-/* Account Chips Inside Card */
+/* Account Chips Inside Card-- for example checking and savings */
 .account-chips-list {
   display: flex;
   flex-direction: column;
@@ -1373,6 +1379,7 @@ body.dashboard::after {
   margin-top: auto;
 }
 
+/* Navigate to Accounts Page Button*/
 .see-accounts-btn {
   display: block;
   width: 100%;
@@ -1395,7 +1402,8 @@ body.dashboard::after {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* ============== TRANSACTION SECTION ============== */
+/* ============== Transaction Table Styling-- shows recent transactions ============== */
+/* and user can navigate to their accounts page to view more transactions from here */
 main {
   max-width: 100%;
 }
@@ -1432,9 +1440,10 @@ main {
   color: var(--text);
 }
 
+/* Shows number of transactions */
 .transaction-badge {
-  background: var(--background);
-  color: var(--text);
+  background: var(--secondary);
+  color: white;
   font-size: 1.3rem;
   padding: 8px 18px;
   border-radius: 14px;
@@ -1450,6 +1459,7 @@ main {
   flex-wrap: wrap;
 }
 
+/* ======= Calendar and Filter Buttons Styling ====== */
 .date-range-picker,
 .filter-btn {
   display: flex;
@@ -1491,10 +1501,10 @@ main {
 }
 
 .date-range-dates {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
 }
 
-/* Transaction Table */
+/* ============== Transaction Table and text, rows, columns etc.. =========== */
 .transaction-table {
   overflow-x: auto;
   border-radius: 16px;
@@ -1563,7 +1573,7 @@ main {
   text-decoration: underline;
 }
 
-/* ============== CHATBOT ============== */
+/* ============================================================================= Chatbot Styling ======================================================================================== */
 .chatbot {
   position: fixed;
   right: 40px;
@@ -1627,6 +1637,7 @@ main {
   gap: 12px;
 }
 
+/* Chatbot Avatar */
 .chatbot-avatar {
   width: 55px;
   height: 55px;
@@ -1644,6 +1655,7 @@ main {
   font-weight: 700;
 }
 
+/* Status-- Online or Offline*/
 .chatbot-status {
   margin: 0;
   font-size: 1.6rem;
@@ -1682,12 +1694,14 @@ main {
   gap: 20px;
 }
 
+/* Message Bubble */
 .chatbot-message {
   display: flex;
   gap: 12px;
   animation: slideIn 0.3s ease;
 }
 
+/* Animation for message bubbles appearing on screen */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -1699,6 +1713,7 @@ main {
   }
 }
 
+/* Chabot Avatar backgroun */
 .message-avatar {
   width: 48px;
   height: 48px;
@@ -1719,6 +1734,7 @@ main {
   flex: 1;
 }
 
+/* Messages styling */
 .message-content p {
   margin: 0;
   padding: 18px 20px;
@@ -1734,6 +1750,7 @@ main {
   color: white;
 }
 
+/*Time of messages*/
 .message-time {
   font-size: 1.4rem;
   color: #6c757d;
@@ -1819,7 +1836,7 @@ main {
   background: #a8a8a8;
 }
 
-/* Mobile Responsive */
+/* ===================================================== Chatbot Mobile Styling =====================================================*/
 @media (max-width: 768px) {
   .chatbot {
     right: 20px;
@@ -1829,15 +1846,83 @@ main {
   }
   
   .chatbot-window {
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
+    right: 16px;
+    bottom: 100px;
+    width: 90%;
+    max-width: 360px;
+    height: 500px;
+    border-radius: 20px;
+    z-index: 1000;
+  }
+
+  .chatbot-header {
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+
+  .chatbot-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .chatbot-status {
+    font-size: 0.95rem;
+  }
+
+  .chatbot-close {
+    width: 35px;
+    height: 35px;
+    font-size: 2rem;
+  }
+
+  .chatbot-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+
+  .chatbot-messages {
+    padding: 12px;
+    gap: 12px;
+    flex-shrink: 1;
+    min-height: 0;
+  }
+
+  .chatbot-input-area {
+    padding: 8px 10px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .chatbot-input {
+    padding: 8px 12px;
+    font-size: 1.1rem;
+  }
+
+  .chatbot-send {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .message-content p {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+
+  .message-time {
+    font-size: 0.8rem;
   }
 }
 
-/* ============== MODAL STYLES ============== */
+/* ============== Modal Styles: used in date picker modal and filter modal for example ============== */
 .modal {
   display: none;
   position: fixed;
@@ -1892,7 +1977,7 @@ main {
 
 .modal-header h3 {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--text);
 }
@@ -1900,7 +1985,7 @@ main {
 .modal-close {
   background: none;
   border: none;
-  font-size: 2.5rem;
+  font-size: 4rem;
   color: #6b7280;
   cursor: pointer;
   width: 40px;
@@ -1923,9 +2008,9 @@ main {
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 32px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px;
   border-top: 1px solid #e5e7eb;
 }
 
@@ -1940,16 +2025,16 @@ main {
 }
 
 .quick-filter-btn {
-  padding: 12px 16px;
+  padding: 16px 20px;
   background: var(--background);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--secondary);
   border-radius: 12px;
   color: var(--text);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 44px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1957,17 +2042,17 @@ main {
 }
 
 .quick-filter-btn:hover {
-  background: var(--primary);
+  background: var(--highlight);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--secondary);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
 
 .quick-filter-btn.active {
-  background: var(--primary);
+  background: var(--secondary);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--secondary);
   box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
 }
 
@@ -1990,7 +2075,7 @@ main {
 
 .date-display-box label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #6b7280;
   margin-bottom: 6px;
@@ -1999,7 +2084,7 @@ main {
 }
 
 .selected-date {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary);
   padding: 8px 12px;
@@ -2012,8 +2097,9 @@ main {
 }
 
 .date-range-arrow {
-  font-size: 1.5rem;
-  color: #d1d5db;
+  font-size: 2rem;
+  color: #b2b3b6;
+  text-align: center;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -2036,9 +2122,9 @@ main {
 
 .calendar-nav-btn {
   background: var(--background);
-  border: 2px solid #e5e7eb;
-  width: 38px;
-  height: 38px;
+  border: 2px solid var(--secondary);
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   font-size: 1.4rem;
   font-weight: 700;
@@ -2052,14 +2138,14 @@ main {
 }
 
 .calendar-nav-btn:hover {
-  background: var(--primary);
+  background: var(--highlight);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--secondary);
   transform: scale(1.05);
 }
 
 .calendar-month-year {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
   text-align: center;
@@ -2075,7 +2161,7 @@ main {
 
 .weekday {
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #6b7280;
   padding: 8px 0;
@@ -2094,7 +2180,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
@@ -2150,24 +2236,24 @@ main {
 
 .filter-group label {
   display: block;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .filter-select,
 .filter-input {
   width: 100%;
-  padding: 10px 14px;
-  font-size: 1rem;
+  padding: 0px 18px;
+  font-size: 1.3rem;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   color: var(--text);
   font-weight: 500;
   background: white;
   transition: all 0.2s ease;
-  height: 40px;
+  height: 54px;
   box-sizing: border-box;
 }
 
@@ -2181,19 +2267,20 @@ main {
 .amount-range {
   display: flex;
   align-items: center;
+  color: var(--text);
   gap: 10px;
 }
 
 .amount-input {
   flex: 1;
-  padding: 10px 14px;
-  font-size: 1rem;
+  padding: 14px 18px;
+  font-size: 1.3rem;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   color: var(--text);
   font-weight: 500;
   transition: all 0.2s ease;
-  height: 40px;
+  height: 54px;
   box-sizing: border-box;
 }
 
@@ -2204,7 +2291,7 @@ main {
 }
 
 .range-separator {
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   color: #6b7280;
   font-weight: 600;
   white-space: nowrap;
@@ -2213,17 +2300,18 @@ main {
 /* ============== MODAL BUTTONS ============== */
 .btn-primary,
 .btn-secondary {
-  padding: 12px 24px;
-  font-size: 1rem;
+  padding: 16px 36px;
+  font-size: 1.2rem;
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 2px solid;
-  min-height: 44px;
+  min-height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1;
 }
 
 .btn-primary {
@@ -2242,21 +2330,21 @@ main {
 .btn-secondary {
   background: white;
   color: var(--text);
-  border-color: #e5e7eb;
+  border-color: var(--secondary);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
+  background: var(--highlight);
   border-color: var(--text);
 }
 
 
-/* ============== Hide old logo ============== */
+/* Hide old logo-- causing issues */
 body.dashboard .floating-logo {
   display: none;
 }
 
-/* ============== RESPONSIVE MODAL STYLES ============== */
+/* =============================================== Modal designs for mobile styling ================================================ */
 @media (max-width: 768px) {
   .modal-content {
     width: 95%;
@@ -2321,9 +2409,7 @@ body.dashboard .floating-logo {
   }
 }
 
-/* ========================================
-   MOBILE RESPONSIVE STYLES
-   ======================================== */
+/* ============================================== Mobile Designs for Dashboard Styling================================ */
 @media (max-width: 768px) {
   .sidebar {
     display: none;
@@ -2356,7 +2442,7 @@ body.dashboard .floating-logo {
   }
 
   .account-summary-card {
-    padding: 20px;  /* Increased from 16px */
+    padding: 20px;  
     border-radius: var(--mobile-radius);
     min-height: auto;
     box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
@@ -2365,7 +2451,7 @@ body.dashboard .floating-logo {
   .summary-title {
     font-size: 1.5rem;
     text-align: center;
-    margin-bottom: 12px;  /* Increased from 8px */
+    margin-bottom: 12px;  
     opacity: 0.9;
   }
 
@@ -2373,7 +2459,7 @@ body.dashboard .floating-logo {
     font-size: 2rem;
     text-align: center;
     font-weight: 700;
-    margin: 0 0 10px 0;  /* Increased from 6px */
+    margin: 0 0 10px 0;  
     letter-spacing: -0.03em;
   }
 
@@ -2381,19 +2467,19 @@ body.dashboard .floating-logo {
     text-align: center;
     font-size: 1.2rem;
     opacity: 0.8;
-    margin-bottom: 20px;  /* Increased from var(--mobile-margin) for more space */
+    margin-bottom: 20px;  
   }
 
-  /* Account Chips - More breathing room */
+  /* Account Chips */
   .account-chips-list {
-    gap: 10px;  /* Increased from var(--mobile-gap) */
-    margin-bottom: 20px;  /* Increased from var(--mobile-margin) */
+    gap: 10px;  
+    margin-bottom: 20px;  
   }
 
   .account-chip-item {
-    padding: 14px;  /* Increased from var(--mobile-padding) */
+    padding: 14px;  
     border-radius: var(--mobile-radius);
-    gap: 10px;  /* Increased from var(--mobile-gap) */
+    gap: 10px;  
   }
 
   .account-dot {
@@ -2404,7 +2490,7 @@ body.dashboard .floating-logo {
   .chip-label {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 4px;  /* Increased from 2px */
+    margin-bottom: 4px;  
   }
 
   .chip-number {
@@ -2414,10 +2500,10 @@ body.dashboard .floating-logo {
 
   .see-accounts-btn {
     font-size: var(--mobile-body);
-    padding: 12px 0;  /* Increased from 10px */
+    padding: 12px 0;  
     border-radius: var(--mobile-radius);
     font-weight: 600;
-    margin-top: 4px;  /* Added small top margin */
+    margin-top: 4px;  
   }
 
   .see-accounts-btn:hover {
@@ -2426,9 +2512,9 @@ body.dashboard .floating-logo {
     transform: translateY(-2px);
   }
 
-  /* TRANSACTION CARD - More internal spacing */
+  /* Transaction card */
   .transaction-card {
-    padding: 20px;  /* Increased from var(--mobile-padding) */
+    padding: 20px;  
     border-radius: var(--mobile-radius);
     margin-bottom: var(--mobile-margin);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
@@ -2437,13 +2523,13 @@ body.dashboard .floating-logo {
   .transaction-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;  /* Increased from var(--mobile-gap) for more separation */
-    margin-bottom: 20px;  /* Increased from var(--mobile-margin) */
+    gap: 16px;  
+    margin-bottom: 20px;  
   }
 
   .transaction-title h2 {
     font-size: var(--mobile-h2);
-    margin-bottom: 8px;  /* Added space between title and badge */
+    margin-bottom: 8px;  
   }
 
   .transaction-badge {
@@ -2455,24 +2541,24 @@ body.dashboard .floating-logo {
   .transaction-controls {
     width: 100%;
     flex-direction: row;
-    gap: 10px;  /* Increased from 8px */
+    gap: 10px; 
     flex-wrap: wrap;
   }
 
   .date-range-picker,
   .filter-btn {
-    padding: 10px 14px;  /* Increased padding */
+    padding: 10px 14px;  
     font-size: 1rem;
-    height: 40px;  /* Increased from 38px */
+    height: 40px;  
     border-radius: var(--mobile-radius);
     gap: 6px;
-    flex: 1 1 calc(50% - 5px);  /* Adjusted for new gap */
+    flex: 1 1 calc(50% - 5px);  
     min-width: 120px;
   }
 
   .date-range-picker {
     flex: 1 1 100%;
-    margin-bottom: 2px;  /* Small space before filter buttons */
+    margin-bottom: 2px;  
   }
 
   .filter-btn {
@@ -2487,13 +2573,13 @@ body.dashboard .floating-logo {
   font-size: 1rem;
   }
 
-  /* ============== TRANSACTION TABLE (MOBILE-FRIENDLY) ============== */
+  /* ============== Transaction Table ============== */
   .transaction-table {
     overflow-x: auto;
     border-radius: var(--mobile-radius);
     border: 1px solid #e5e7eb;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 20px;  /* Added space before "View All" link */
+    margin-bottom: 20px;  
     margin-top: 20px;
   }
 
@@ -2503,7 +2589,7 @@ body.dashboard .floating-logo {
   }
 
   .tt th {
-    padding: 12px;  /* Increased from var(--mobile-padding) */
+    padding: 12px;  
     font-size: 1rem;
     letter-spacing: 0.03em;
     background: #f8fafc;
@@ -2514,7 +2600,7 @@ body.dashboard .floating-logo {
   }
 
   .tt td {
-    padding: 12px;  /* Increased from var(--mobile-padding) */
+    padding: 12px;  
     font-size: 1rem;
     font-weight: 500;
     border-bottom: 1px solid #f1f5f9;
@@ -2530,7 +2616,7 @@ body.dashboard .floating-logo {
 
   /* View more link */
   .view-more-t {
-    margin-top: 4px;  /* Added explicit top margin */
+    margin-top: 4px;  
   }
 
   .view-more-t a {
@@ -2544,7 +2630,7 @@ body.dashboard .floating-logo {
     font-size: var(--mobile-label); 
   }
   
-  /* ============== CHATBOT (Smaller) ============== */
+  /* ============== Chatbot button ============== */
   .chatbot {
     right: 16px;
     bottom: 16px;
@@ -2568,7 +2654,7 @@ body.dashboard .floating-logo {
   padding-top: calc(var(--card-top-margin) + 20px);
 }
 
-/* Card wrapper for left (blue glass) + right (form) panels */
+/* Card wrapper for left and right panels */
 .forgot-username-card {
   display: flex;
   max-width: var(--card-max-width);
@@ -2580,7 +2666,7 @@ body.dashboard .floating-logo {
   height: var(--auth-card-height);
 }
 
-/* Additional decorative circles on login container */
+/* Additional decorative circles on the page */
 .forgot-username-container::before,
 .forgot-username-container::after {
   content: "";
@@ -2609,7 +2695,7 @@ body.dashboard .floating-logo {
   animation-delay: 3s;
 }
 
-/* Left panel */
+/* ============================================ Left panel ===================================================== */
 .forgot-left-panel {
   flex: 1;
   background: var(--secondary);
@@ -2650,7 +2736,7 @@ body.dashboard .floating-logo {
   max-width: 600px;
 }
 
-/* Right panel: white background form area */
+/* ======================================================= Right panel ================================================================================*/
 .forgot-right-panel {
   flex: 1;
   padding: 100px 90px;
@@ -2756,7 +2842,7 @@ body.dashboard .floating-logo {
   min-height: 0px;
 }
 
-/* Register links styling */
+/* Register links styling-- for example back to login */
 .forgot-right-panel .register-links {
   text-align: center;
   margin-top: 25px;
@@ -2779,7 +2865,7 @@ body.dashboard .floating-logo {
   color: var(--highlight);
 }
 
-/* Link back to login (if using button style) */
+/* Link back to login */
 .link-btn {
   background: none;
   border: none;
@@ -2795,7 +2881,7 @@ body.dashboard .floating-logo {
   color: var(--highlight);
 }
 
-/* Mobile responsive adjustments */
+/* ======================================================================== Mobile Styling for Forogt Username Page-===============================================================================*/
 @media (max-width: 768px) {
    /* Page / logo adjustments */
   header { 
@@ -2813,7 +2899,7 @@ body.dashboard .floating-logo {
     height: 85px;
   }
 
-  /* Simplify background decorations for performance */
+  /* Simplify background decorations */
   body::before {
     width: 300px;
     height: 300px;
@@ -2838,7 +2924,7 @@ body.dashboard .floating-logo {
     padding-bottom: 20px;
   }
 
-  /* Card sizing & appearance - match login */
+  /* Card sizing and appearance */
   .forgot-username-card {
     width: 100%;
     max-width: 520px;
@@ -2851,7 +2937,7 @@ body.dashboard .floating-logo {
     height: auto;
   }
 
-  /* Hide large left panel on small screens */
+  /* Hide large left panel on small, mobile screens */
   .forgot-left-panel { 
     display: none; 
   }
@@ -2861,7 +2947,7 @@ body.dashboard .floating-logo {
     display: none; 
   }
 
-  /* Right panel — spacing and typography tweaks */
+  /* ============================================== Right panel ============================================ */
   .forgot-right-panel {
     padding: var(--mobile-padding);
     background: var(--background);
@@ -2956,7 +3042,7 @@ body.dashboard .floating-logo {
   padding-top: calc(var(--card-top-margin) + 20px);
 }
 
-/* Card wrapper for left (blue glass) + right (form) panels */
+/* Card wrapper for left Panel */
 .forgot-password-card {
   display: flex;
   max-width: var(--card-max-width);
@@ -3005,7 +3091,7 @@ body.dashboard .floating-logo {
   font-weight: 600;
 }
 
-/* Mobile responsive adjustments */
+/* ============================================================== Mobile Styling for the Forgot Password Page-=============================================================================== */
 @media (max-width: 768px) {
     /* Page / logo adjustments */
   header { 
@@ -3048,7 +3134,7 @@ body.dashboard .floating-logo {
     padding-bottom: 20px;
   }
 
-  /* Card sizing & appearance - match login */
+  /* Card sizing and appearance  */
   .forgot-password-card {
     width: 100%;
     max-width: 520px;
@@ -3062,7 +3148,7 @@ body.dashboard .floating-logo {
     height: auto;
   }
 
-  /* Hide large left panel on small screens */
+  /* Hide large left panel on small, mobile screens */
   .forgot-password-left-panel { 
     display: none; 
   }
@@ -3072,7 +3158,7 @@ body.dashboard .floating-logo {
     display: none; 
   }
 
-  /* Right panel — spacing and typography tweaks */
+  /* ======================================== Right panel ================================================*/
   .forgot-password-right-panel {
     padding: var(--mobile-padding);
     background: var(--background);
@@ -3174,7 +3260,7 @@ body.dashboard .floating-logo {
   padding-top: calc(var(--card-top-margin) + 20px);
 }
 
-/* Card wrapper for left (blue glass) + right (form) panels */
+/* Card wrapper for left panel */
 .confirm-password-card {
   display: flex;
   max-width: var(--card-max-width);
@@ -3215,7 +3301,7 @@ body.dashboard .floating-logo {
   animation-delay: 3s;
 }
 
-/* Left panel: blue glassmorphism */
+/* ========================================================== Left panel =============================================================== */
 .confirm-left-panel {
   flex: 1;
   background: var(--secondary);
@@ -3256,12 +3342,11 @@ body.dashboard .floating-logo {
   max-width: 600px;
 }
 
-/* Reuse exact same toggle hover effect as login page */
+/* Reused the exact same toggle hover effect as login page */
 .toggle-btn:hover .eye-icon {
   filter: brightness(0) saturate(100%) invert(70%) sepia(65%) saturate(450%) hue-rotate(40deg) brightness(95%) contrast(87%);
 }
 
-/* Optional: Add base filter to match login (if not already tinted) */
 .eye-icon {
   width: 55px;
   height: 55px;
@@ -3287,7 +3372,7 @@ body.dashboard .floating-logo {
   font-weight: bold;
 }
 
-/* Right panel: white background form area */
+/* ====================================== Right panel =================================== */
 .confirm-right-panel {
   flex: 1;
   padding: 100px 90px;
@@ -3349,7 +3434,7 @@ body.dashboard .floating-logo {
   box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
 }
 
-/* Mobile responsive adjustments */
+/* ==================================================== Mobile Styling for the Confirm Password Page ======================================================================== */
 @media (max-width: 768px) {
   .confirm-left-panel {
     display: none;
@@ -3435,7 +3520,7 @@ body.dashboard .floating-logo {
     margin-bottom: 40px;
 }
 
-/* Account Card Base Styles */
+/* Account Card Style */
 .account-card {
     background: white;
     border-radius: 16px;
@@ -3455,7 +3540,7 @@ body.dashboard .floating-logo {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* Account Card Color Variants */
+/* Account Card Color for background on each of the cards */
 .account-card.teal {
     border-left-color: greenyellow;
 }
@@ -3489,7 +3574,7 @@ body.dashboard .floating-logo {
 .account-card-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #14b8a6, #0d9488); /* Default fallback */
+    background: linear-gradient(135deg, #14b8a6, #0d9488); 
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -3558,12 +3643,13 @@ body.dashboard .floating-logo {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 14px 22px;
     background: var(--secondary);
     border: 2px solid #e2e8f0;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-size: 1.3rem;
 }
 
 #transactionModal .date-range-picker:hover {
@@ -3571,11 +3657,11 @@ body.dashboard .floating-logo {
 }
 
 #transactionModal .date-icon {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
 }
 
 #transactionModal .date-range-dates {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: 500;
     color: white;
 }
@@ -3634,10 +3720,7 @@ body.dashboard .floating-logo {
     box-shadow: 0 4px 12px rgba(132, 204, 22, 0.3);
 }
 
-/* ===============================================================================
-   TRANSACTION MODAL STYLES
-   =============================================================================== */
-
+/* ========= Transaction Modal Styles ========*/
 .modal {
     display: none;
     position: fixed;
@@ -3684,14 +3767,14 @@ body.dashboard .floating-logo {
 }
 
 .modal-header h2 {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
     color: var(--text);
     margin: 0 0 8px 0;
 }
 
 .modal-subtitle {
-    font-size: 1.8rem;
+    font-size: 2.1rem;
     color: #64748b;
     margin: 0;
     font-family: 'Courier New', monospace;
@@ -3744,13 +3827,13 @@ body.dashboard .floating-logo {
 }
 
 .modal-balance-label {
-    font-size: 1.7rem;
+    font-size: 1.9rem;
     color: #64748b;
     font-weight: 500;
 }
 
 .modal-balance-value {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
 }
@@ -3831,9 +3914,7 @@ body.dashboard .floating-logo {
     font-weight: 600;
 }
 
-/* ===============================================================================
-   RESPONSIVE DESIGN
-   =============================================================================== */
+/* ======================================================================== Mobile Styling for the Accounts Page=============================================================== */
 @media (max-width: 768px) {
     .accounts-grid {
         grid-template-columns: 1fr;
@@ -3977,16 +4058,16 @@ body.dashboard .floating-logo {
 }
 
 
-/* ======================================================= TRANSFERS Styling =================================================================== */
+/* ======================================================= Payment Transfers Page Styling =================================================================== */
 .transfer-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;     /* Two equal columns */
-    grid-template-rows: auto auto;      /* Two rows, height by content */
-    gap: 3rem;                        /* 40px spacing between cards */
-    align-items: stretch;               /* Ensures all cards stretch to same height */
+    grid-template-columns: 1fr 1fr;     
+    grid-template-rows: auto auto;      
+    gap: 3rem;                        
+    align-items: stretch;               
 }
 
-/* Force all cards to be exactly the same size */
+/* Forcing all cards to be exactly the same size */
 .transfer-card {
     background: white;
     border-radius: 22px;
@@ -3996,8 +4077,8 @@ body.dashboard .floating-logo {
     box-shadow: 0 8px 24px var(--secondary);
     display: flex;
     flex-direction: column;
-    min-height: 480px;                  /* Adjust this value to fit your content */
-    height: 100%;                       /* Fill grid cell height */
+    min-height: 480px;                  
+    height: 100%;                       
     box-sizing: border-box;
 }
 
@@ -4038,7 +4119,7 @@ body.dashboard .floating-logo {
 
 .transfer-card h2 {
     margin-bottom: 24px;
-    font-size: 3rem;  /* Increased for bigger text */
+    font-size: 3rem;  
     font-weight: 700;
     color: var(--text);
 }
@@ -4047,7 +4128,7 @@ body.dashboard .floating-logo {
 .transfer-form label {
     color: var(--text);
     font-weight: 600;
-    font-size: 1.8rem;  /* Increased for bigger text */
+    font-size: 1.8rem;  
 }
 
 .transfer-form .form-row {
@@ -4074,7 +4155,7 @@ body.dashboard .floating-logo {
     padding: 16px 18px;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
-    font-size: 1.6rem;  /* Increased for bigger text */
+    font-size: 1.6rem;  
     outline: none;
     background: #fff;
     color: var(--text);
@@ -4088,7 +4169,7 @@ body.dashboard .floating-logo {
     box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
 }
 
-/* $ Prefix Input */
+/* $ Input */
 .input-with-prefix {
     position: relative;
 }
@@ -4107,7 +4188,7 @@ body.dashboard .floating-logo {
     padding-left: 34px !important;
 }
 
-/* Style date trigger as a clickable button */
+/* date trigger as a clickable button */
 .date-picker-trigger {
     display: flex;
     align-items: center;
@@ -4165,14 +4246,14 @@ body.dashboard .floating-logo {
     display: grid;
     gap: 14px;
     flex: 1;
-    align-content: start;  /* Added to align content to top */
+    align-content: start;  
 }
 
 .transfer-item {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    font-size: 1.4rem;  /* Increased for bigger text */
+    font-size: 1.4rem;  
     align-items: center;
     padding: 16px 18px;
     border: 1px solid #e5e7eb;
@@ -4185,9 +4266,7 @@ body.dashboard .floating-logo {
     font-weight: 700;
 }
 
-/* =======================================================
-   RESPONSIVE – Mobile (stacks into 1 column)
-   ======================================================= */
+/* ======================================================================== Mobile Styling for the Payment Transfers Page =================================================== */
 @media (max-width: 768px) {
 
     /* 1 column layout */
@@ -4196,25 +4275,21 @@ body.dashboard .floating-logo {
         gap: var(--mobile-gap);
     }
 
-    /* Smaller cards, no forced height */
     .transfer-card {
         padding: var(--mobile-padding);
         min-height: unset;
         height: auto;
     }
 
-    /* Reduce header size */
     .transfer-card h2 {
         font-size: var(--mobile-h2);
         margin-bottom: var(--mobile-gap);
     }
 
-    /* Fix oversized form labels */
     .transfer-form label {
         font-size: var(--mobile-label);
     }
 
-    /* Inputs smaller + tighter */
     .transfer-form input[type="date"],
     .transfer-form input[type="number"],
     .transfer-form select {
@@ -4223,7 +4298,6 @@ body.dashboard .floating-logo {
         border-radius: var(--mobile-radius);
     }
 
-    /* Adjust prefix input */
     .input-with-prefix .prefix {
         left: 10px;
         font-size: var(--mobile-body);
@@ -4233,21 +4307,21 @@ body.dashboard .floating-logo {
         padding-left: 28px !important;
     }
 
-    /* Date trigger smaller */
+    /* Date trigger  */
     .date-picker-trigger {
         padding: var(--mobile-padding);
         font-size: var(--mobile-body);
         gap: var(--mobile-gap);
     }
 
-    /* Buttons smaller */
+    /* Primary Button */
     .btn-primary {
         padding: var(--mobile-padding);
         font-size: var(--mobile-label);
         border-radius: var(--mobile-radius);
     }
 
-    /* Transfer list items compact */
+    /* Transfer list items */
     .transfer-item {
         padding: var(--mobile-padding);
         gap: var(--mobile-gap);
@@ -4263,7 +4337,6 @@ body.dashboard .floating-logo {
 
 /* ================================================================= PROFILE PAGE ====================================================================================== */
 
-/* lightweight "card" look consistent with your transaction/transfer cards */
 .cardish {
   background: var(--background);
   border-radius: 22px;
@@ -4271,7 +4344,7 @@ body.dashboard .floating-logo {
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-/* grid shell: left hero, right two cards (stack) */
+/* grid display vertically--stack */
 .profile-grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -4291,7 +4364,7 @@ body.dashboard .floating-logo {
   padding: 36px 32px;
 }
 
-/* avatar */
+/* avatar-- Profile picture styling */
 .profile-avatar {
   display: flex;
   flex-direction: column;
@@ -4308,13 +4381,14 @@ body.dashboard .floating-logo {
   background-color: #f3f4f6;  
 }
 
-/* identity block */
+/* profile identity block */
 .profile-identity {
   display: flex;
   flex-direction: column;
   gap: 14px;
   align-self: center;
 }
+/* Profile Name and username */
 .settings-card .profile-name {
   margin: 0;
   font-size: 3rem;
@@ -4328,6 +4402,7 @@ body.dashboard .floating-logo {
   font-weight: 700;
   font-size: 1.5rem;
 }
+/* User's information */
 .profile-meta {
   list-style: none;
   padding: 0;
@@ -4448,7 +4523,7 @@ body.dashboard .floating-logo {
 .pref-label { font-weight: 700; color: #64748b; }
 .pref-value { font-weight: 800; color: var(--text); }
 
-/* Responsive */
+/* ============================================================================= Mobile Styling for Profile Page =================================================================== */
 @media (max-width: 768px) {
   .info-grid { grid-template-columns: 1fr; }
 }
@@ -4551,7 +4626,6 @@ body.dashboard .floating-logo {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
-/* Avatar tile matches your profile visuals */
 .avatar-tile {
   display: grid;
   grid-template-columns: 220px 1fr;
@@ -4560,7 +4634,7 @@ body.dashboard .floating-logo {
   margin-bottom: 30px;
 }
 
-/* Wrap the image so we can style an outer ring / shadow separately */
+/* Wrap the image so we can style an outer ring / shadow separately-- together, they would not conform */
 .avatar-photo {
   display: inline-block;
   border-radius: 50%;
@@ -4603,7 +4677,7 @@ body.dashboard .floating-logo {
   color: #fff;
 }
 
-/* Form layout (reuse your register/transfer rhythm) */
+/* Form layout */
 .settings-form .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4626,7 +4700,7 @@ body.dashboard .floating-logo {
 
 .settings-form input {
   width: 100%;
-  padding: 24px 50px 24px 24px; /* right pad for eye icon */
+  padding: 24px 50px 24px 24px; 
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   font-size: 1.5rem;
@@ -4641,7 +4715,6 @@ body.dashboard .floating-logo {
   box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
 }
 
-/* Make the eye toggle sit correctly on settings forms too */
 .settings-form .input-wrapper {
   position: relative;
 }
@@ -4680,7 +4753,7 @@ body.dashboard .floating-logo {
   box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
 }
 
-/* Responsive */
+/* ====================================== Mobile Styles for the Settings Page ================================================= */
 @media (max-width: 768px) {
   .settings-grid {
     gap: var(--mobile-gap);
@@ -4847,8 +4920,8 @@ body.dashboard .floating-logo {
   }
 }
 
-/*======================================== Monthly Budgeting Styling ============================================ */
-/* Budget Tab Navigation */
+/*================================================================ Monthly Budgeting Styling ======================================================================== */
+/* Budget Tab Navigation Menu */
 .budget-tabs {
   display: flex;
   gap: 12px;
@@ -5180,7 +5253,7 @@ body.dashboard .floating-logo {
   font-size: 1.2rem;
 }
 
-/* Mobile Responsive Styles for Budget Page */
+/* =================================================================== Mobile Styles for Budget Page ========================================================== */
 @media (max-width: 768px) {
   /* Tab Navigation */
   .budget-tabs {
@@ -5358,7 +5431,7 @@ body.dashboard .floating-logo {
 }
 
 
-/* ================================================== Yearly Budgeting Styling ===================================================== */
+/* ==================================================================== Yearly Budgeting Styling ================================================================================== */
 /* Yearly Overview Grid */
 .yearly-overview-grid {
   display: grid;
@@ -5479,7 +5552,6 @@ body.dashboard .floating-logo {
   text-align: center;
 }
 
-/* Yearly Table Specific */
 .yearly-table tbody tr {
   transition: all 0.2s ease;
 }
@@ -5859,6 +5931,8 @@ body.dashboard .floating-logo {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 28px;
+  overflow-x: auto;
+  padding-bottom: 12px;
 }
 
 .day-card {
@@ -6129,7 +6203,7 @@ body.dashboard .floating-logo {
   line-height: 1.4;
 }
 
-
+/* ===================================================================== Mobile Styles For Weekly Budgeting Page ================================================================================================================= */
 @media (max-width: 768px) {
   .week-selector-card {
     flex-direction: column;
@@ -6304,7 +6378,7 @@ body.dashboard .floating-logo {
   }
 }
 
-
+/* =============================================================================== Mobile Styles for Yearly Budgeting Page ================================================================================ */
 @media (max-width: 768px) {
   /* Yearly Overview Cards */
   .yearly-overview-grid {
@@ -6366,7 +6440,7 @@ body.dashboard .floating-logo {
   }
 
   .year-nav-btn {
-    width: 30px;         /* slightly smaller so they fit on narrow screens */
+    width: 30px;         
     height: 30px;
     font-size: 1rem;
     padding: 0;
@@ -6380,14 +6454,13 @@ body.dashboard .floating-logo {
   .current-year {
     font-size: 1.3rem;
     min-width: 56px;
-    max-width: calc(100% - 104px); /* reserves space for nav buttons and possible action buttons */
+    max-width: calc(100% - 104px); 
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  /* HIDE the yearly spending breakdown table on mobile */
   .budget-summary-card .budget-table-wrapper {
     padding: 16px;
     margin-bottom: 20px;
@@ -6406,7 +6479,7 @@ body.dashboard .floating-logo {
   /* Insights Section */
   .insights-card {
     padding: 16px;
-    margin-bottom: 100px; /* Extra space for mobile footer */
+    margin-bottom: 100px; 
     border-radius: var(--mobile-radius);
   }
 
@@ -6464,14 +6537,14 @@ body.dashboard .floating-logo {
     left: 0;
     right: 0;
     width: 100%;
-    height: 80px; /* Increased from 70px */
+    height: 80px;
     background: white;
-    border-top: 1px solid #e5e7eb; /* Reduced from 2px */
+    border-top: 1px solid #e5e7eb; 
     box-shadow: 0 -2px 10px var(--secondary);
     z-index: 999;
     justify-content: space-around;
     align-items: center;
-    padding: 8px 20px; /* Adjusted padding */
+    padding: 8px 20px; 
     box-sizing: border-box;
   }
 
@@ -6481,7 +6554,7 @@ body.dashboard .floating-logo {
     pointer-events: none !important;
   }
 
-  /* ensure main content uses full width */
+  /*  main content uses full width */
   .main-container {
     margin-left: 0 !important;
     width: 100% !important;
@@ -6526,12 +6599,12 @@ body.dashboard .floating-logo {
   }
 
   .footer-icon.active img {
-    filter: brightness(0) invert(1); /* Make icon white when active */
+    filter: brightness(0) invert(1); 
   }
 
   /* Add bottom padding to main content so footer doesn't cover it */
   .main-container {
-    padding-bottom: 100px; /* Increased from 90px */
+    padding-bottom: 100px; 
     margin-left: 0;
     width: 100%;
   }

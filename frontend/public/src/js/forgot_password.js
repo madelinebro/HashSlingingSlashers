@@ -1,3 +1,9 @@
+/* ======================================================================
+  BloomFi - Forgot Password (forgot_password.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+
 // Wait until html document is loaded before running
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("forgotForm");
@@ -26,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show loading state
     showMessage(message, "Sending verification link...", "secondary");
 
-    // Submit to backend (ready for API integration)
+    // Submit to backend 
     const success = await sendPasswordReset(formData);
 
     if (success) {
@@ -42,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ========== VALIDATION LOGIC ==========
+// Validation logic
 function validatePasswordReset(data) {
   // Check for empty fields
   if (!data.fullName || !data.email) {
@@ -62,7 +68,7 @@ function isValidEmail(email) {
   return emailRegex.test(email);
 }
 
-// ========== BACKEND COMMUNICATION ==========
+// Future backend API call implementation
 async function sendPasswordReset(userData) {
   // RIGHT NOW: Simulate password reset
   // LATER: Replace with actual API call
@@ -94,7 +100,7 @@ async function sendPasswordReset(userData) {
   }
   */
 
-  // Temporary: Simulate API call with timeout
+  // Simulate API call with timeout, this is just for demo
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('Password reset requested for:', {
@@ -106,7 +112,7 @@ async function sendPasswordReset(userData) {
   });
 }
 
-// ========== UI HELPER FUNCTIONS ==========
+// UI helper functions
 function showMessage(messageElement, text, type) {
   messageElement.textContent = text;
   

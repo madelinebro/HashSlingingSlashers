@@ -4,6 +4,7 @@
   Author: Samantha Saunsaucie 
   Date: 11/03/2025
    ====================================================================== */
+
 // Wait for DOM to be fully loaded before executing scripts
 document.addEventListener('DOMContentLoaded', () => {
   
@@ -55,16 +56,35 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = "login.html";
     });
   }
-  
-  // Chatbot Button (Works on all pages) 
-  // Placeholder functionality for future chatbot feature
-  const chatbotBtn = document.querySelector('.chatbot');
-  if (chatbotBtn) {
-    chatbotBtn.addEventListener('click', () => {
-      alert('Chatbot feature coming soon! 🤖');
-    });
-  }
 
+
+  // Budget View Navigation Tabs
+  const budgetTabs = document.querySelectorAll('.budget-tab-btn');
+
+  if (budgetTabs.length > 0) {
+    budgetTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+      
+      const period = tab.getAttribute('data-period');
+      
+      if (period) {
+        let targetPage = '';
+        if (period === 'week') {
+          targetPage = 'budgeting_week.html';
+        } else if (period === 'month') {
+          targetPage = 'budgeting_month.html';
+        } else if (period === 'year') {
+          targetPage = 'budgeting_year.html';
+        }
+        
+        if (targetPage) {
+          window.location.href = targetPage;
+        }
+      }
+    });
+  });
+}
   
   // Initialize the appropriate budget page based on current URL
   if (window.location.pathname.includes('budgeting_month')) {

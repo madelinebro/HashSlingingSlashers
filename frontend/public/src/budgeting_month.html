@@ -17,45 +17,56 @@
     <script src="js/mobile_footer.js" defer></script>
     <script src="js/chatbot.js" defer></script>
 </head>
-<!-- Setups the page body and uses the dashboard style for Profile Toggle in upper corner -->
+
+<!-- The main body of the page -->
 
 <body class="dashboard">
-    <!-- LEFT SIDEBAR NAVIGATION -->
+
+    <!-- This is the left sidebar-->
     <aside class="sidebar">
-        <!-- Logo Section -->
+
+        <!-- The BloomFi logo at the top of the sidebar -->
         <div class="sidebar-logo">
             <img src="images/logo.svg" alt="BloomFi Logo" />
         </div>
 
-        <!-- Navigation Menu -->
+        <!-- The main navigation menu with links to different pages -->
         <nav class="sidebar-nav">
+            <!-- Dashboard link -->
             <a class="sidebar-nav-item" href="dashboard.html">
                 <span class="nav-icon">🏠</span>
                 Dashboard
             </a>
+            <!-- My Accounts link  -->
             <a class="sidebar-nav-item" href="accounts.html">
                 <span class="nav-icon">💳</span>
                 My Accounts
             </a>
+            <!-- Budgeting link, marked as active since we're on this page -->
             <a class="sidebar-nav-item active" href="budgeting_month.html">
                 <span class="nav-icon">📊</span>
                 Budgeting
             </a>
+            <!-- Transfers link  -->
             <a class="sidebar-nav-item" href="transfers.html">
                 <span class="nav-icon">🔄</span>
                 Transfers
             </a>
         </nav>
 
-        <!-- User Profile at Bottom -->
+        <!-- User profile section that sticks to the bottom of the sidebar -->
         <div class="sidebar-user">
             <div class="sidebar-user-info">
+                <!-- The user's profile picture -->
                 <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
                 <div class="sidebar-user-details">
+                    <!-- Button that toggles the user menu -->
                     <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
                         Jane
+                        <!-- Little arrow icon that indicates there is a dropdown menu -->
                         <img class="chev" src="images/Chevron left.svg" alt="" />
                     </button>
+                    <!-- The dropdown menu that appears when clicking the chevron arrow -->
                     <div id="userMenu" class="sidebar-user-menu" role="menu">
                         <a href="profile.html" role="menuitem">Profile</a>
                         <a href="settings.html" role="menuitem">Settings</a>
@@ -66,40 +77,46 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
+    <!-- The main content area  -->
     <div class="main-container">
-        <!-- Page Header -->
+
+        <!-- Page header with the title and subtitle -->
         <header class="content-header">
             <h1 class="page-title">Monthly Budget</h1>
             <p class="page-subtitle">Track and manage your spending</p>
         </header>
 
-        <!-- Tab Navigation for Week/Month/Year -->
+        <!-- Tab buttons to switch between viewing weekly, monthly, or yearly budgets -->
         <div class="budget-tabs">
             <button class="budget-tab-btn" data-period="week">Week</button>
+            <!-- The month button is marked as active since we are viewing the monthly budget -->
             <button class="budget-tab-btn active" data-period="month">Month</button>
             <button class="budget-tab-btn" data-period="year">Year</button>
         </div>
 
-        <!-- SPENDING SUMMARY SECTION -->
+        <!-- Section that shows an overview of how much you have spent this month -->
         <section class="budget-summary-card">
             <h2>Monthly Spending Summary</h2>
 
-            <!-- Summary Stats -->
+            <!-- Two key stats displayed at the top -->
             <div class="budget-summary-stats">
+                <!-- Shows the total amount spent so far this month -->
                 <div class="budget-stat-item total-spent">
+                    <!-- The month name gets filled in by JavaScript -->
                     <span class="budget-stat-label">Total Spend in <span id="currentMonth"></span></span>
                     <span class="budget-stat-value" id="totalSpent">$0</span>
                 </div>
+                <!-- Shows how much money is still available to spend -->
                 <div class="budget-stat-item remaining">
                     <span class="budget-stat-label">Left for Spending</span>
                     <span class="budget-stat-value" id="remainingBudget">$0</span>
                 </div>
             </div>
 
-            <!-- Category Breakdown Table -->
+            <!-- Table showing a detailed breakdown by category like groceries, entertainment, etc -->
             <div class="budget-table-wrapper">
                 <table class="budget-table">
+                    <!-- Column headers for the breakdown table -->
                     <thead>
                         <tr>
                             <th>Category</th>
@@ -108,26 +125,30 @@
                             <th>Status</th>
                         </tr>
                     </thead>
+                    <!-- Table body where category rows will be added by JavaScript -->
                     <tbody id="categoryTableBody">
-                        <!-- Dynamically populated by JS -->
+                        <!-- Starts empty, category data gets filled in dynamically -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- BUDGET EDITOR SECTION -->
+        <!-- Section where you can actually change/edit your budget amounts for each category -->
         <section class="budget-editor-card">
             <h2>Edit Monthly Budget</h2>
             <p class="budget-editor-subtitle">Adjust your budget allocations for each category</p>
 
+            <!-- Form with input fields for editing budget amounts -->
             <form id="budgetForm" class="budget-form">
+                <!-- Grid layout where all the category input fields will appear -->
                 <div class="budget-form-grid" id="budgetFormGrid">
-                    <!-- Dynamically populated by JS -->
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Buttons at the bottom of the form -->
                 <div class="budget-form-actions">
+                    <!-- Reset button to go back to original default budget values -->
                     <button type="button" class="budget-btn-secondary" id="resetBtn">Reset to Default</button>
+                    <!-- Submit button to save the changes you have made to the budget -->
                     <button type="submit" class="budget-btn-primary">
                         <span>Update Budget</span>
                         <span class="btn-icon-small">✓</span>
@@ -137,7 +158,7 @@
         </section>
     </div>
 
-    <!-- Mobile Footer -->
+    <!-- Navigation footer that only shows on mobile devices -->
     <footer id="mobile-footer" class="mobile-footer"></footer>
 </body>
 

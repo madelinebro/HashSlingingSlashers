@@ -1,3 +1,9 @@
+/* ======================================================================
+  BloomFi - Forgot Username (forgot_username.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+
 // Wait until html document is loaded before running
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("forgotUsernameForm");
@@ -42,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ========== VALIDATION LOGIC ==========
+// Logic for validating user input
 function validateUsernameRecovery(data) {
   // Check for empty fields
   if (!data.fullName || !data.email) {
@@ -62,7 +68,7 @@ function isValidEmail(email) {
   return emailRegex.test(email);
 }
 
-// ========== BACKEND COMMUNICATION ==========
+// Future backend communication logic
 async function recoverUsername(userData) {
   // RIGHT NOW: Simulate username recovery
   // LATER: Replace with actual API call
@@ -94,7 +100,7 @@ async function recoverUsername(userData) {
   }
   */
 
-  // Temporary: Simulate API call with timeout
+  // Simulate an API call with timeout
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('Username recovery requested for:', {
@@ -106,7 +112,7 @@ async function recoverUsername(userData) {
   });
 }
 
-// ========== UI HELPER FUNCTIONS ==========
+// UI helper functions
 function showMessage(messageElement, text, type) {
   messageElement.textContent = text;
   

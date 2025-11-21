@@ -1,7 +1,13 @@
-// ========== GLOBAL STATE ==========
-let allTransactions = []; // Store all transactions
-let filteredTransactions = []; // Store filtered transactions
-let userData = {}; // Store user data
+/* ======================================================================
+  BloomFi - Dashboard (dashboard.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
+
+// Global state management
+let allTransactions = []; // All transactions from database
+let filteredTransactions = []; // Transactions after applying filters
+let userData = {}; // Current user's account data
 let currentFilters = {
   startDate: null,
   endDate: null,
@@ -12,30 +18,29 @@ let currentFilters = {
   searchTerm: ''
 };
 
-// Calendar state
+// Calendar state tracking
 let currentCalendarMonth = new Date();
-let selectingStartDate = true; // Toggle between selecting start and end date
+let selectingStartDate = true; // Tracks if we're picking start or end date
 let tempStartDate = null;
 let tempEndDate = null;
 
-// ========== PAGE INITIALIZATION ==========
-
+// Page initialization
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // === LOAD USER DATA ===
+    // Load user data from backend or mock data
     userData = await loadUserData();
     
     if (!userData) {
-      // If no user data, redirect to login
+      // No user data means not logged in, redirect to login
       window.location.href = "login.html";
       return;
     }
 
-    // Store transactions globally
+    // Copy transactions to global state for filtering
     allTransactions = [...userData.transactions];
     filteredTransactions = [...userData.transactions];
 
-    // === INITIALIZE UI ===
+    // Set up the page
     initializeGreeting();
     initializeUserProfile();
     calculateAndDisplayBalance();
@@ -45,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     populateAccountDropdown();
     setupEventListeners();
     
-    // === SET DEFAULT DATE RANGE (Last 30 days) ===
+    // Default to showing last 30 days
     initializeDateRange();
     
   } catch (error) {
@@ -54,22 +59,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ========== DATA LOADING (Backend Ready) ==========
-
-/**
- * Load user data from backend or localStorage
- * @returns {Promise<Object>} User data object
- */
+// Data loading functions 
+// Loads user data from the backend API or returns mock data for now
+// Returns user object with accounts and transactions, or null if not authenticated
 async function loadUserData() {
   try {
-    // DEVELOPMENT MODE: Check if we're using mock data
-    const useMockData = true; // SET TO FALSE WHEN BACKEND IS READY
+    // Development mode flag - set to false when backend is ready
+    const useMockData = true;
     
     if (useMockData) {
-      // Get user name from localStorage if available, otherwise use default
+      // Get stored user name or use default
       const storedUserName = localStorage.getItem('userName') || "Jane";
       
-      // Return mock data for development
+      // Return sample data for testing
       return {
         name: storedUserName,
         accounts: [
@@ -95,8 +97,8 @@ async function loadUserData() {
       };
     }
     
-    // ========== PRODUCTION MODE: Backend API Call ==========
-    // Check for auth token
+    // Production mode - call actual backend API
+    // Check if user has authentication token
     const authToken = localStorage.getItem('authToken');
     
     if (!authToken) {
@@ -114,7 +116,7 @@ async function loadUserData() {
 
     if (!response.ok) {
       if (response.status === 401) {
-        // Token expired or invalid
+        // Token expired or invalid, clear stored data
         localStorage.removeItem('authToken');
         localStorage.removeItem('userName');
         return null;
@@ -124,7 +126,7 @@ async function loadUserData() {
 
     const data = await response.json();
     
-    // Validate data structure
+    // Make sure we got valid data back
     if (!data.accounts || !data.transactions) {
       console.error('Invalid data structure from API');
       return null;
@@ -138,11 +140,8 @@ async function loadUserData() {
   }
 }
 
-// ========== UI INITIALIZATION ==========
-
-/**
- * Initialize time-based greeting
- */
+// UI initialization functions
+// Sets the greeting message based on time of day
 function initializeGreeting() {
   const greetingTitle = document.getElementById("greetingTitle");
   if (!greetingTitle) return;
@@ -158,26 +157,21 @@ function initializeGreeting() {
   greetingTitle.textContent = `${greeting}, ${userData.name}`;
 }
 
-/**
- * Initialize user profile in sidebar
- * Updates the user's name dynamically in the sidebar menu
- */
+// Updates the user's name in the sidebar menu
 function initializeUserProfile() {
   const userToggleBtn = document.getElementById("userToggle");
   if (!userToggleBtn) return;
 
-  // The button contains text and an image
-  // We need to update only the text node, keeping the chevron image
   // Clear existing content
   while (userToggleBtn.firstChild) {
     userToggleBtn.removeChild(userToggleBtn.firstChild);
   }
   
-  // Add user's name as text node
+  // Add user's name
   const nameText = document.createTextNode(userData.name + ' ');
   userToggleBtn.appendChild(nameText);
   
-  // Re-add the chevron image
+  // Add back the dropdown chevron icon
   const chevron = document.createElement('img');
   chevron.className = 'chev';
   chevron.src = 'images/Chevron left.svg';
@@ -185,9 +179,7 @@ function initializeUserProfile() {
   userToggleBtn.appendChild(chevron);
 }
 
-/**
- * Calculate and display total balance
- */
+// Calculates total balance across all accounts and displays it
 function calculateAndDisplayBalance() {
   const totalBalanceEl = document.getElementById("totalBalance");
   if (!totalBalanceEl) return;
@@ -196,9 +188,7 @@ function calculateAndDisplayBalance() {
   totalBalanceEl.textContent = formatCurrency(totalBalance);
 }
 
-/**
- * Render account chips dynamically
- */
+// Creates and displays account chips showing account type and number
 function renderAccountChips() {
   const accountChipsList = document.getElementById("accountChipsList");
   if (!accountChipsList) return;
@@ -216,14 +206,12 @@ function renderAccountChips() {
     .join("");
 }
 
-/**
- * Populate account dropdown in filter modal
- */
+// Fills the account dropdown in the filter modal with user's accounts
 function populateAccountDropdown() {
   const filterAccountSelect = document.getElementById("filterAccount");
   if (!filterAccountSelect) return;
 
-  // Clear existing options except "All Accounts"
+  // Start with "All Accounts" option
   filterAccountSelect.innerHTML = '<option value="all">All Accounts</option>';
 
   userData.accounts.forEach(acc => {
@@ -234,11 +222,9 @@ function populateAccountDropdown() {
   });
 }
 
-/**
- * Setup all event listeners
- */
+// Attaches all event listeners for interactive elements
 function setupEventListeners() {
-  // User menu toggle
+  // User menu dropdown toggle
   const userToggle = document.getElementById("userToggle");
   const userMenu = document.getElementById("userMenu");
   
@@ -249,13 +235,14 @@ function setupEventListeners() {
       userToggle.setAttribute("aria-expanded", !expanded);
       userMenu.style.display = expanded ? "none" : "block";
       
+      // Rotate chevron icon
       const chevron = userToggle.querySelector(".chev");
       if (chevron) {
         chevron.style.transform = expanded ? "rotate(0deg)" : "rotate(-90deg)";
       }
     });
 
-    // Close menu when clicking outside
+    // Close menu when clicking anywhere else on the page
     document.addEventListener("click", () => {
       userToggle.setAttribute("aria-expanded", "false");
       userMenu.style.display = "none";
@@ -266,13 +253,13 @@ function setupEventListeners() {
     });
   }
 
-  // Logout functionality
+  // Logout link functionality
   const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", handleLogout);
   }
 
-  // Close modals on outside click
+  // Close modals when clicking outside of them
   window.addEventListener('click', (e) => {
     const dateModal = document.getElementById("datePickerModal");
     const filterModal = document.getElementById("filterModal");
@@ -286,25 +273,21 @@ function setupEventListeners() {
   });
 }
 
-/**
- * Handle user logout
- */
+// Logs out the user and redirects to login page
 function handleLogout(e) {
   e.preventDefault();
   
-  // Clear stored session data
+  // Clear all stored session data
   localStorage.removeItem("loggedIn");
   localStorage.removeItem("userName");
   localStorage.removeItem("authToken");
   
-  // Redirect to login
+  // Send user to login page
   window.location.href = "login.html";
 }
 
-/**
- * Show error message to user
- * @param {string} message - Error message to display
- */
+
+// Displays an error message with a retry button
 function showErrorState(message) {
   const mainContainer = document.querySelector('.main-container');
   if (!mainContainer) return;
@@ -323,11 +306,10 @@ function showErrorState(message) {
   `;
 }
 
-// ========== STATS CALCULATION ==========
+// Stats calculation and display
 
-/**
- * Calculate and update all dashboard statistics
- */
+// Calculates income, expenses, and net change from filtered transactions
+// Updates all stat displays with percentage changes
 function updateStats() {
   let income = 0;
   let expenses = 0;
@@ -342,11 +324,11 @@ function updateStats() {
   
   const net = income - expenses;
 
-  // Calculate percentage changes
+  // Calculate percentage changes from previous period
   const incomeChange = calculatePercentageChange(income, userData.previousPeriod.income);
   const expenseChange = calculatePercentageChange(expenses, userData.previousPeriod.expenses);
 
-  // Update all stat displays
+  // Update stat values
   updateElement("incomeValue", formatCurrency(income));
   updateElement("expenseValue", formatCurrency(expenses));
   updateElement("netValue", net >= 0 ? `+${formatCurrency(net)}` : formatCurrency(net));
@@ -354,18 +336,13 @@ function updateStats() {
   updateElement("transactionBadge", filteredTransactions.length);
   updateElement("transactionCount", `${filteredTransactions.length} new`);
 
-  // Update stat changes with dynamic classes
+  // Update stat change indicators with colors
   updateStatChange("incomeChange", incomeChange, true);
   updateStatChange("expenseChange", expenseChange, false);
   updateNetChange(net);
 }
 
-/**
- * Calculate percentage change between two values
- * @param {number} current - Current period value
- * @param {number} previous - Previous period value
- * @returns {number} Percentage change
- */
+// Calculates percentage change between two values
 function calculatePercentageChange(current, previous) {
   if (previous === 0) {
     return current > 0 ? 100 : 0;
@@ -373,12 +350,8 @@ function calculatePercentageChange(current, previous) {
   return ((current - previous) / previous) * 100;
 }
 
-/**
- * Update a stat change element
- * @param {string} elementId - ID of the element
- * @param {number} change - Percentage change value
- * @param {boolean} higherIsBetter - Whether increase is positive
- */
+// Updates a stat change element with percentage and appropriate color
+// Higher is better for some stats (income), worse for others (expenses)
 function updateStatChange(elementId, change, higherIsBetter) {
   const element = document.getElementById(elementId);
   if (!element) {
@@ -393,10 +366,7 @@ function updateStatChange(elementId, change, higherIsBetter) {
   element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
 }
 
-/**
- * Update net change indicator
- * @param {number} netValue - Net change value
- */
+// Updates the net change indicator showing if overall balance is positive
 function updateNetChange(netValue) {
   const element = document.getElementById("netChange");
   if (!element) {
@@ -409,21 +379,18 @@ function updateNetChange(netValue) {
   element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
 }
 
-// ========== TRANSACTION RENDERING ==========
-
-/**
- * Render transactions table
- */
+// Transaction table rendering
+//  Renders the transaction table with filtered and sorted transactions
 function renderTransactions() {
   const txBody = document.getElementById("txBody");
   if (!txBody) return;
 
-  // Create account lookup map
+  // Create a quick lookup map for account numbers
   const accountMap = Object.fromEntries(
     userData.accounts.map(a => [a.id, a.number])
   );
 
-  // Sort transactions by date (most recent first)
+  // Sort by date, newest first
   const sortedTransactions = [...filteredTransactions].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
@@ -451,11 +418,8 @@ function renderTransactions() {
     .join("");
 }
 
-// ========== FILTER FUNCTIONS ==========
-
-/**
- * Initialize default date range (last 30 days)
- */
+// Filter functions
+// Sets up the default date range of last 30 days
 function initializeDateRange() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -468,33 +432,32 @@ function initializeDateRange() {
   updateDateRangeDisplay();
 }
 
-/**
- * Apply all active filters to transactions
- */
+// Filters transactions based on all active filters
+// Then updates the UI with filtered results
 function applyAllFilters() {
   filteredTransactions = allTransactions.filter(transaction => {
-    // Date filter
+    // Filter by date range
     if (currentFilters.startDate || currentFilters.endDate) {
       const txDate = normalizeDate(transaction.date);
       if (currentFilters.startDate && txDate < currentFilters.startDate) return false;
       if (currentFilters.endDate && txDate > currentFilters.endDate) return false;
     }
     
-    // Account filter
+    // Filter by account
     if (currentFilters.account !== 'all') {
       if (transaction.accountId !== parseInt(currentFilters.account)) return false;
     }
     
-    // Type filter
+    // Filter by transaction type (income vs expense)
     if (currentFilters.type === 'income' && transaction.amount <= 0) return false;
     if (currentFilters.type === 'expense' && transaction.amount >= 0) return false;
     
-    // Amount range filter
+    // Filter by amount range
     const absAmount = Math.abs(transaction.amount);
     if (currentFilters.minAmount !== null && absAmount < currentFilters.minAmount) return false;
     if (currentFilters.maxAmount !== null && absAmount > currentFilters.maxAmount) return false;
     
-    // Search filter
+    // Filter by search term in description
     if (currentFilters.searchTerm && !transaction.desc.toLowerCase().includes(currentFilters.searchTerm)) {
       return false;
     }
@@ -502,19 +465,17 @@ function applyAllFilters() {
     return true;
   });
   
-  // Update UI
+  // Refresh the display
   renderTransactions();
   updateStats();
 }
 
-/**
- * Open filter modal
- */
+// Opens the filter modal and populates it with current filter values
 function openFilterModal() {
   const modal = document.getElementById("filterModal");
   if (!modal) return;
   
-  // Set current filter values
+  // Pre-fill form with current filters
   document.getElementById("filterAccount").value = currentFilters.account;
   document.getElementById("filterType").value = currentFilters.type;
   document.getElementById("minAmount").value = currentFilters.minAmount || '';
@@ -524,18 +485,14 @@ function openFilterModal() {
   modal.style.display = "flex";
 }
 
-/**
- * Close filter modal
- */
+// Closes the filter modal
 function closeFilterModal() {
   const modal = document.getElementById("filterModal");
   if (!modal) return;
   modal.style.display = "none";
 }
 
-/**
- * Apply filters from modal
- */
+// Saves filter selections from modal and applies them
 function applyFilters() {
   currentFilters.account = document.getElementById("filterAccount").value;
   currentFilters.type = document.getElementById("filterType").value;
@@ -551,9 +508,7 @@ function applyFilters() {
   closeFilterModal();
 }
 
-/**
- * Clear all filters
- */
+// Resets all filters to their default values
 function clearFilters() {
   currentFilters = {
     startDate: null,
@@ -565,26 +520,24 @@ function clearFilters() {
     searchTerm: ''
   };
   
-  // Reset form fields
+  // Reset form fields to defaults
   document.getElementById("filterAccount").value = 'all';
   document.getElementById("filterType").value = 'all';
   document.getElementById("minAmount").value = '';
   document.getElementById("maxAmount").value = '';
   document.getElementById("searchDesc").value = '';
   
-  initializeDateRange(); // Reset to default 30-day range
+  initializeDateRange(); // Back to last 30 days
   applyAllFilters();
 }
 
-// ========== DATE PICKER FUNCTIONS ==========
-
-/**
- * Open date picker modal
- */
+// Date picker functions
+// Opens the date picker modal and initializes calendar
 function openDatePicker() {
   const modal = document.getElementById("datePickerModal");
   if (!modal) return;
   
+  // Store current dates as temporary while user makes selection
   tempStartDate = currentFilters.startDate;
   tempEndDate = currentFilters.endDate;
   selectingStartDate = true;
@@ -597,19 +550,14 @@ function openDatePicker() {
   modal.style.display = "flex";
 }
 
-/**
- * Close date picker modal
- */
+// Closes the date picker modal
 function closeDatePicker() {
   const modal = document.getElementById("datePickerModal");
   if (!modal) return;
   modal.style.display = "none";
 }
 
-/**
- * Set quick date filter
- * @param {string} period - 'today', 'week', 'month', or 'all'
- */
+// Sets date range based on quick filter buttons (today, week, month, all)
 function setQuickFilter(period) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -637,9 +585,7 @@ function setQuickFilter(period) {
   renderCalendar();
 }
 
-/**
- * Apply selected date filter
- */
+// Applies the selected date range and closes modal
 function applyDateFilter() {
   currentFilters.startDate = tempStartDate;
   currentFilters.endDate = tempEndDate;
@@ -649,9 +595,7 @@ function applyDateFilter() {
   closeDatePicker();
 }
 
-/**
- * Update date range display in header
- */
+// Updates the date range text shown in the header
 function updateDateRangeDisplay() {
   const dateRangeEl = document.getElementById("dateRange");
   if (!dateRangeEl) return;
@@ -670,11 +614,8 @@ function updateDateRangeDisplay() {
   }
 }
 
-// ========== CALENDAR FUNCTIONS ==========
-
-/**
- * Render the custom calendar
- */
+// Calendar rendering and interaction
+// Renders the monthly calendar view with selectable dates
 function renderCalendar() {
   const calendarDays = document.getElementById("calendarDays");
   const calendarMonthYear = document.getElementById("calendarMonthYear");
@@ -698,23 +639,25 @@ function renderCalendar() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Add previous month's trailing days
+  // Add trailing days from previous month
   for (let i = firstDayIndex; i > 0; i--) {
     const day = createDayElement(prevLastDate - i + 1, 'other-month');
     calendarDays.appendChild(day);
   }
   
-  // Add current month's days
+  // Add days of current month
   for (let i = 1; i <= lastDateOfMonth; i++) {
     const date = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth(), i);
     date.setHours(0, 0, 0, 0);
     
     const dayEl = createDayElement(i, '');
     
+    // Highlight today's date
     if (date.getTime() === today.getTime()) {
       dayEl.classList.add('today');
     }
     
+    // Mark selected start and end dates
     if (tempStartDate && date.getTime() === tempStartDate.getTime()) {
       dayEl.classList.add('selected');
     }
@@ -722,6 +665,7 @@ function renderCalendar() {
       dayEl.classList.add('selected');
     }
     
+    // Highlight dates in between start and end
     if (tempStartDate && tempEndDate && date > tempStartDate && date < tempEndDate) {
       dayEl.classList.add('in-range');
     }
@@ -731,21 +675,16 @@ function renderCalendar() {
     calendarDays.appendChild(dayEl);
   }
   
-  // Add next month's leading days
+  // Add leading days from next month to fill calendar grid
   const totalCells = calendarDays.children.length;
-  const remainingCells = 42 - totalCells;
+  const remainingCells = 42 - totalCells; // 6 rows x 7 days = 42 cells
   for (let i = 1; i <= remainingCells; i++) {
     const day = createDayElement(i, 'other-month');
     calendarDays.appendChild(day);
   }
 }
 
-/**
- * Create a calendar day element
- * @param {number} dayNumber - Day of the month
- * @param {string} className - CSS class to apply
- * @returns {HTMLElement} Calendar day element
- */
+// Creates a single calendar day element
 function createDayElement(dayNumber, className) {
   const dayEl = document.createElement('div');
   dayEl.className = `calendar-day ${className}`;
@@ -753,19 +692,20 @@ function createDayElement(dayNumber, className) {
   return dayEl;
 }
 
-/**
- * Handle date selection in calendar
- * @param {Date} date - Selected date
- */
+
+// Handles clicking a date in the calendar
+// First click selects start date, second click selects end date
 function selectDate(date) {
   if (selectingStartDate) {
     tempStartDate = date;
     selectingStartDate = false;
     
+    // Clear end date if it's before new start date
     if (tempEndDate && tempEndDate < tempStartDate) {
       tempEndDate = null;
     }
   } else {
+    // If clicked date is before start, swap them
     if (date < tempStartDate) {
       tempEndDate = tempStartDate;
       tempStartDate = date;
@@ -779,9 +719,8 @@ function selectDate(date) {
   renderCalendar();
 }
 
-/**
- * Update the selected date display boxes
- */
+
+//  Updates the date selection display boxes above calendar
 function updateDateDisplay() {
   const startDateEl = document.getElementById("selectedStartDate");
   const endDateEl = document.getElementById("selectedEndDate");
@@ -800,26 +739,20 @@ function updateDateDisplay() {
   startDateEl.textContent = formatDateDisplay(tempStartDate);
   endDateEl.textContent = formatDateDisplay(tempEndDate);
   
+  // Dim the box that's not currently being selected
   startDateEl.parentElement.style.opacity = selectingStartDate ? '1' : '0.6';
   endDateEl.parentElement.style.opacity = selectingStartDate ? '0.6' : '1';
 }
 
-/**
- * Change calendar month
- * @param {number} direction - 1 for next month, -1 for previous month
- */
+
+// Changes the calendar to next or previous month
 function changeMonth(direction) {
   currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + direction);
   renderCalendar();
 }
 
-// ========== UTILITY FUNCTIONS ==========
-
-/**
- * Format number as currency
- * @param {number} amount - Amount to format
- * @returns {string} Formatted currency string
- */
+// Utility functions
+// Formats a number as US currency (e.g., $1,234.56)
 function formatCurrency(amount) {
   return new Intl.NumberFormat("en-US", { 
     style: "currency", 
@@ -827,11 +760,8 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
-/**
- * Format date string or Date object for display
- * @param {string|Date} dateInput - Date to format
- * @returns {string} Formatted date string
- */
+
+// Formats a date in readable format (e.g., "Oct 15, 2025")
 function formatDate(dateInput) {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   return date.toLocaleDateString('en-US', { 
@@ -841,23 +771,17 @@ function formatDate(dateInput) {
   });
 }
 
-/**
- * Normalize date to midnight local time for consistent comparison
- * @param {string} dateString - ISO date string
- * @returns {Date} Normalized date object
- */
+
+// Converts date string to midnight local time for accurate date comparisons
 function normalizeDate(dateString) {
   const date = new Date(dateString);
   date.setHours(0, 0, 0, 0);
   return date;
 }
 
-/**
- * Update text content of an element safely
- * @param {string} id - Element ID
- * @param {string} text - Text content to set
- * @returns {boolean} Success status
- */
+
+// Safely updates an element's text content
+// Logs a warning if element doesn't exist
 function updateElement(id, text) {
   const el = document.getElementById(id);
   if (!el) {
@@ -868,11 +792,9 @@ function updateElement(id, text) {
   return true;
 }
 
-/**
- * Escape HTML to prevent XSS attacks
- * @param {string} text - Text to escape
- * @returns {string} Escaped text
- */
+
+// Escapes HTML characters 
+// Converts user input to safe display text
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;

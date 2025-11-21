@@ -1,10 +1,12 @@
-// ============================================================================
-// PROFILE_SETTINGS.JS - Dynamic User Data Management
-// ============================================================================
-
+/* ======================================================================
+  BloomFi - Profile and Settings Functionality (profile_settings.js)
+  Author: Samantha Saunsaucie 
+  Date: 11/03/2025
+   ====================================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   
-  // === MOCK USER DATA (will be replaced by backend API call) ===
+  // Mock user data that simulates what we'll eventually get from a real database
+  // This is temporary placeholder data for testing the frontend
   let currentUser = {
     id: "user123",
     fullName: "Jane Doe",
@@ -16,25 +18,30 @@ document.addEventListener("DOMContentLoaded", () => {
     avatarUrl: "images/Generic avatar (1).svg"
   };
 
-  // === LOCAL AVATAR STORAGE (until backend is ready) ===
+  // Since we don't have a backend yet, we're using the browser's local storage
+  // to save the user's profile picture between page refreshes
   const AVATAR_STORAGE_KEY = 'userProfilePicture';
   
+  // Check if there's a saved profile picture in local storage
   function getStoredAvatar() {
     return localStorage.getItem(AVATAR_STORAGE_KEY);
   }
   
+  // Save the user's profile picture to local storage
   function saveAvatarLocally(imageData) {
     localStorage.setItem(AVATAR_STORAGE_KEY, imageData);
   }
   
+  // Remove the saved profile picture from local storage
   function removeStoredAvatar() {
     localStorage.removeItem(AVATAR_STORAGE_KEY);
   }
 
-  // === UTILITY: FETCH USER DATA FROM BACKEND ===
+  // This function will eventually fetch real user data from the backend API
+  // For now, it just returns our mock data with any saved avatar
   async function fetchUserData() {
     try {
-      // TODO: Replace with actual backend endpoint
+      // When the backend is ready, we'll uncomment this code to make a real API call
       // const response = await fetch('/api/user/profile', {
       //   headers: {
       //     'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -43,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // const userData = await response.json();
       // return userData;
       
-      // For now, return mock data with stored avatar
+      // Temporarily return mock data, but check if there's a saved avatar first
       const storedAvatar = getStoredAvatar();
       if (storedAvatar) {
         currentUser.avatarUrl = storedAvatar;
@@ -55,10 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === UTILITY: UPDATE USER DATA ON BACKEND ===
+  // This function will send updated profile information to the backend
+  // Currently it just updates our local mock data
   async function updateUserProfile(profileData) {
     try {
-      // TODO: Replace with actual backend endpoint
+      // Future backend call to save profile changes to the database
       // const response = await fetch('/api/user/profile', {
       //   method: 'PUT',
       //   headers: {
@@ -69,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // });
       // return await response.json();
       
-      // For now, update mock data
+      // For now, just update the mock data in memory
       Object.assign(currentUser, profileData);
       return { success: true, message: "Profile updated successfully" };
     } catch (error) {
@@ -78,10 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === UTILITY: UPDATE PASSWORD ON BACKEND ===
+  // This function will send the password change request to the backend
+  // Currently it just pretends the operation was successful
   async function updatePassword(passwordData) {
     try {
-      // TODO: Replace with actual backend endpoint
+      // Future backend call to change the user's password
       // const response = await fetch('/api/user/change-password', {
       //   method: 'POST',
       //   headers: {
@@ -92,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // });
       // return await response.json();
       
-      // For now, simulate success
+      // Temporary simulation of a successful password change
       return { success: true, message: "Password updated successfully" };
     } catch (error) {
       console.error("Error updating password:", error);
@@ -100,25 +109,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === UTILITY: UPDATE ALL AVATARS ON PAGE ===
+  // Update all profile pictures throughout the page to keep them consistent
+  // This finds every avatar image and changes them all to the new picture
   function updateAllAvatars(avatarUrl) {
     document.querySelectorAll('.profile-avatar-img, .sidebar-user-info > img').forEach(img => {
       img.src = avatarUrl;
     });
   }
 
-  // === POPULATE PROFILE PAGE ===
+  // Fill in all the user information on the main Profile page
   function populateProfilePage(userData) {
-    // Update all avatar images
+    // Update all the profile picture images
     updateAllAvatars(userData.avatarUrl);
 
-    // Update profile identity section
+    // Update the name and username at the top of the profile
     const profileName = document.querySelector('.profile-name');
     const profileUsername = document.querySelector('.profile-username');
     if (profileName) profileName.textContent = userData.fullName;
     if (profileUsername) profileUsername.textContent = `@${userData.username}`;
 
-    // Update profile meta list
+    // Update the list showing email, phone, and member since date
     const metaItems = document.querySelectorAll('.profile-meta li');
     if (metaItems.length >= 3) {
       metaItems[0].innerHTML = `<span class="meta-icon">📧</span> ${userData.email}`;
@@ -126,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
       metaItems[2].innerHTML = `<span class="meta-icon">🆔</span> Member since ${userData.memberSince}`;
     }
 
-    // Update personal details card
+    // Update the detailed personal information card
     const infoItems = document.querySelectorAll('.info-item');
     infoItems.forEach(item => {
       const label = item.querySelector('.info-label')?.textContent;
@@ -134,6 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (!valueSpan) return;
       
+      // Match each label with the corresponding user data
       switch(label) {
         case 'Full Name':
           valueSpan.textContent = userData.fullName;
@@ -153,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Update sidebar user name
+    // Update the user's first name in the sidebar menu
     const sidebarUserName = document.querySelector('.sidebar-user-name');
     if (sidebarUserName) {
       const firstName = userData.fullName.split(' ')[0];
@@ -161,12 +172,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === POPULATE SETTINGS PAGE ===
+  // Fill in the user information on the Settings page form
   function populateSettingsPage(userData) {
-    // Update avatar
+    // Update the profile picture
     updateAllAvatars(userData.avatarUrl);
 
-    // Populate form fields
+    // Fill in the form input fields with current user data
     const fullNameInput = document.getElementById('fullName');
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
@@ -177,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (emailInput) emailInput.value = userData.email;
     if (mobileInput) mobileInput.value = userData.mobile;
 
-    // Update sidebar user name
+    // Update the sidebar with the user's first name
     const sidebarUserName = document.querySelector('.sidebar-user-name');
     if (sidebarUserName) {
       const firstName = userData.fullName.split(' ')[0];
@@ -185,17 +196,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === INITIALIZE PAGE WITH USER DATA ===
+  // Load the user's data when the page first loads
   async function initializePage() {
     const userData = await fetchUserData();
     
+    // If we can't get user data, send them back to the login page
     if (!userData) {
-      // Redirect to login if no user data
       window.location.href = 'login.html';
       return;
     }
 
-    // Determine which page we're on and populate accordingly
+    // Figure out which page we're on and populate it accordingly
     if (document.querySelector('.profile-avatar')) {
       // We're on the Profile page
       populateProfilePage(userData);
@@ -205,10 +216,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Initialize the page
+  // Start everything up
   initializePage();
 
-  // === USER MENU TOGGLE ===
+  // Handle the dropdown menu that appears when you click your profile picture
   const userToggle = document.getElementById("userToggle");
   const userMenu = document.getElementById("userMenu");
   
@@ -219,13 +230,14 @@ document.addEventListener("DOMContentLoaded", () => {
       userToggle.setAttribute("aria-expanded", !expanded);
       userMenu.style.display = expanded ? "none" : "block";
       
+      // Rotate the arrow icon when menu opens and closes
       const chevron = userToggle.querySelector(".chev");
       if (chevron) {
         chevron.style.transform = expanded ? "rotate(0deg)" : "rotate(-90deg)";
       }
     });
 
-    // Close menu when clicking outside
+    // Close the dropdown menu if someone clicks anywhere else on the page
     document.addEventListener("click", (e) => {
       if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
         userToggle.setAttribute("aria-expanded", "false");
@@ -238,12 +250,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === LOGOUT FUNCTIONALITY ===
+  // Handle the logout button click
   const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
       e.preventDefault();
-      // Clear authentication data
+      // Clear all saved login information
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("userName");
       localStorage.removeItem("authToken");
@@ -252,42 +264,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === AVATAR UPLOAD (SETTINGS PAGE) ===
+  // Handle uploading a new profile picture on the Settings page
   const avatarInput = document.getElementById('avatarInput');
   if (avatarInput) {
     avatarInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Validate file type
+      // Make sure they selected an actual image file
       if (!file.type.startsWith('image/')) {
         alert('Please select an image file');
         return;
       }
 
-      // Validate file size (max 5MB)
+      // Make sure the image isn't too large (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
         alert('Image must be less than 5MB');
         return;
       }
 
-      // Preview the image
+      // Read the image and display it immediately
       const reader = new FileReader();
       reader.onload = (event) => {
         const newImageURL = event.target.result;
         
-        // Store locally until backend is ready
+        // Save to local storage since we don't have a backend yet
         saveAvatarLocally(newImageURL);
         
-        // Update the current user data
+        // Update our mock data
         currentUser.avatarUrl = newImageURL;
         
-        // Update all profile pictures on the current page
+        // Update all the profile pictures on the page
         updateAllAvatars(newImageURL);
       };
       reader.readAsDataURL(file);
 
-      // TODO: Upload to backend
+      // When backend is ready, we'll upload the image to the server
       // const formData = new FormData();
       // formData.append('avatar', file);
       // const response = await fetch('/api/user/avatar', {
@@ -301,29 +313,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === AVATAR REMOVE BUTTON (SETTINGS PAGE) ===
+  // Handle the button that removes your profile picture
   const avatarRemoveBtn = document.querySelector('.avatar-remove-btn');
   if (avatarRemoveBtn) {
     avatarRemoveBtn.addEventListener('click', async () => {
       if (confirm('Are you sure you want to remove your profile picture?')) {
         const defaultAvatar = 'images/Generic avatar (1).svg';
         
-        // Remove from local storage
+        // Remove the saved image from local storage
         removeStoredAvatar();
         
-        // Update the current user data
+        // Set back to the default avatar
         currentUser.avatarUrl = defaultAvatar;
         
-        // Update all avatars on page
+        // Update all profile pictures to show the default
         updateAllAvatars(defaultAvatar);
         
-        // Clear the file input
+        // Clear the file selection
         const avatarInput = document.getElementById('avatarInput');
         if (avatarInput) {
           avatarInput.value = '';
         }
         
-        // TODO: Send removal request to backend
+        // When backend is ready, tell the server to remove the avatar
         // await fetch('/api/user/avatar', {
         //   method: 'DELETE',
         //   headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
@@ -332,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === PASSWORD VISIBILITY TOGGLES (HOVER) ===
+  // Make password fields visible when you hover over the eye icon
   const toggleButtons = document.querySelectorAll('.toggle-btn');
   
   toggleButtons.forEach(toggleBtn => {
@@ -341,12 +353,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const eyeIcon = toggleBtn.querySelector('.eye-icon');
     
     if (inputField && eyeIcon) {
+      // Show password when mouse hovers over the eye icon
       toggleBtn.addEventListener('mouseenter', () => {
         inputField.type = 'text';
         eyeIcon.alt = 'Hiding password';
         eyeIcon.src = 'images/Eye.svg';
       });
       
+      // Hide password again when mouse moves away
       toggleBtn.addEventListener('mouseleave', () => {
         inputField.type = 'password';
         eyeIcon.alt = 'Show password';
@@ -355,39 +369,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // === PROFILE FORM SUBMISSION ===
+  // Handle submitting the profile update form
   const profileForm = document.getElementById("profileForm");
   if (profileForm) {
     profileForm.addEventListener("submit", async (e) => {
       e.preventDefault();
     
+      // Get all the values from the form
       const fullName = document.getElementById("fullName").value.trim();
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const mobile = document.getElementById("mobile").value.trim();
     
-      // Validate fields
+      // Make sure they didn't leave any fields empty
       if (!fullName || !username || !email || !mobile) {
         alert("Please fill in all fields!");
         return;
       }
 
-      // Email validation
+      // Check that the email looks valid
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         alert("Please enter a valid email address!");
         return;
       }
 
-      // Prepare update data
+      // Package up the changes to send to the backend
       const updateData = { fullName, username, email, mobile };
       
-      // Update backend
+      // Send the update request
       const result = await updateUserProfile(updateData);
       
+      // Show success or error message
       if (result.success) {
         alert("Profile updated successfully!");
-        // Refresh the page data
+        // Reload the page data to show the changes
         initializePage();
       } else {
         alert(`Error: ${result.message}`);
@@ -395,51 +411,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === PASSWORD FORM SUBMISSION ===
+  // Handle submitting the password change form
   const passwordForm = document.getElementById("passwordForm");
   if (passwordForm) {
     passwordForm.addEventListener("submit", async (e) => {
       e.preventDefault();
     
+      // Get all the password values from the form
       const currentPassword = document.getElementById("currentPassword").value;
       const newPassword = document.getElementById("newPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
       const email = document.getElementById("changeEmail").value.trim();
     
-      // Validate all fields are filled
+      // Make sure they filled in everything
       if (!currentPassword || !newPassword || !confirmPassword || !email) {
         alert("Please fill in all fields!");
         return;
       }
 
-      // Verify email matches current user
+      // Make sure the email matches the logged-in user
       if (email !== currentUser.email) {
         alert("Email does not match your account!");
         return;
       }
 
-      // Ensure passwords match
+      // Make sure both new password fields match
       if (newPassword !== confirmPassword) {
         alert("New passwords do not match!");
         return;
       }
 
-      // Password strength validation (minimum 8 characters)
+      // Make sure the password is long enough for security
       if (newPassword.length < 8) {
         alert("Password must be at least 8 characters long!");
         return;
       }
 
-      // Prepare password data
+      // Package up the password data for the backend
       const passwordData = {
         currentPassword,
         newPassword,
         email
       };
 
-      // Update backend
+      // Send the password change request
       const result = await updatePassword(passwordData);
       
+      // Show success or error message
       if (result.success) {
         alert("Password updated successfully!");
         passwordForm.reset();

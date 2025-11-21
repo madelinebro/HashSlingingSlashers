@@ -16,17 +16,20 @@
     <script src="js/script.js" defer></script>
     <script src="js/forgot_username.js" defer></script>
 </head>
-<!-- Main area for Forgot Username Form -->
+
+<!-- This is the main content area where users can recover their username -->
 
 <body>
-    <!-- Floating Logo -->
+    <!-- The BloomFi logo floats at the top of the page above the main card -->
     <div class="floating-logo">
         <img src="images/logo.svg" alt="BloomFi Logo" />
     </div>
 
+    <!-- Main container that holds the entire forgot username card -->
     <main class="forgot-username-container">
+        <!-- Card is split into two sections: left for explanation, right for the form -->
         <div class="forgot-username-card">
-            <!-- Left Panel -->
+            <!-- Left panel explains what this page does -->
             <div class="forgot-left-panel">
                 <div class="forgot-icon">❔</div>
                 <h2>Forgot Username?</h2>
@@ -36,42 +39,45 @@
                 </p>
             </div>
 
-            <!-- Right Panel -->
+            <!-- Right panel contains the actual form for recovering the username -->
             <div class="forgot-right-panel">
                 <h1>Recover Username</h1>
 
+                <!-- Form that collects user information to verify their identity before sending username -->
                 <form id="forgotUsernameForm" class="forgot-form">
-                    <!-- Full Name -->
+                    <!-- Input field for the user's full name to confirm their identity -->
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
                         <div class="input-wrapper">
+                            <!-- Name field -->
                             <input type="text" id="fullname" name="fullname" placeholder="👤 Full Name"
                                 autocomplete="name" required />
                         </div>
                     </div>
 
-                    <!-- Email -->
+                    <!-- Input field for the user's email where the username will be sent -->
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-wrapper">
+                            <!-- Email field  -->
                             <input type="email" id="email" name="email" placeholder="📧 Email" autocomplete="email"
                                 required />
                         </div>
                     </div>
 
+                    <!-- Button that submits the form and triggers sending the username to their email -->
                     <button type="submit" class="submit-btn">
                         Send Username to Email
                     </button>
                 </form>
+                <!-- Empty paragraph that will show success or error messages after the form submission -->
                 <p id="message" class="message"></p>
-                <!-- Already have an account? -->
+                <!-- Link for users who want to go back to the login page -->
                 <div class="register-links">
                     <p>Already have an account? <a href="login.html">Login</a></p>
                 </div>
             </div>
-            <!-- /forgot-right-panel -->
         </div>
-        <!-- /forgot-username-card -->
     </main>
 </body>
 
