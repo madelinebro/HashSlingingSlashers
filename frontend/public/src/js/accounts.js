@@ -18,10 +18,29 @@ document.addEventListener("DOMContentLoaded", () => {
       available: 3050.22,
       pending: -45.12,
       transactions: [
-        { id: "t1", desc: "Deposit - Payroll", date: "2025-10-28", amount: 1850, type: "income" },
+        // Last 30 days (November 2025)
+        { id: "t1", desc: "Deposit - Payroll", date: "2025-11-15", amount: 1850, type: "income" },
         { id: "t2", desc: "Rent", date: "2025-11-01", amount: -1200, type: "expense" },
-        { id: "t3", desc: "Coffee Shop", date: "2025-11-03", amount: -5.75, type: "expense" },
-        { id: "t4", desc: "Transfer to Savings", date: "2025-11-04", amount: -150, type: "transfer" },
+        { id: "t3", desc: "Coffee Shop", date: "2025-11-18", amount: -5.75, type: "expense" },
+        { id: "t4", desc: "Transfer to Savings", date: "2025-11-10", amount: -150, type: "transfer" },
+        { id: "t5", desc: "Online Shopping", date: "2025-11-12", amount: -89.99, type: "expense" },
+        { id: "t6", desc: "Restaurant", date: "2025-11-16", amount: -45.30, type: "expense" },
+        
+        // 30-90 days ago (September-October 2025)
+        { id: "t7", desc: "Deposit - Payroll", date: "2025-10-15", amount: 1850, type: "income" },
+        { id: "t8", desc: "Electric Bill", date: "2025-10-05", amount: -120.50, type: "expense" },
+        { id: "t9", desc: "Gym Membership", date: "2025-10-01", amount: -50, type: "expense" },
+        { id: "t10", desc: "Grocery Store", date: "2025-09-28", amount: -156.78, type: "expense" },
+        { id: "t11", desc: "Gas Station", date: "2025-09-25", amount: -45.00, type: "expense" },
+        { id: "t12", desc: "Deposit - Payroll", date: "2025-09-15", amount: 1850, type: "income" },
+        
+        // Year to date - older transactions (Jan-Aug 2025)
+        { id: "t13", desc: "Tax Refund", date: "2025-04-15", amount: 850, type: "income" },
+        { id: "t14", desc: "Car Insurance", date: "2025-03-01", amount: -450, type: "expense" },
+        { id: "t15", desc: "Vacation Expense", date: "2025-07-10", amount: -1200, type: "expense" },
+        { id: "t16", desc: "Bonus Payment", date: "2025-06-30", amount: 500, type: "income" },
+        { id: "t17", desc: "Medical Bill", date: "2025-02-14", amount: -275, type: "expense" },
+        { id: "t18", desc: "Deposit - Payroll", date: "2025-01-15", amount: 1850, type: "income" },
       ],
     },
     {
@@ -34,8 +53,19 @@ document.addEventListener("DOMContentLoaded", () => {
       available: 4770.12,
       pending: 0,
       transactions: [
-        { id: "t5", desc: "Interest Payment", date: "2025-10-31", amount: 6.84, type: "income" },
-        { id: "t6", desc: "Transfer from Checking", date: "2025-11-04", amount: 150, type: "income" },
+        // Last 30 days
+        { id: "t19", desc: "Interest Payment", date: "2025-11-01", amount: 6.84, type: "income" },
+        { id: "t20", desc: "Transfer from Checking", date: "2025-11-10", amount: 150, type: "income" },
+        
+        // 30-90 days ago
+        { id: "t21", desc: "Interest Payment", date: "2025-10-01", amount: 6.50, type: "income" },
+        { id: "t22", desc: "Transfer from Checking", date: "2025-09-15", amount: 200, type: "income" },
+        { id: "t23", desc: "Interest Payment", date: "2025-09-01", amount: 6.25, type: "income" },
+        
+        // Year to date
+        { id: "t24", desc: "Initial Deposit", date: "2025-01-05", amount: 2000, type: "income" },
+        { id: "t25", desc: "Interest Payment", date: "2025-05-01", amount: 5.80, type: "income" },
+        { id: "t26", desc: "Emergency Withdrawal", date: "2025-08-12", amount: -500, type: "expense" },
       ],
     },
     {
@@ -48,9 +78,24 @@ document.addEventListener("DOMContentLoaded", () => {
       available: 2450.75, 
       pending: -35.9,
       transactions: [
-        { id: "t7", desc: "Groceries", date: "2025-11-02", amount: -86.12, type: "expense" },
-        { id: "t8", desc: "Gas", date: "2025-11-04", amount: -35.9, type: "expense" },
-        { id: "t9", desc: "Rewards Credit", date: "2025-11-05", amount: 5, type: "income" },
+        // Last 30 days
+        { id: "t27", desc: "Groceries", date: "2025-11-17", amount: -86.12, type: "expense" },
+        { id: "t28", desc: "Gas", date: "2025-11-14", amount: -35.90, type: "expense" },
+        { id: "t29", desc: "Rewards Credit", date: "2025-11-05", amount: 5, type: "income" },
+        { id: "t30", desc: "Amazon Purchase", date: "2025-11-08", amount: -124.99, type: "expense" },
+        { id: "t31", desc: "Restaurant", date: "2025-11-11", amount: -67.45, type: "expense" },
+        
+        // 30-90 days ago
+        { id: "t32", desc: "Groceries", date: "2025-10-20", amount: -95.30, type: "expense" },
+        { id: "t33", desc: "Monthly Payment", date: "2025-10-15", amount: 450, type: "income" },
+        { id: "t34", desc: "Electronics Store", date: "2025-09-28", amount: -299.99, type: "expense" },
+        { id: "t35", desc: "Gas", date: "2025-09-22", amount: -42.15, type: "expense" },
+        
+        // Year to date
+        { id: "t36", desc: "Hotel Booking", date: "2025-07-05", amount: -456.00, type: "expense" },
+        { id: "t37", desc: "Airline Tickets", date: "2025-06-20", amount: -680, type: "expense" },
+        { id: "t38", desc: "Monthly Payment", date: "2025-05-15", amount: 325, type: "income" },
+        { id: "t39", desc: "Department Store", date: "2025-03-10", amount: -189.50, type: "expense" },
       ],
     },
   ];
@@ -174,14 +219,51 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Transaction Modal Functions
-  // Track which account's transactions are displayed
+  // Track which accounts transactions are displayed
   let currentAccount = null;
+  let currentAccountsList = null; // For "All Accounts" view
   // For restoring focus when modal closes
   let lastFocusedElementBeforeModal = null;
+
+  // Helper function to filter transactions by date range
+  function filterTransactionsByDateRange(transactions, dateRange) {
+    const today = new Date("2025-11-21"); // Using current date from context
+    let cutoffDate;
+
+    switch (dateRange) {
+      case "Last 30 days":
+        cutoffDate = new Date(today);
+        cutoffDate.setDate(cutoffDate.getDate() - 30);
+        break;
+      case "Last 90 days":
+        cutoffDate = new Date(today);
+        cutoffDate.setDate(cutoffDate.getDate() - 90);
+        break;
+      case "Year to date":
+        cutoffDate = new Date(today.getFullYear(), 0, 1); // January 1st of current year
+        break;
+      case "All time":
+        return transactions; // Return all transactions
+      default:
+        cutoffDate = new Date(today);
+        cutoffDate.setDate(cutoffDate.getDate() - 30);
+    }
+
+    // Filter transactions that are on or after the cutoff date
+    return transactions.filter(t => {
+      const txDate = new Date(t.date);
+      return txDate >= cutoffDate;
+    });
+  }
 
   // Open modal and populate with account transactions
   function openTransactionModal(account, allAccounts = null) {
     currentAccount = account;
+    currentAccountsList = allAccounts;
+
+    // Get current date range selection
+    const currentDateRange = elModalDateRange.textContent?.trim() || "Last 30 days";
+
     // Handle "All Accounts" view 
     if (account.id === "all-accounts" && allAccounts) {
       elModalName.textContent = "All Accounts — Transactions";
@@ -190,16 +272,19 @@ document.addEventListener("DOMContentLoaded", () => {
       // Calculate total balance
       const totalBalance = allAccounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
       elModalBalance.textContent = fmtCurrency(totalBalance);
-      elModalDateRange.textContent = "Last 30 days";
+      elModalDateRange.textContent = currentDateRange;
 
-      // Combine all transactions from all accounts and sort by date 
-      const allTransactions = allAccounts.flatMap(a => a.transactions || [])
+      // Combine all transactions from all accounts
+      const allTransactions = allAccounts.flatMap(a => a.transactions || []);
+      
+      // Filter by date range
+      const filteredTransactions = filterTransactionsByDateRange(allTransactions, currentDateRange)
         .slice()
         .sort((a, b) => (a.date < b.date ? 1 : -1));
 
       // Build transaction rows
       elModalTbody.innerHTML =
-        allTransactions
+        filteredTransactions
           .map((t) => {
             const amt = Number(t.amount) || 0;
             return `
@@ -218,12 +303,16 @@ document.addEventListener("DOMContentLoaded", () => {
       elModalName.textContent = account.name + " — Transactions";
       elModalNumber.textContent = account.number;
       elModalBalance.textContent = fmtCurrency(Number(account.balance) || 0);
-      elModalDateRange.textContent = "Last 30 days";
-      // Sort transactions by date (newest first) and build rows
+      elModalDateRange.textContent = currentDateRange;
+      
+      // Filter transactions by date range
+      const filteredTransactions = filterTransactionsByDateRange(account.transactions, currentDateRange)
+        .slice()
+        .sort((a, b) => (a.date < b.date ? 1 : -1));
+
+      // Build transaction rows
       elModalTbody.innerHTML =
-        account.transactions
-          .slice()
-          .sort((a, b) => (a.date < b.date ? 1 : -1))
+        filteredTransactions
           .map((t) => {
             const amt = Number(t.amount) || 0;
             return `
@@ -259,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.removeEventListener("keydown", handleModalKeys);
     elModal.removeEventListener("click", handleBackdropClick);
     currentAccount = null;
+    currentAccountsList = null;
 
     // Restore focus to element that opened the modal
     if (lastFocusedElementBeforeModal) {
@@ -308,11 +398,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Date Range Picker Functionality
   window.openDatePickerModal = function openDatePickerModal() {
     if (!currentAccount) return;
-    // Simple preset rotation 
+    
+    // Cycle through date range presets
     const presets = ["Last 30 days", "Last 90 days", "Year to date", "All time"];
     const current = elModalDateRange.textContent?.trim();
-    const next = presets[(presets.indexOf(current) + 1) % presets.length];
+    const nextIndex = (presets.indexOf(current) + 1) % presets.length;
+    const next = presets[nextIndex];
+    
+    // Update the date range display
     elModalDateRange.textContent = next;
+    
+    // Reopen the modal with the new date range to refresh the transaction list
+    openTransactionModal(currentAccount, currentAccountsList);
   };
 
  
@@ -334,9 +431,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Initialize, Load and Display Data
+  // Initialize, load and display data
   // Currently using sample data
-  // Future: Replace with API call like: fetch('/api/accounts')
+  // Replace with API call like: fetch('/api/accounts')
   const accounts = SAMPLE_ACCOUNTS;
   // Create lookup map by ID
   const ACCOUNTS_BY_ID = new Map(accounts.map((a) => [a.id, a]));
