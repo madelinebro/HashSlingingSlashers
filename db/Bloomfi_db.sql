@@ -124,6 +124,7 @@ EXECUTE FUNCTION handle_account_transfer();
 
 
 
+
 INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
 (2, '2025-08-08 19:59:49', 'Withdrawal', 1003.47, 'Fuel Payment', 'Food & Dining', 'CA'),
 (2, '2025-11-15 05:17:05', 'Transfer', 529.57, 'Transfer Savings to Checking', 'Food & Dining', 'NY'),
@@ -395,8 +396,10 @@ INSERT INTO public.transactions (accountnumber, transaction_date, transaction_ty
 (3,'2025-10-25','Deposit',800, 'ATM BOA', 'Shopping','MO'),
 (2, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
 (3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO'),
-(2,'2025-11-28','Deposit',25000,'ATM','Car','MO');
-(1,'2025-09-20','Transfer',3000,'Checking to Saving','Transfer','MO')
+(2,'2025-11-28','Deposit',25000,'ATM','Car','MO'),
+(1,'2025-09-20','Transfer',3000,'Checking to Saving','Transfer','MO');
+
+
 
 
 ALTER TABLE public.transactions
