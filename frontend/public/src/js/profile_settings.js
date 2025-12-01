@@ -50,18 +50,26 @@ document.addEventListener("DOMContentLoaded", () => {
       // const userData = await response.json();
       // return userData;
       
-      // Temporarily return mock data, but check if there's a saved avatar first
-      const storedAvatar = getStoredAvatar();
-      if (storedAvatar) {
-        currentUser.avatarUrl = storedAvatar;
-      }
-      return currentUser;
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
+    // Check if we have saved profile data in localStorage
+    const savedProfileData = localStorage.getItem('userProfileData');
+    
+    if (savedProfileData) {
+      // Use the saved data if it exists
+      currentUser = JSON.parse(savedProfileData);
     }
+    
+    // Check if there's a saved avatar
+    const storedAvatar = getStoredAvatar();
+    if (storedAvatar) {
+      currentUser.avatarUrl = storedAvatar;
+    }
+    
+    return currentUser;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
   }
-
+}
   // This function will send updated profile information to the backend
   // Currently it just updates our local mock data
   async function updateUserProfile(profileData) {
@@ -77,14 +85,18 @@ document.addEventListener("DOMContentLoaded", () => {
       // });
       // return await response.json();
       
-      // For now, just update the mock data in memory
-      Object.assign(currentUser, profileData);
-      return { success: true, message: "Profile updated successfully" };
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      return { success: false, message: "Failed to update profile" };
-    }
+    // For now, just updating the mock data in memory
+    Object.assign(currentUser, profileData);
+    
+    // SAVE TO LOCAL STORAGE so other pages can access it
+    localStorage.setItem('userProfileData', JSON.stringify(currentUser));
+    
+    return { success: true, message: "Profile updated successfully" };
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    return { success: false, message: "Failed to update profile" };
   }
+}
 
   // This function will send the password change request to the backend
   // Currently it just pretends the operation was successful

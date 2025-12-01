@@ -106,54 +106,15 @@
                 </div>
             </section>
 
-            <!-- Right side shows a grid of four stat cards with financial information -->
-            <section class="stats-grid">
-                <!-- Income stat card shows how much money came in -->
-                <div class="stat-card income">
-                    <div class="stat-header">
-                        <div class="stat-icon">💰</div>
-                        <!-- Shows percentage change in income, filled by JavaScript -->
-                        <div class="stat-change positive" id="incomeChange">↑ 100%</div>
-                    </div>
-                    <div class="stat-label">Income</div>
-                    <!-- Total income amount gets inserted here -->
-                    <div class="stat-value" id="incomeValue">$0.00</div>
+            <!-- Right side shows spending breakdown by category -->
+            <section class="spending-chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Spending by Category</h3>
+                    <p class="chart-subtitle">This month's breakdown</p>
                 </div>
-
-                <!-- Expense stat card shows how much money went out -->
-                <div class="stat-card expense">
-                    <div class="stat-header">
-                        <div class="stat-icon">💸</div>
-                        <!-- Shows percentage change in expenses -->
-                        <div class="stat-change negative" id="expenseChange">↓ 0%</div>
-                    </div>
-                    <div class="stat-label">Expenses</div>
-                    <!-- Total expenses amount gets inserted here -->
-                    <div class="stat-value" id="expenseValue">$0.00</div>
-                </div>
-
-                <!-- Net change card shows the difference between income and expenses -->
-                <div class="stat-card net">
-                    <div class="stat-header">
-                        <div class="stat-icon">📈</div>
-                        <!-- Indicates whether net change is positive or negative -->
-                        <div class="stat-change positive" id="netChange">↑ Positive</div>
-                    </div>
-                    <div class="stat-label">Net Change</div>
-                    <!-- The actual net change dollar amount -->
-                    <div class="stat-value" id="netValue">$0.00</div>
-                </div>
-
-                <!-- Transactions card shows how many transactions happened -->
-                <div class="stat-card transactions">
-                    <div class="stat-header">
-                        <div class="stat-icon">🧾</div>
-                        <!-- Shows how many new transactions there are -->
-                        <div class="stat-change neutral" id="transactionCount">0 new</div>
-                    </div>
-                    <div class="stat-label">Transactions</div>
-                    <!-- Total number of transactions -->
-                    <div class="stat-value" id="transactionValue">0</div>
+                <!-- Container where the bar chart will be rendered -->
+                <div class="chart-container" id="categoryChart">
+                    <!-- Chart bars will be inserted here by JavaScript -->
                 </div>
             </section>
         </div>

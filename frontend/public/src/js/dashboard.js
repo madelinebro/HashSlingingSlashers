@@ -44,8 +44,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeGreeting();
     initializeUserProfile();
     calculateAndDisplayBalance();
-    updateStats();
     renderAccountChips();
+    renderCategorySpendingChart(); // NEW: Render the spending chart
     renderTransactions();
     populateAccountDropdown();
     setupEventListeners();
@@ -71,7 +71,49 @@ async function loadUserData() {
       // Get stored user name or use default
       const storedUserName = localStorage.getItem('userName') || "Jane";
       
-      // Return sample data for testing
+      // Check if we have saved profile data in localStorage
+      const savedProfileData = localStorage.getItem('userProfileData');
+      
+      if (savedProfileData) {
+        // Use saved profile data if it exists
+        const profileData = JSON.parse(savedProfileData);
+        
+        // Merge profile data with transaction data
+        return {
+          name: profileData.fullName.split(' ')[0], // Use first name from saved profile
+          accounts: [
+            { id: 1, type: "Checking", number: "****3456", balance: 4890.25, color: "teal" },
+            { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
+          ],
+          transactions: [
+            { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1, category: "Bills & Utilities" },
+            { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1, category: "Income" },
+            { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2, category: "Groceries" },
+            { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2, category: "Entertainment" },
+            { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1, category: "Food & Drinks" },
+            { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1, category: "Car & Transportation" },
+            { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2, category: "Food & Drinks" },
+            { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2, category: "Income" },
+            { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1, category: "Bills & Utilities" },
+            { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1, category: "Shopping" },
+            { desc: "Target", date: "2025-10-14", amount: -124.50, accountId: 2, category: "Shopping" },
+            { desc: "Movie Tickets", date: "2025-10-12", amount: -32.00, accountId: 1, category: "Entertainment" },
+            { desc: "Uber", date: "2025-10-11", amount: -18.50, accountId: 2, category: "Car & Transportation" },
+            { desc: "Whole Foods", date: "2025-10-09", amount: -156.30, accountId: 1, category: "Groceries" },
+          ],
+          previousPeriod: {
+            income: 0,
+            expenses: 245.00
+          },
+          // Include full profile data
+          fullName: profileData.fullName,
+          username: profileData.username,
+          email: profileData.email,
+          mobile: profileData.mobile
+        };
+      }
+      
+      // If no saved data, return defaults using storedUserName
       return {
         name: storedUserName,
         accounts: [
@@ -79,16 +121,20 @@ async function loadUserData() {
           { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
         ],
         transactions: [
-          { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1 },
-          { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1 },
-          { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2 },
-          { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2 },
-          { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1 },
-          { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1 },
-          { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2 },
-          { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2 },
-          { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1 },
-          { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1 },
+          { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1, category: "Bills & Utilities" },
+          { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1, category: "Income" },
+          { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2, category: "Groceries" },
+          { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2, category: "Entertainment" },
+          { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1, category: "Food & Drinks" },
+          { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1, category: "Car & Transportation" },
+          { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2, category: "Food & Drinks" },
+          { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2, category: "Income" },
+          { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1, category: "Bills & Utilities" },
+          { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1, category: "Shopping" },
+          { desc: "Target", date: "2025-10-14", amount: -124.50, accountId: 2, category: "Shopping" },
+          { desc: "Movie Tickets", date: "2025-10-12", amount: -32.00, accountId: 1, category: "Entertainment" },
+          { desc: "Uber", date: "2025-10-11", amount: -18.50, accountId: 2, category: "Car & Transportation" },
+          { desc: "Whole Foods", date: "2025-10-09", amount: -156.30, accountId: 1, category: "Groceries" },
         ],
         previousPeriod: {
           income: 0,
@@ -222,6 +268,86 @@ function populateAccountDropdown() {
   });
 }
 
+// NEW FUNCTION: Renders the category spending chart
+function renderCategorySpendingChart() {
+  const chartContainer = document.getElementById("categoryChart");
+  if (!chartContainer) return;
+
+  // Define category structure with colors matching your budgeting page
+  const categoryConfig = {
+    'Bills & Utilities': { colorClass: 'bills', icon: '💡' },
+    'Shopping': { colorClass: 'shopping', icon: '🛍️' },
+    'Car & Transportation': { colorClass: 'transport', icon: '🚗' },
+    'Groceries': { colorClass: 'groceries', icon: '🛒' },
+    'Food & Drinks': { colorClass: 'food', icon: '🍔' },
+    'Entertainment': { colorClass: 'entertainment', icon: '🎬' }
+  };
+
+  // Calculate spending by category from filtered transactions (expenses only)
+  const categoryTotals = {};
+  let totalExpenses = 0;
+
+  filteredTransactions.forEach(t => {
+    // Only count expenses (negative amounts)
+    if (t.amount < 0) {
+      const category = t.category || 'Other';
+      const amount = Math.abs(t.amount);
+      categoryTotals[category] = (categoryTotals[category] || 0) + amount;
+      totalExpenses += amount;
+    }
+  });
+
+  // Convert to array and sort by amount (highest first)
+  const categoryData = Object.entries(categoryTotals)
+    .map(([name, amount]) => ({
+      name,
+      amount,
+      percentage: (amount / totalExpenses * 100).toFixed(1),
+      config: categoryConfig[name] || { colorClass: 'other', icon: '📦' }
+    }))
+    .sort((a, b) => b.amount - a.amount);
+
+  // Find the maximum amount for scaling bars
+  const maxAmount = Math.max(...categoryData.map(c => c.amount));
+
+  // Clear and render chart
+  chartContainer.innerHTML = '';
+
+  if (categoryData.length === 0) {
+    chartContainer.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+        <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
+        <div>No expense data available</div>
+      </div>
+    `;
+    return;
+  }
+
+  // Create bar chart items
+  categoryData.forEach(category => {
+    const barWidth = (category.amount / maxAmount * 100).toFixed(1);
+    
+    const chartItem = document.createElement('div');
+    chartItem.className = 'chart-bar-item';
+    chartItem.innerHTML = `
+      <div class="chart-bar-label">
+        <span class="chart-category-name">
+          <span class="category-dot ${category.config.colorClass}"></span>
+          ${category.name}
+        </span>
+        <span class="chart-bar-value">${formatCurrency(category.amount)}</span>
+      </div>
+      <div class="chart-bar-container">
+        <div class="chart-bar-fill ${category.config.colorClass}-bar" style="width: ${barWidth}%">
+          <span class="chart-bar-percentage">${category.percentage}%</span>
+        </div>
+      </div>
+    `;
+    
+    chartContainer.appendChild(chartItem);
+  });
+}
+
 // Attaches all event listeners for interactive elements
 function setupEventListeners() {
   // User menu dropdown toggle
@@ -306,79 +432,6 @@ function showErrorState(message) {
   `;
 }
 
-// Stats calculation and display
-
-// Calculates income, expenses, and net change from filtered transactions
-// Updates all stat displays with percentage changes
-function updateStats() {
-  let income = 0;
-  let expenses = 0;
-  
-  filteredTransactions.forEach(t => {
-    if (t.amount > 0) {
-      income += t.amount;
-    } else {
-      expenses += Math.abs(t.amount);
-    }
-  });
-  
-  const net = income - expenses;
-
-  // Calculate percentage changes from previous period
-  const incomeChange = calculatePercentageChange(income, userData.previousPeriod.income);
-  const expenseChange = calculatePercentageChange(expenses, userData.previousPeriod.expenses);
-
-  // Update stat values
-  updateElement("incomeValue", formatCurrency(income));
-  updateElement("expenseValue", formatCurrency(expenses));
-  updateElement("netValue", net >= 0 ? `+${formatCurrency(net)}` : formatCurrency(net));
-  updateElement("transactionValue", filteredTransactions.length);
-  updateElement("transactionBadge", filteredTransactions.length);
-  updateElement("transactionCount", `${filteredTransactions.length} new`);
-
-  // Update stat change indicators with colors
-  updateStatChange("incomeChange", incomeChange, true);
-  updateStatChange("expenseChange", expenseChange, false);
-  updateNetChange(net);
-}
-
-// Calculates percentage change between two values
-function calculatePercentageChange(current, previous) {
-  if (previous === 0) {
-    return current > 0 ? 100 : 0;
-  }
-  return ((current - previous) / previous) * 100;
-}
-
-// Updates a stat change element with percentage and appropriate color
-// Higher is better for some stats (income), worse for others (expenses)
-function updateStatChange(elementId, change, higherIsBetter) {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    console.warn(`Stat change element '${elementId}' not found`);
-    return;
-  }
-
-  const isPositive = higherIsBetter ? change >= 0 : change < 0;
-  const arrow = change >= 0 ? '↑' : '↓';
-  
-  element.textContent = `${arrow} ${Math.abs(change).toFixed(1)}%`;
-  element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
-}
-
-// Updates the net change indicator showing if overall balance is positive
-function updateNetChange(netValue) {
-  const element = document.getElementById("netChange");
-  if (!element) {
-    console.warn("Net change element not found");
-    return;
-  }
-
-  const isPositive = netValue >= 0;
-  element.textContent = isPositive ? '↑ Positive' : '↓ Negative';
-  element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
-}
-
 // Transaction table rendering
 //  Renders the transaction table with filtered and sorted transactions
 function renderTransactions() {
@@ -416,6 +469,9 @@ function renderTransactions() {
       </tr>
     `)
     .join("");
+  
+  // Update transaction badge count
+  updateElement("transactionBadge", sortedTransactions.length);
 }
 
 // Filter functions
@@ -467,7 +523,7 @@ function applyAllFilters() {
   
   // Refresh the display
   renderTransactions();
-  updateStats();
+  renderCategorySpendingChart(); // Update chart with filtered data
 }
 
 // Opens the filter modal and populates it with current filter values
