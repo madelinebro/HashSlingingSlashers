@@ -80,3 +80,7 @@ def get_settings(
         "theme": "light",
         "language": "en"
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 173c8158186f559b79646d14d17dba2221229be6

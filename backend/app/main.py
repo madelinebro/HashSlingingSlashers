@@ -3,13 +3,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes.database import engine, Base
+#from routes.database import engine, Base
 
-import routes.accounts as accounts
-import routes.transactions as transactions
-import routes.budgets as budgets
-import routes.dashboard as dashboard
-import routes.profile as profile
+import backend.routes.accounts as accounts
+import backend.routes.transactions as transactions
+import backend.routes.budgets as budgets
+import backend.routes.dashboard as dashboard
+import backend.routes.profile as profile
+from backend.routes.database import engine, Base
+
 
 app = FastAPI(title="BloomFi Financial Management API")
 

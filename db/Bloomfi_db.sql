@@ -8,6 +8,11 @@ CREATE TABLE IF NOT EXISTS public.users (
     role VARCHAR(20) DEFAULT 'user', -- 'admin' or 'user'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Users
+INSERT INTO users(username, email, phone_number, password_hash, role)
+VALUES
+('username1', 'user1@example.com', '555-111-2222', 'hashedpassword1', 'user'),
+('username2', 'user2@example.com', '555-222-3333', 'hashedpassword2', 'user');
 
 
 -- Bank Accounts
@@ -18,6 +23,15 @@ CREATE TABLE IF NOT EXISTS public.accounts (
     balance NUMERIC(15,2) DEFAULT 0.00,
     account_display_number VARCHAR(20) -- For masked display like ***4567
 );
+
+
+-- Accounts
+-- =========================
+INSERT INTO accounts (user_id, account_type, balance, account_display_number)
+VALUES
+(1, 'Checking', 2000.00, '***4567'),  -- User 1 Checking
+(1, 'Savings', 5000.00, '***1234'),   -- User 1 Savings
+(2, 'Checking', 1500.00, '***9876');  -- User 2 Checking
 
 
 -- Transactions
@@ -33,64 +47,6 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     state VARCHAR(20)
 	
 );
-
-
-
-INSERT INTO public.transactions
-(accountnumber, transaction_date, transaction_type, amount, description, category, state)
-VALUES
-
-(1, '2025-10-15', 'Withdrawal', 609.46, 'Monthly Home Rent', 'Housing', 'MO'),
-(1, '2025-10-16', 'Withdrawal', 9.99, 'Recurring Payment - Apple', 'Subscription', 'MO'),
-(1, '2025-10-17', 'Deposit', 20.00, 'Cashout Venmo', 'Transfer', 'MO'),
-(1, '2025-10-19', 'Deposit', 1530.12, 'Payroll BloomFi', 'Income', 'MO'),
-(1, '2025-10-20', 'Withdrawal', 429.10, 'Venmo Payment', 'Transfer', 'MO'),
-(1, '2025-10-21', 'Withdrawal', 100.00, 'ATM Withdrawal', 'Cash', 'MO'),
-(1, '2025-10-22', 'Withdrawal', 268.12, 'Payment Amazon Corp', 'Shopping', 'MO'),
-
-(2, '2025-10-24', 'Transfer', 600, 'savings to checking', 'Transfer', 'MO'),
-
-(2, '2025-10-25', 'Withdrawal', 1827.76, 'Fuel Payment', 'Utilities', 'NY'),
-(2, '2025-10-25', 'Deposit', 412.3, 'Cash Deposit', 'Entertainment', 'CA'),
-(2, '2025-10-26 ', 'Transfer', 196.98, 'Transfer Savings to Checking', 'Income', 'MO'),
-(2, '2025-10-27 ', 'Deposit', 1073.99, 'Cash Deposit', 'Shopping', 'MO'),
-(1, '2025-10-17 ', 'Deposit', 1787.41, 'Refund Deposit', 'Entertainment', 'MO'),
-(1, '2025-10-05 ', 'Deposit', 143.3, 'Refund Deposit', 'Groceries', 'CA'),
-(3, '2025-10-14 ', 'Withdrawal', 1201.31, 'Online Purchase', 'Utilities', 'CA'),
-(1, '2025-10-09 ', 'Withdrawal', 1314.63, 'ATM Withdrawal', 'Entertainment', 'NY'),
-(3, '2025-09-19 08:08:49', 'Deposit', 668.9, 'Gift Deposit', 'Bills', 'CA');
-
-
-
-ALTER TABLE public.transactions
-ADD COLUMN user_id INT REFERENCES public.users(user_id) ON DELETE CASCADE;
-UPDATE public.transactions t
-SET user_id = a.user_id
-FROM public.accounts a
-WHERE t.accountnumber = a.accountnumber;
-
-SELECT transaction_id, user_id, accountnumber, amount, description
-FROM public.transactions
-LIMIT 10;
-
-
-
-drop table transactions
-
-
-select * from transactions
-select * from accounts
-
-
-
-
-INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
-(1, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
-(3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO');
-
-
-
-
 
 -- ============================================================
 -- TRIGGER: Automatically update account balances
@@ -108,8 +64,10 @@ INSERT INTO public.transactions (accountnumber, transaction_date, transaction_ty
 -- - If the user has only one account (like User 2), the system will just deduct
 --   money from the source account and skip the deposit step safely
 -- Drop existing trigger and function if they exist
-DROP TRIGGER IF EXISTS update_balance_on_transfer ON transactions;
-DROP FUNCTION IF EXISTS handle_account_transfer;
+DROP TRIGGER IF EXISTS update_balance_on_transfer ON transactions; --run this line first
+
+DROP FUNCTION IF EXISTS handle_account_transfer; --then this
+
 
 -- Create function
 CREATE OR REPLACE FUNCTION handle_account_transfer()
@@ -164,33 +122,6 @@ AFTER INSERT ON transactions
 FOR EACH ROW
 EXECUTE FUNCTION handle_account_transfer();
 
-
-
--- Users
-INSERT INTO users(username, email, phone_number, password_hash, role)
-VALUES
-('username1', 'user1@example.com', '555-111-2222', 'hashedpassword1', 'user'),
-('username2', 'user2@example.com', '555-222-3333', 'hashedpassword2', 'user');
-
-
--- Accounts
--- =========================
-INSERT INTO accounts (user_id, account_type, balance, account_display_number)
-VALUES
-(1, 'Checking', 2000.00, '***4567'),  -- User 1 Checking
-(1, 'Savings', 5000.00, '***1234'),   -- User 1 Savings
-(2, 'Checking', 1500.00, '***9876');  -- User 2 Checking
-
-
-select * from accounts
-
-
-INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
-(2, '2025-10-23','Transfer',9000,'from saving to checking','shoping','MO'),
-(3,'2025-10-25','Deposit',800, 'ATM BOA', 'Shopping','MO');
-INSERT INTO public.transactions (accountnumber, transaction_date, transaction_type, amount, description, category, state) VALUES
-(2, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
-(3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO');
 
 
 
@@ -434,10 +365,54 @@ INSERT INTO public.transactions (accountnumber, transaction_date, transaction_ty
 (3, '2025-12-08 07:22:24', 'Deposit', 600.01, 'Refund Deposit', 'Bills', 'NY'),
 (2, '2025-04-22 22:46:46', 'Transfer', 110.27, 'Transfer Savings to Checking', 'Bills', 'NY'),
 (1, '2025-05-11 19:48:05', 'Withdrawal', 1067.81, 'Online Purchase', 'Transportation', 'CA'),
-(3, '2025-07-23 01:31:17', 'Withdrawal', 1706.8, 'Fuel Payment', 'Transportation', 'CA');
+(3, '2025-07-23 01:31:17', 'Withdrawal', 1706.8, 'Fuel Payment', 'Transportation', 'CA'),
+(2, '2025-10-23','Transfer',9000,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',800, 'ATM BOA', 'Shopping','MO'),
+(2, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO'),
+
+(1, '2025-10-15', 'Withdrawal', 609.46, 'Monthly Home Rent', 'Housing', 'MO'),
+(1, '2025-10-16', 'Withdrawal', 9.99, 'Recurring Payment - Apple', 'Subscription', 'MO'),
+(1, '2025-10-17', 'Deposit', 20.00, 'Cashout Venmo', 'Transfer', 'MO'),
+(1, '2025-10-19', 'Deposit', 1530.12, 'Payroll BloomFi', 'Income', 'MO'),
+(1, '2025-10-20', 'Withdrawal', 429.10, 'Venmo Payment', 'Transfer', 'MO'),
+(1, '2025-10-21', 'Withdrawal', 100.00, 'ATM Withdrawal', 'Cash', 'MO'),
+(1, '2025-10-22', 'Withdrawal', 268.12, 'Payment Amazon Corp', 'Shopping', 'MO'),
+
+(2, '2025-10-24', 'Transfer', 600, 'savings to checking', 'Transfer', 'MO'),
+
+(2, '2025-10-25', 'Withdrawal', 1827.76, 'Fuel Payment', 'Utilities', 'NY'),
+(2, '2025-10-25', 'Deposit', 412.3, 'Cash Deposit', 'Entertainment', 'CA'),
+(2, '2025-10-26 ', 'Transfer', 196.98, 'Transfer Savings to Checking', 'Income', 'MO'),
+(2, '2025-10-27 ', 'Deposit', 1073.99, 'Cash Deposit', 'Shopping', 'MO'),
+(1, '2025-10-17 ', 'Deposit', 1787.41, 'Refund Deposit', 'Entertainment', 'MO'),
+(1, '2025-10-05 ', 'Deposit', 143.3, 'Refund Deposit', 'Groceries', 'CA'),
+(3, '2025-10-14 ', 'Withdrawal', 1201.31, 'Online Purchase', 'Utilities', 'CA'),
+(1, '2025-10-09 ', 'Withdrawal', 1314.63, 'ATM Withdrawal', 'Entertainment', 'NY'),
+(3, '2025-09-19 08:08:49', 'Deposit', 668.9, 'Gift Deposit', 'Bills', 'CA'),
+(1, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO'),
+(2, '2025-10-23','Transfer',9000,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',800, 'ATM BOA', 'Shopping','MO'),
+(2, '2025-10-23','Transfer',10000,'from saving to checking','shoping','MO'),
+(3,'2025-10-25','Deposit',7000, 'ATM BOA', 'Shopping','MO'),
+(2,'2025-11-28','Deposit',25000,'ATM','Car','MO'),
+(1,'2025-09-20','Transfer',3000,'Checking to Saving','Transfer','MO');
+
+
+
+
+ALTER TABLE public.transactions
+ADD COLUMN user_id INT REFERENCES public.users(user_id) ON DELETE CASCADE;
+UPDATE public.transactions t
+SET user_id = a.user_id
+FROM public.accounts a
+WHERE t.accountnumber = a.accountnumber;
+
 
 
 select * from transactions
 
+select * from accounts
 
-
+select * from transactions

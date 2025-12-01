@@ -26,7 +26,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .routes.database import get_db, User
+from backend.routes.database import get_db, User
 from .authorize import get_current_user, validate_csrf
 
 router = APIRouter()
