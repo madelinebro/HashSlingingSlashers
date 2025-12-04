@@ -82,7 +82,7 @@ class Transaction(Base):
 
     transaction_id = Column(Integer, primary_key=True)
     accountnumber = Column(Integer, ForeignKey("accounts.accountnumber", ondelete="CASCADE"))
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))  # ✅ NEW
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))  
     transaction_date = Column(TIMESTAMP, default=datetime.utcnow)
     transaction_type = Column(String(20), nullable=False)
     amount = Column(DECIMAL(12, 2), nullable=False)
