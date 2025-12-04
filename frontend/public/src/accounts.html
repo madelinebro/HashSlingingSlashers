@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+        Financial Management Capstone Project
+        My Accounts
+        Author: Samantha Saunsaucie
+        Date: 10/10/2025
+        -->
+    <!-- Setup and Title -->
+    <title>My Accounts</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/accounts.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js"></script>
+</head>
+
+<!-- The main body of the page, using the dashboard style -->
+
+<body class="dashboard">
+
+    <!-- This is the left sidebar  -->
+    <aside class="sidebar">
+
+        <!-- The BloomFi logo at the top of the sidebar -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- The main navigation menu with links to different pages -->
+        <nav class="sidebar-nav">
+            <!-- Dashboard link  -->
+            <a class="sidebar-nav-item" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <!-- My Accounts link, marked as active since we are on this page -->
+            <a class="sidebar-nav-item active" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <!-- Budgeting link  -->
+            <a class="sidebar-nav-item" href="budgeting_month.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <!-- Transfers link -->
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User profile section that sticks to the bottom of the sidebar -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <!-- The user's profile picture -->
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <!-- Button that shows the user's name and toggles a dropdown menu when clicked -->
+                    <!-- aria-expanded and aria-controls help screen readers understand the button's purpose -->
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <!-- Little arrow icon that indicates there's a dropdown menu -->
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <!-- The dropdown menu that appears when clicking the user's name -->
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- The main content area -->
+    <div class="main-container">
+
+        <!-- Page header with the title and description -->
+        <header class="content-header">
+            <div>
+                <h1 class="page-title">My Accounts</h1>
+                <p class="page-subtitle">Manage and view all your financial accounts</p>
+            </div>
+        </header>
+
+        <!-- Summary section showing overall financial info -->
+        <section class="accounts-summary">
+            <div class="total-overview">
+                <!-- Shows the combined balance of all accounts -->
+                <div class="overview-item">
+                    <span class="overview-label">Total Balance</span>
+                    <span class="overview-value" id="totalBalanceOverview">$7,890.45</span>
+                </div>
+                <!-- Shows how many accounts the user has -->
+                <div class="overview-item">
+                    <span class="overview-label">Total Accounts</span>
+                    <span class="overview-value" id="totalAccounts">2</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- The main section where individual account cards will be displayed -->
+        <main>
+            <section class="accounts-grid" id="accountsGrid">
+                <!-- This section starts empty, JavaScript will add account cards here dynamically -->
+            </section>
+        </main>
+
+        <!-- Pop up window that shows when you click to view transactions for a specific account -->
+        <div id="transactionModal" class="modal">
+            <div class="modal-content">
+
+                <!-- Top part of the pop-up with the account name and close button -->
+                <div class="modal-header">
+                    <div>
+                        <!-- This will show which account's transactions you are viewing -->
+                        <h2 id="modalAccountName">Account Transactions</h2>
+                        <!-- This will show the account number -->
+                        <p class="modal-subtitle" id="modalAccountNumber"></p>
+                    </div>
+                    <!-- X button to close the pop up window -->
+                    <button class="modal-close" onclick="closeTransactionModal()">&times;</button>
+                </div>
+
+                <!-- Main body of the pop up with filters and the transaction list -->
+                <div class="modal-body">
+
+                    <!-- Filter controls at the top of the transaction view -->
+                    <div class="modal-filters">
+                        <!-- Date range selector to filter which transactions you see -->
+                        <!-- Clicking this opens another pop-up to choose dates -->
+                        <div class="date-range-picker" onclick="openDatePickerModal()"
+                            title="Click to change date range">
+                            <span class="date-icon">📅</span>
+                            <span class="date-range-dates" id="modalDateRange">Last 30 days</span>
+                        </div>
+                        <!-- Shows the current balance for this specific account -->
+                        <div class="modal-balance">
+                            <span class="modal-balance-label">Current Balance:</span>
+                            <span class="modal-balance-value" id="modalBalance">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- The actual table displaying all the transactions -->
+                    <div class="transaction-table">
+                        <table class="tt">
+                            <!-- Column headers for the transaction table -->
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <!-- Table body where transaction rows will be added by JavaScript -->
+                            <tbody id="modalTxBody">
+                                <!-- Starts empty, transactions get added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation footer that only shows on mobile devices -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
+</body>
+
+</html>

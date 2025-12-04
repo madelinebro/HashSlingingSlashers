@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+        Financial Management Capstone Project
+        Create Account 
+        Author: Samantha Saunsaucie
+        Date: 10/10/2025
+        -->
+    <!-- Setup and Title -->
+    <title>Create Your Account</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/register.js" defer></script>
+
+</head>
+
+<!-- Main area for Register Container -->
+
+<body>
+    <!-- Logo that stays visible at the top of the page -->
+    <div class="floating-logo">
+        <img src="images/logo.svg" alt="BloomFi Logo" />
+    </div>
+
+    <!-- Main container that holds the entire registration card -->
+    <div class="register-container">
+        <!-- The card that contains both left and right panels -->
+        <div class="register-card">
+
+            <!-- Left side panel with welcome message -->
+            <div class="register-left-panel">
+                <div class="forgot-icon">✨</div>
+                <h2>Create Your Account</h2>
+                <h3>Join BloomFi and start managing your finances today!</h3>
+            </div>
+
+            <!-- Right side panel with the actual registration form -->
+            <div class="register-right-panel">
+
+                <!-- Header section with title and description -->
+                <div class="register-header">
+                    <h1>Get Started</h1>
+                    <p>Enter your information to create your account</p>
+                </div>
+
+                <!-- The form where users enter their registration information -->
+                <form id="registerForm" class="register-form" novalidate>
+
+                    <!-- First row: Full name field that takes up the entire width -->
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="👤 Full Name"
+                                autocomplete="name" required />
+                        </div>
+                    </div>
+
+                    <!-- Second row: Username and phone number side by side -->
+                    <div class="form-row">
+                        <!-- Username field on the left -->
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="username" name="username" placeholder="🔑 Username"
+                                    autocomplete="username" required />
+                            </div>
+                        </div>
+
+                        <!-- Phone number field on the right -->
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="📱 Phone Number" autocomplete="tel"
+                                inputmode="tel" required />
+                        </div>
+                    </div>
+
+                    <!-- Third row: Email field takes up the entire width -->
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="📧 Email" autocomplete="email"
+                                required />
+                        </div>
+                    </div>
+
+                    <!-- Fourth row: Password and confirm password side by side -->
+                    <div class="form-row">
+                        <!-- Password field on the left with show/hide eye button -->
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="password" name="password" placeholder="🔒 Password"
+                                    autocomplete="new-password" required />
+                                <!-- Button to toggle password visibility with eye icon -->
+                                <button type="button" class="toggle-btn" id="passwordToggle"
+                                    aria-label="Toggle password visibility">
+                                    <img src="images/Eye off.svg" alt="Show password" class="eye-icon" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm password field on the right with show/hide eye button -->
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="confirmPassword" name="confirmPassword"
+                                    placeholder="🔒 Confirm Password" autocomplete="new-password" required />
+                                <!-- Button to toggle confirm password visibility with eye icon -->
+                                <button type="button" class="toggle-btn" id="confirmPasswordToggle"
+                                    aria-label="Toggle password visibility">
+                                    <img src="images/Eye off.svg" alt="Show password" class="eye-icon" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit button to create the account -->
+                    <button type="submit" class="btn">
+                        <img src="images/Log in.svg" alt="" class="btn-icon" />
+                        Create Account
+                    </button>
+                </form>
+
+                <!-- Link at the bottom for users who already have an account -->
+                <div class="register-links">
+                    <p>Already have an account? <a href="login.html">Log in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

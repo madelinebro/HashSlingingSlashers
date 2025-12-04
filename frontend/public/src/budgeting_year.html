@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+        Financial Management Capstone Project
+        Yearly Budget
+        Author: Samantha Saunsaucie
+        Date: 10/11/2025
+        -->
+    <!-- Setup and Title -->
+    <title>Yearly Budget</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/budgeting.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js" defer></script>
+</head>
+
+<!-- The main body of the page -->
+
+<body class="dashboard">
+
+    <!-- This is the left sidebar that shows on desktop and larger screens -->
+    <aside class="sidebar">
+
+        <!-- The BloomFi logo at the top of the sidebar -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- The main navigation menu with links to different pages -->
+        <nav class="sidebar-nav">
+            <!-- Dashboard link -->
+            <a class="sidebar-nav-item" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <!-- My Accounts link -->
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <!-- Budgeting link, marked as active since we're on this page -->
+            <a class="sidebar-nav-item active" href="budgeting_year.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <!-- Transfers link -->
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User profile section that sticks to the bottom of the sidebar -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <!-- The user's profile picture -->
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <!-- Button that shows the user's name and toggles a dropdown menu when clicked -->
+                    <!-- aria-expanded and aria-controls help screen readers understand the button's purpose -->
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <!-- Little arrow icon that indicates there is a dropdown menu -->
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <!-- The dropdown menu that appears when clicking the user's name -->
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- The main content area for the yearly budget page -->
+    <div class="main-container">
+
+        <!-- Page header with the title and description -->
+        <header class="content-header">
+            <h1 class="page-title">Yearly Budget</h1>
+            <p class="page-subtitle">Annual spending overview and planning</p>
+        </header>
+
+        <!-- Tab buttons to switch between viewing weekly, monthly, or yearly budgets -->
+        <div class="budget-tabs">
+            <button class="budget-tab-btn" data-period="week">Week</button>
+            <button class="budget-tab-btn" data-period="month">Month</button>
+            <!-- The year button is marked as active since we are viewing the yearly budget -->
+            <button class="budget-tab-btn active" data-period="year">Year</button>
+        </div>
+
+        <!-- Grid showing key yearly statistics -->
+        <div class="yearly-overview-grid" id="yearlyOverviewGrid">
+        </div>
+
+        <!-- Section that shows a detailed breakdown of spending for the entire year -->
+        <section class="budget-summary-card">
+            <!-- Header with the year selector controls -->
+            <div class="section-header-with-actions">
+                <h2>Yearly Spending Summary</h2>
+                <!-- Controls to switch between different years -->
+                <div class="year-selector">
+                    <!-- Button to go back and view the previous year -->
+                    <button class="year-nav-btn" id="prevYearBtn">←</button>
+                    <!-- Shows which year your ae currently viewing -->
+                    <span class="current-year" id="currentYear">2025</span>
+                    <!-- Button to move forward and view the next year -->
+                    <button class="year-nav-btn" id="nextYearBtn">→</button>
+                </div>
+            </div>
+
+            <!-- Table showing spending broken down by category for the whole year -->
+            <div class="budget-table-wrapper">
+                <table class="budget-table yearly-table">
+                    <!-- Column headers for the yearly breakdown table -->
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Annual Amount</th>
+                            <th>Monthly Avg</th>
+                            <th>% of Total</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <!-- Table body where category rows will be added by JavaScript -->
+                    <tbody id="yearlyTableBody"></tbody>
+                    <tfoot id="yearlyTableFooter"></tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section showing how spending varied month to month throughout the year -->
+        <section class="monthly-breakdown-card">
+            <h2>Monthly Breakdown</h2>
+            <p class="section-subtitle">Spending patterns throughout the year</p>
+
+            <!-- Grid displaying a card for each month of the year -->
+            <div class="months-grid" id="monthsGrid">
+            </div>
+        </section>
+
+        <!-- Section providing helpful insights and observations about the year's spending -->
+        <section class="insights-card">
+            <h2>📌 Year-End Insights</h2>
+            <!-- Grid of insight cards with personalized observations -->
+            <div class="insights-grid" id="insightsGrid">
+            </div>
+        </section>
+    </div>
+
+    <!-- Navigation footer that only shows on mobile devices -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
+</body>
+
+</html>

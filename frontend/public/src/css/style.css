@@ -1,0 +1,6828 @@
+:root {
+  /* Main Theme Colors for Web and Mobile Across the Board */
+  /* Primary brand color */
+  --primary: #0d9488;
+ 
+  /* Secondary / Info */
+  --secondary: #6691F1;
+
+  /* Success / Positive */
+  --success: #10b981;
+  
+  /* Accent / Highlight */
+  --highlight: #84cc16;
+  
+  /* Warning / Negative */
+  --warning: #cf5e44;
+  
+  /* Color of the buttons before hover */
+  --button: #999999;
+  
+
+  /* Neutral Light Mode  */
+  /* Background / Neutral */
+  --background: #f9fafb;
+
+  /* Text / Dark tone */
+  --text: #140c17;
+
+  
+
+  /* CONSISTENT CARD SPACING */
+  /* Max width for auth cards */
+  --card-max-width: 1900px;
+  /* Horizontal padding inside cards */
+  --card-horizontal-padding: 60px;
+  /* Vertical padding inside cards */
+  --card-vertical-padding: 60px;
+  /* Distance from logo to card */
+  --card-top-margin: 100px;
+  /* shared card height */
+  --auth-card-height: 85vh;
+  
+  /* Max width for pages */
+  --page-max: clamp(1600px, 96vw, 2100px);
+  /* Gutter spacing */
+  --gutter: clamp(40px, 5.5vw, 96px);
+
+  /* MOBILE DESIGN SYSTEM */
+  /* Typography for mobile */
+  --mobile-h1: 1.75rem;
+  --mobile-h2: 1.5rem;
+  --mobile-h3: 1.25rem;
+  --mobile-label: 0.95rem;
+  --mobile-body: 0.95rem;
+  --mobile-small: 0.8rem;
+
+  /* Spacing for mobile */
+  --mobile-padding: 16px;
+  --mobile-gap: 12px;
+  --mobile-margin: 16px;
+  --mobile-radius: 12px;
+}
+
+/* Hide footer on desktop */
+@media (min-width: 769px) {
+  .mobile-footer {
+    display: none !important;
+  }
+}
+
+/* ============== Universal Mobile Styles ============== */
+@media (max-width: 768px) {
+  /* Base mobile typography */
+  h1 { font-size: var(--mobile-h1); }
+  h2 { font-size: var(--mobile-h2); }
+  h3 { font-size: var(--mobile-h3); }
+  label { font-size: var(--mobile-label); }
+  body { font-size: var(--mobile-body); }
+  
+  /* Consistent card padding across all cards */
+  [class*="card"] {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+  
+  /* Consistent gap spacing */
+  [class*="grid"],
+  [class*="flex"],
+  [class*="list"] {
+    gap: var(--mobile-gap);
+  }
+  
+  /* Consistent button sizing */
+  button, .btn {
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    border-radius: var(--mobile-radius);
+  }
+  
+  /* Consistent input sizing */
+  input, select, textarea {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+}
+
+
+/* Set base font size for all pages */
+html {
+  font-size: 18px;
+}
+
+/*================================== Styling for Logo =====================================*/
+
+/* Floating BloomFi logo in top-left corner */
+.floating-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.floating-logo img {
+  height: 200px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+/*=================================================================================== Styling for Login Page==================================================================================*/
+/* Basic Body setup */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  color: var(--text);
+  margin: 0;
+  font-size: 16px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Background decorative, floating circles */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.15;
+  background: white;
+  pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+}
+/* First Circle-- top right */
+body::before {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  right: -150px;
+}
+
+/* Second circle (bottom-left) */
+body::after {
+  width: 450px;
+  height: 450px;
+  bottom: -150px;
+  left: -120px;
+  animation-delay: 1s;
+}
+
+/* Additional decorative circles on login container */
+.login-container::before,
+.login-container::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+/* First Circle */
+.login-container::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+/* Second Circle */
+.login-container::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+/* Centers the login form both veritcally and horizontally */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--card-vertical-padding) var(--card-horizontal-padding);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--card-top-margin) + 20px); /* Space for floating logo */
+}
+
+/* Main login card (has the two-panel layout) */
+.login-card {
+  display: flex;
+  max-width: var(--card-max-width);
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  height: var(--auth-card-height);
+}
+
+/*================================== Left Panel Styling for Log In =====================================*/
+/* Main left panel container */
+.left-panel {
+  flex: 1;
+  background: var(--secondary);
+  padding: 100px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+}
+/* Adds a white circle that is see through in left panel */
+.left-panel::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -140px;
+  right: -140px;
+}
+
+/* Heading styling within the left panel */
+.left-panel h2 {
+  font-size: 60px;
+  margin-bottom: 30px;
+  z-index: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Paragraph text inside the left panel */
+.left-panel p {
+  font-size: 35px;
+  line-height: 1.7;
+  text-align: center;
+  opacity: 0.95;
+  z-index: 1;
+  max-width: 700px;
+}
+
+/* Circle icon above the login title */
+.login-icon {
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  color: white;
+  font-size: 65px;
+}
+
+/*================================== Right Panel (Login Form) =====================================*/
+/* Main container for the login form */
+.right-panel {
+  flex: 1;
+  padding: 100px 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--background);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Login Header section */
+.login-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+/* Main title and subtitle inside the header */
+.login-header h1 {
+  font-size: 60px;
+  color: var(--text);
+  margin-bottom: 12px;
+  margin-top: 0;
+  font-weight: 600;
+}
+
+.login-header p {
+  color: var(--text);
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 30px;
+}
+
+/* Login form container for all form elements */
+.login-form {
+  width: 100%;
+  margin-bottom: 25px;
+}
+/* Wrapper for input fields-- used for positioning icons inside input fields */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Form group for labels and inputs */
+.form-group {
+  margin-bottom: 35px;
+  text-align: left;
+}
+
+/* Labels above each input */
+.form-group label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 30px;
+}
+
+/* Input focus effect (when the user clicks into the field) */
+.form-group input:focus,
+.login-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+/* Error state for inputs */
+.form-group input[aria-invalid="true"],
+.login-form input[aria-invalid="true"] {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 4px rgba(207, 94, 68, 0.1);
+}
+
+/* Error message styling */
+.error-message {
+  color: var(--warning);
+  font-size: 14px;
+  margin-top: 8px;
+  display: block;
+  font-weight: 500;
+}
+
+/* Placeholder text color inside input fields */
+.form-group input::placeholder,
+.login-form input::placeholder {
+  color: #a0aec0;
+}
+
+/* Input field styling */
+.form-group input,
+.login-form input {
+  width: 100%;
+  padding: 18px 20px;
+  font-weight: 500;
+  font-size: 28px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Toggle button styling */
+.toggle-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+/* Makes the toggle button slightly transparent when hovered */
+.toggle-btn:hover {
+  opacity: 0.7;
+}
+
+/* Uses focus state for accessibility and removes outline and adds spacing */
+.toggle-btn:focus {
+  outline-offset: 2px;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Icon Styling */
+.eye-icon,
+.toggle-icon {
+  width: 55px;
+  height: 55px;
+  display: block;
+  pointer-events: none;
+  /* Adds a subtle teal/gray accent to the SVG icon */
+  filter: brightness(0) saturate(100%) invert(44%) sepia(10%) saturate(450%) hue-rotate(169deg) brightness(95%) contrast(87%);
+  transition: filter 0.3s ease;
+}
+
+/* Hover effect-- change color to warmer highlight color-- hard to change color of imported icon */
+.toggle-btn:hover .eye-icon,
+.toggle-btn:hover .toggle-icon {
+  filter: brightness(0) saturate(100%) invert(70%) sepia(65%) saturate(450%) hue-rotate(40deg) brightness(95%) contrast(87%);
+}
+
+/* Login button Styling */
+.login-form .btn,
+.btn {
+  width: 100%;
+  padding: 22px;
+  margin-top: 15px;
+  background: var(--button);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 35px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Icon on right side */
+  flex-direction: row-reverse;
+  gap: 14px;
+  
+}
+
+/* Button icon styling */
+.btn-icon {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  /* Filter to change icon color to match button text */
+  filter: brightness(0) saturate(100%) invert(11%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(96%) contrast(89%);
+  transform: translateY(4px);
+}
+
+/* Hover state for login button-- lifts up slightly and changes color */
+.login-form .btn:hover,
+.btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
+}
+
+.login-form .btn:active,
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Links Styling-- Forgot Password, Create Account, Forgot Username */
+.links {
+  font-size: 25px;
+  color: var(--text);
+  margin-top: 28px;
+  text-align: center;
+}
+
+/* Defines text color for links */
+.links a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* Create hover effect for links and underlines them */
+.links a:hover {
+  color: var(--highlight);
+  text-decoration: underline;
+}
+
+/* Spacing between link elements */
+.links span {
+  margin: 0 10px;
+  color: var(--text);
+}
+
+.links p {
+  margin-top: 22px;
+  font-size: 25px;
+  color: var(--text);
+}
+
+.links p a {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.links p a:hover {
+  color: var(--highlight);
+}
+
+/* ====================== Login Mobile Styling ==================== */
+@media (max-width: 768px) {
+
+  /* Page and logo adjustments */
+  header { 
+    height: 70px; 
+  }
+  .logo img { 
+    height: 40px; 
+  }
+
+  .floating-logo {
+    top: 10px;
+    left: 12px;
+  }
+  .floating-logo img {
+    height: 85px;
+  }
+
+  /* Simplify background decorations bc smaller screen */
+  body::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -75px;
+  }
+  body::after {
+    width: 225px;
+    height: 225px;
+    bottom: -75px;
+    left: -60px;
+  }
+  .login-container::before,
+  .login-container::after { display: none; }
+
+  /* Make the login container take more horizontal space */
+  .login-container {
+    padding: 20px;                  
+    padding-top: 70px; 
+    padding-bottom: 20px !important;
+    
+  }
+
+  /* Card sizing & appearance */
+  .login-card {
+    width: 100%;
+    max-width: 520px;              
+    min-height: 70vh;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 36px var(--secondary);
+    margin: 0 auto;                 /* center horizontally */
+    overflow: hidden;
+    height: auto;                   /* allow content to set height */
+  }
+
+  /* Hide large left panel on small screens */
+  .left-panel { display: none; }
+  .left-panel::before,
+  .left-panel h2,
+  .left-panel p { display: none; }
+
+  /* ===== Right panel Styling ===== */
+  .right-panel {
+    padding: var(--mobile-padding);
+    background: var(--background);
+    border-radius: var(--mobile-radius);
+  }
+  .login-header {
+    margin-bottom: 32px;
+    margin-top: 0;
+  }
+  .login-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: var(--mobile-gap);
+  }
+  .login-header h1 { 
+    font-size: var(--mobile-h2); 
+    margin-bottom: 8px; 
+  }
+  .login-header p { 
+    font-size: var(--mobile-body); 
+  }
+
+  /* Form spacing */
+  .form-group {
+    margin-bottom: var(--mobile-margin); 
+  }
+  .form-group label {
+    font-size: var(--mobile-label);
+    margin-bottom: 8px;
+  }
+
+  /* Inputs */
+  .form-group input,
+  .login-form input {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    padding-right: 52px;
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Error messaging on mobile */
+  .error-message {
+    font-size: var(--mobile-small);
+    margin-top: 6px;
+  }
+
+  /* Toggle button placement and size */
+  .toggle-btn {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    right: 14px;                    
+    padding: 6px;                   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+  }
+
+  /* Force identical sizes for toggle images */
+  .toggle-btn img,
+  .eye-icon,
+  .toggle-icon {
+    width: 28px !important;          
+    height: 28px !important;
+    display: block;
+    pointer-events: none;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(44%) sepia(10%) saturate(450%) hue-rotate(169deg) brightness(95%) contrast(87%);
+    transition: filter 0.25s ease;
+  }
+  .toggle-btn:hover .eye-icon,
+  .toggle-btn:hover .toggle-icon {
+    filter: brightness(0) saturate(100%) invert(70%) sepia(65%) saturate(450%) hue-rotate(40deg) brightness(95%) contrast(87%);
+  }
+
+  /* Login button adjustments */
+  .login-form .btn,
+  .btn {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
+  }
+  .btn-icon {
+    width: 24px;
+    height: 24px;
+    transform: translateY(2.7px);
+  }
+
+  /* Links adjustments */
+  .links { 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
+    text-align: center; 
+  }
+  .links span { 
+    margin: 0 0px; 
+  }
+  .links p {
+    display: none; 
+  }
+
+}
+
+/*============================================================================Create Account (Register) Styling ===================================================================================== */
+/* Layout similar to Log In, centered on the screen */
+
+/* Additional decorative circles on login container */
+.register-container::before,
+.register-container::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.register-container::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+
+.register-container::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--card-vertical-padding) var(--card-horizontal-padding);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--card-top-margin) + 20px);
+}
+
+/* Card container for registration -- two panel layout */
+.register-card {
+  display: flex;
+  max-width: var(--card-max-width);
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  height: var(--auth-card-height);
+}
+
+/* ======================================================== Left Panel for Register ======================================================================================== */
+.register-left-panel {
+  flex: 1;
+  background: var(--secondary);
+  padding: 100px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+}
+
+.register-left-panel::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -140px;
+  right: -140px;
+}
+
+.register-left-panel h2 {
+  font-size: 60px;
+  margin-bottom: 30px;
+  z-index: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+.register-left-panel h3 {
+  font-size: 35px;
+  line-height: 1.7;
+  text-align: center;
+  opacity: 0.95;
+  z-index: 1;
+  max-width: 700px;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* =========================================================================== Right Panel (Form) for Register ==========================================================*/
+.register-right-panel {
+  flex: 1;
+  padding: 100px 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--background);
+  overflow-y: auto;
+  min-height: 0;
+  /* allows scrolling inside flex item */
+}
+
+/* Allow full-width rows (Full Name and Email) to span on both columns */
+.form-row .form-group.full {
+  grid-column: span 2;
+}
+
+.form-group.full input {
+  width: 100%;
+}
+
+/* Right-side line above the form */
+.register-header {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 36px;
+}
+
+.register-header h1 {
+  font-size: 60px;
+  color: var(--text);
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.register-header p {
+  color: var(--text);
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 30px;
+}
+
+/* Register form container */
+.register-form {
+  width: 100%;
+}
+
+/* Two-column grid for form fields */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+/* Individual form groups within register */
+.register-form .form-group {
+  margin-bottom: 0;
+}
+
+.register-form .form-group label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 30px;
+}
+
+/* Register form input fields */
+.register-form input {
+  width: 100%;
+  padding: 20px 22px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 25px;
+  transition: all 0.3s ease;
+  outline: none;
+  background: white;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+/* Register form inputs with toggle buttons (password fields) */
+.register-form .input-wrapper input {
+  padding: 20px 60px 20px 22px;
+}
+
+.register-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.register-form input::placeholder {
+  color: #a0aec0;
+}
+
+/* Activate Account Button */
+.register-form .btn {
+  width: 100%;
+  padding: 22px;
+  margin-top: 15px;
+  background: var(--button);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 35px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 14px;
+}
+
+/* Activate Account Button Hover highlight */
+.register-form .btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
+}
+
+.register-form .btn:active {
+  transform: translateY(0);
+}
+
+/* Link styling for register */
+.register-links {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 25px;
+  color: var(--text);
+}
+
+.register-links a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-links a:hover {
+  color: var(--highlight);
+  text-decoration: underline;
+}
+
+/*=========================================================================Dashboard Settings================================================================================================= */
+/* Main Dashboard Body Style */
+body.dashboard {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  display: flex;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background decorative circles */
+body.dashboard::before,
+body.dashboard::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.15;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+body.dashboard::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+
+body.dashboard::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+/* Animation for floating circles */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+/* ============== Left Navivation Sidebar Styling  ============== */
+.sidebar {
+  width: 450px;
+  background: white;
+  border-right: 1px solid var(--secondary);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  z-index: 1000;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Floating BloomFi logo in top-left corner */
+.sidebar-logo {
+  padding: 40px 24px 36px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-logo img {
+  max-width: 360px;
+  height: auto;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.76rem;
+  transition: all 0.2s ease;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--highlight);
+  color: var(--text);
+}
+
+/* For active page display */
+.sidebar-nav-item.active {
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.nav-icon {
+  font-size: 2rem;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========= Sidebar User Profile at Bottom ======== */
+.sidebar-user {
+  padding: 28px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.sidebar-user-info img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.sidebar-user-details {
+  flex: 1;
+  position: relative;
+}
+
+.sidebar-user-name {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-user-name .chev {
+  width: 35px;
+  height: 35px;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-user-name:hover .chev {
+  opacity: 1;
+  color: var(--highlight);
+}
+
+.sidebar-user-menu {
+  position: absolute;
+  bottom: calc(100% + 25px);
+  left: 0;
+  display: none;
+  min-width: 300px;
+  background: var(--secondary);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 10px 0;
+  z-index: 1000;
+  border: 1px solid #e5e7eb;
+}
+
+.sidebar-user-menu a {
+  display: block;
+  padding: 16px 24px;
+  color: white;
+  text-decoration: none;
+  font-size: 1.35rem;
+  transition: background 0.2s;
+}
+
+.sidebar-user-menu a:hover {
+  background: #f3f4f6;
+  color: var(--primary);
+}
+
+/* =================== Main Content Area ================= */
+.main-container {
+  margin-left: 470px;
+  flex: 1;
+  width: calc(100% - 320px);
+  padding: 32px 36px;
+  background: transparent;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+}
+
+/* Content Header */
+.content-header {
+  margin-bottom: 48px;
+}
+
+.page-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-subtitle {
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ============== Top section of dashboard, category spending chat styles  ============== */
+.dashboard-top-section {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+/* Main chart card container */
+.spending-chart-card {
+  background: linear-gradient(135deg, 
+    rgba(20, 184, 166, 0.1) 0%, 
+    rgba(59, 130, 246, 0.1) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px var(--secondary);
+  height: fit-content;
+}
+
+/* Chart header section */
+.chart-header {
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+}
+
+.chart-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 6px 0;
+}
+
+.chart-subtitle {
+  font-size: 1.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* Chart container */
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Individual chart bar item */
+.chart-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Label row showing category name and amount */
+.chart-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.chart-category-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.chart-bar-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Bar container and fill */
+.chart-bar-container {
+  width: 100%;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.chart-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(20, 184, 166, 0.8) 0%, 
+    rgba(20, 184, 166, 1) 100%);
+  border-radius: 8px;
+  transition: width 0.6s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  position: relative;
+}
+
+.chart-bar-percentage {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Category-specific bar colors */
+.bills-bar {
+  background: linear-gradient(90deg, 
+    rgba(239, 68, 68, 0.8) 0%, 
+    rgba(239, 68, 68, 1) 100%);
+}
+
+.shopping-bar {
+  background: linear-gradient(90deg, 
+    rgba(251, 146, 60, 0.8) 0%, 
+    rgba(251, 146, 60, 1) 100%);
+}
+
+.transport-bar {
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.8) 0%, 
+    rgba(245, 158, 11, 1) 100%);
+}
+
+.groceries-bar {
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.8) 0%, 
+    rgba(16, 185, 129, 1) 100%);
+}
+
+.food-bar {
+  background: linear-gradient(90deg, 
+    rgba(59, 130, 246, 0.8) 0%, 
+    rgba(59, 130, 246, 1) 100%);
+}
+
+.entertainment-bar {
+  background: linear-gradient(90deg, 
+    rgba(168, 85, 247, 0.8) 0%, 
+    rgba(168, 85, 247, 1) 100%);
+}
+
+.other-bar {
+  background: linear-gradient(90deg, 
+    rgba(107, 114, 128, 0.8) 0%, 
+    rgba(107, 114, 128, 1) 100%);
+}
+
+/* Category dots matching the bar colors */
+.category-dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.category-dot.bills {
+  background-color: #ef4444;
+}
+
+.category-dot.shopping {
+  background-color: #fb923c;
+}
+
+.category-dot.transport {
+  background-color: #f59e0b;
+}
+
+.category-dot.groceries {
+  background-color: #10b981;
+}
+
+.category-dot.food {
+  background-color: #3b82f6;
+}
+
+.category-dot.entertainment {
+  background-color: #a855f7;
+}
+
+.category-dot.other {
+  background-color: #6b7280;
+}
+
+
+@media (max-width: 768px) {
+  .spending-chart-card {
+    padding: 20px;
+  }
+  
+  .chart-container {
+    gap: 16px;
+  }
+  
+  .chart-bar-label {
+    font-size: 0.9rem;
+  }
+  
+  .chart-bar-value {
+    font-size: 0.9rem;
+  }
+  
+  .chart-bar-container {
+    height: 24px;
+  }
+  
+  .chart-bar-percentage {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============== Account Summary Card-- Shows user's combinded totals for each account and user can navigate to their accounts from this card ============== */
+.account-summary-card {
+  background: var(--secondary);
+  color: white;
+  border-radius: 22px;
+  padding: 44px 36px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.summary-title {
+  font-size: 2.5rem;
+  margin: 0 0 20px 0;
+  color: var(--background);
+  text-align: left;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+.total-balance {
+  font-size: 3.75rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  text-align: left;
+  color: var(--background);
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard .balance-label {
+  font-size: 1.7rem;
+  opacity: 0.85;
+  text-align: left;
+  color: var(--background);
+  margin-bottom: 32px;
+}
+
+
+/* Account Chips Inside Card-- for example checking and savings */
+.account-chips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex: 1;
+}
+
+.account-chip-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.account-dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.account-dot.teal {
+  background: darkgreen;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.account-dot.blue {
+  background: darkblue;
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+}
+
+.chip-label {
+  font-size: 1.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.chip-number {
+  font-size: 1.6rem;
+  opacity: 0.85;
+}
+
+.summary-footer {
+  margin-top: auto;
+}
+
+/* Navigate to Accounts Page Button*/
+.see-accounts-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: white;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.6rem;
+  padding: 13px 0px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.see-accounts-btn:hover {
+  background: var(--highlight);
+  transform: translateY(4px);
+  color: rgba(255, 255, 255, 0.856);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ============== Transaction Table Styling-- shows recent transactions ============== */
+/* and user can navigate to their accounts page to view more transactions from here */
+main {
+  max-width: 100%;
+}
+
+.transaction-card {
+  background: white;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  border-left: 10px solid var(--highlight);
+  padding: 36px 32px;
+  margin-bottom: 50px;
+  box-shadow: 0 8px 24px var(--secondary);
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.transaction-title {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.transaction-card h2 {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Shows number of transactions */
+.transaction-badge {
+  background: var(--secondary);
+  color: white;
+  font-size: 1.3rem;
+  padding: 8px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.transaction-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+/* ======= Calendar and Filter Buttons Styling ====== */
+.date-range-picker,
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 34px;
+  height: 64px;
+  background: var(--background);
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  justify-content: center;
+}
+
+.date-range-picker {
+  min-width: 260px;
+}
+
+.filter-btn {
+  min-width: 150px;
+  background: var(--background);
+}
+
+.date-range-picker:hover,
+.filter-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.date-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.date-range-dates {
+  font-size: 1.7rem;
+}
+
+/* ============== Transaction Table and text, rows, columns etc.. =========== */
+.transaction-table {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.tt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.1rem;
+}
+
+.tt th {
+  text-align: left;
+  padding: 20px 24px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tt td {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.tt tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tt tbody tr:hover {
+  background: #f9fafb;
+}
+
+.tt .neg {
+  color: var(--warning);
+  font-weight: 700;
+}
+
+.tt .pos {
+  color: #0fd12c;
+  font-weight: 700;
+}
+
+.view-more-t {
+  text-align: center;
+  margin: 32px 0 0;
+}
+
+.view-more-t a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.5rem;
+  transition: all 0.2s;
+}
+
+.view-more-t a:hover {
+  color: var(--highlight);
+  text-decoration: underline;
+}
+
+/* ============================================================================= Chatbot Styling ======================================================================================== */
+.chatbot {
+  position: fixed;
+  right: 40px;
+  bottom: 40px;
+  background: var(--primary);
+  color: white;
+  border: 3px solid var(--primary);
+  padding: 24px 48px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(13, 148, 136, 0.35);
+  transition: all 0.3s;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chatbot:hover {
+  background: var(--highlight);
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px var(--primary);
+}
+
+/* Chatbot Window */
+.chatbot-window {
+  position: fixed;
+  right: 40px;
+  bottom: 40px;
+  width: 800px;
+  height: 800px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: none;
+  flex-direction: column;
+  z-index: 101;
+  overflow: hidden;
+}
+
+.chatbot-window.active {
+  display: flex;
+}
+
+/* Chatbot Header */
+.chatbot-header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+.chatbot-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Chatbot Avatar */
+.chatbot-avatar {
+  width: 55px;
+  height: 55px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.chatbot-header h3 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+/* Status-- Online or Offline*/
+.chatbot-status {
+  margin: 0;
+  font-size: 1.6rem;
+  opacity: 0.9;
+}
+
+.chatbot-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 3rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  line-height: 1;
+}
+
+.chatbot-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* Messages Area */
+.chatbot-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Message Bubble */
+.chatbot-message {
+  display: flex;
+  gap: 12px;
+  animation: slideIn 0.3s ease;
+}
+
+/* Animation for message bubbles appearing on screen */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chabot Avatar backgroun */
+.message-avatar {
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.user-message .message-avatar {
+  background: var(--secondary);
+}
+
+.message-content {
+  flex: 1;
+}
+
+/* Messages styling */
+.message-content p {
+  margin: 0;
+  padding: 18px 20px;
+  background: white;
+  border-radius: 12px;
+  font-size: 1.7rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.user-message .message-content p {
+  background: var(--secondary);
+  color: white;
+}
+
+/*Time of messages*/
+.message-time {
+  font-size: 1.4rem;
+  color: #6c757d;
+  margin-top: 4px;
+  display: block;
+  padding-left: 16px;
+}
+
+.user-message {
+  flex-direction: row-reverse;
+}
+
+.user-message .message-time {
+  text-align: right;
+  padding-right: 16px;
+  padding-left: 0;
+}
+
+/* Input Area */
+.chatbot-input-area {
+  padding: 24px;
+  background: white;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  gap: 14px;
+}
+
+.chatbot-input {
+  flex: 1;
+  padding: 16px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 25px;
+  font-size: 1.6rem;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.chatbot-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.chatbot-send {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 2.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.chatbot-send:hover {
+  background: var(--secondary);
+  transform: scale(1.1);
+}
+
+.chatbot-send:active {
+  transform: scale(0.95);
+}
+
+/* Scrollbar Styling */
+.chatbot-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ===================================================== Chatbot Mobile Styling =====================================================*/
+@media (max-width: 768px) {
+  .chatbot {
+    right: 20px;
+    bottom: 20px;
+    padding: 18px 36px;
+    font-size: 1.2rem;
+  }
+  
+  .chatbot-window {
+    right: 16px;
+    bottom: 100px;
+    width: 90%;
+    max-width: 360px;
+    height: 500px;
+    border-radius: 20px;
+    z-index: 1000;
+  }
+
+  .chatbot-header {
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+
+  .chatbot-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .chatbot-status {
+    font-size: 0.95rem;
+  }
+
+  .chatbot-close {
+    width: 35px;
+    height: 35px;
+    font-size: 2rem;
+  }
+
+  .chatbot-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+
+  .chatbot-messages {
+    padding: 12px;
+    gap: 12px;
+    flex-shrink: 1;
+    min-height: 0;
+  }
+
+  .chatbot-input-area {
+    padding: 8px 10px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .chatbot-input {
+    padding: 8px 12px;
+    font-size: 1.1rem;
+  }
+
+  .chatbot-send {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .message-content p {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+
+  .message-time {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============== Modal Styles: used in date picker modal and filter modal for example ============== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 750px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 36px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 4rem;
+  color: #6b7280;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+  color: var(--text);
+}
+
+.modal-body {
+  padding: 36px 40px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ============== DATE PICKER MODAL ============== */
+
+/* Quick Filters at Top */
+.quick-filters-top {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.quick-filter-btn {
+  padding: 16px 20px;
+  background: var(--background);
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.quick-filter-btn:hover {
+  background: var(--highlight);
+  color: white;
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.quick-filter-btn.active {
+  background: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+/* Date Range Display */
+.date-range-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.date-display-box {
+  flex: 1;
+  min-width: 120px;
+}
+
+.date-display-box label {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.selected-date {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+}
+
+.date-range-arrow {
+  font-size: 2rem;
+  color: #b2b3b6;
+  text-align: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Custom Calendar */
+.custom-calendar {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 8px;
+}
+
+.calendar-nav-btn {
+  background: var(--background);
+  border: 2px solid var(--secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--highlight);
+  color: white;
+  border-color: var(--secondary);
+  transform: scale(1.05);
+}
+
+.calendar-month-year {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  flex: 1;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #6b7280;
+  padding: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text);
+  background: white;
+  border: 2px solid transparent;
+  min-height: 40px;
+}
+
+.calendar-day:hover:not(.disabled):not(.other-month) {
+  background: var(--background);
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.calendar-day.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
+.calendar-day.in-range {
+  background: rgba(13, 148, 136, 0.15);
+  border-color: transparent;
+}
+
+.calendar-day.today {
+  border: 2px solid var(--primary);
+  font-weight: 700;
+}
+
+.calendar-day.disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.calendar-day.other-month {
+  color: #d1d5db;
+  opacity: 0.5;
+}
+
+.calendar-day.empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============== FILTER MODAL ============== */
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group label {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.filter-select,
+.filter-input {
+  width: 100%;
+  padding: 0px 18px;
+  font-size: 1.3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 500;
+  background: white;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.amount-range {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  gap: 10px;
+}
+
+.amount-input {
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 1.3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.amount-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.range-separator {
+  font-size: 1.2rem;
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ============== MODAL BUTTONS ============== */
+.btn-primary,
+.btn-secondary {
+  padding: 16px 36px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: #0a7c72;
+  border-color: #0a7c72;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text);
+  border-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--highlight);
+  border-color: var(--text);
+}
+
+
+/* Hide old logo-- causing issues */
+body.dashboard .floating-logo {
+  display: none;
+}
+
+/* =============================================== Modal designs for mobile styling ================================================ */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-width: none;
+    margin: var(--mobile-margin);
+  }
+
+  .modal-header {
+    padding: var(--mobile-padding);
+  }
+
+  .modal-header h3 {
+    font-size: var(--mobile-h2);
+  }
+
+  .modal-close {
+    font-size: var(--mobile-h3);
+    width: 35px;
+    height: 35px;
+  }
+
+  .modal-body {
+    padding: var(--mobile-padding);
+  }
+
+  .modal-footer {
+    padding: var(--mobile-padding);
+    flex-direction: column-reverse;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+  }
+
+  .date-input-group label,
+  .filter-group label {
+    font-size: var(--mobile-label);
+  }
+
+  .date-input,
+  .filter-select,
+  .filter-input,
+  .amount-input {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+  }
+
+  .quick-filters-top {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .quick-filter-btn {
+    font-size: var(--mobile-body);
+    padding: 10px 12px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ============================================== Mobile Designs for Dashboard Styling================================ */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .page-title {
+    font-size: var(--mobile-h1);
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    font-size: var(--mobile-h3);
+    opacity: 0.9;
+  }
+
+  .dashboard-top-section {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .stats-grid {
+    display: none;
+  }
+
+  .account-summary-card {
+    padding: 20px;  
+    border-radius: var(--mobile-radius);
+    min-height: auto;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+  }
+
+  .summary-title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 12px;  
+    opacity: 0.9;
+  }
+
+  .dashboard .total-balance {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 700;
+    margin: 0 0 10px 0;  
+    letter-spacing: -0.03em;
+  }
+
+  .dashboard .balance-label {
+    text-align: center;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 20px;  
+  }
+
+  /* Account Chips */
+  .account-chips-list {
+    gap: 10px;  
+    margin-bottom: 20px;  
+  }
+
+  .account-chip-item {
+    padding: 14px;  
+    border-radius: var(--mobile-radius);
+    gap: 10px;  
+  }
+
+  .account-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .chip-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;  
+  }
+
+  .chip-number {
+    font-size: 1rem;
+    opacity: 0.85;
+  }
+
+  .see-accounts-btn {
+    font-size: var(--mobile-body);
+    padding: 12px 0;  
+    border-radius: var(--mobile-radius);
+    font-weight: 600;
+    margin-top: 4px;  
+  }
+
+  .see-accounts-btn:hover {
+    background: var(--highlight);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Transaction card */
+  .transaction-card {
+    padding: 20px;  
+    border-radius: var(--mobile-radius);
+    margin-bottom: var(--mobile-margin);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .transaction-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;  
+    margin-bottom: 20px;  
+  }
+
+  .transaction-title h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 8px;  
+  }
+
+  .transaction-badge {
+    font-size: var(--mobile-small);
+    padding: 6px 12px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .transaction-controls {
+    width: 100%;
+    flex-direction: row;
+    gap: 10px; 
+    flex-wrap: wrap;
+  }
+
+  .date-range-picker,
+  .filter-btn {
+    padding: 10px 14px;  
+    font-size: 1rem;
+    height: 40px;  
+    border-radius: var(--mobile-radius);
+    gap: 6px;
+    flex: 1 1 calc(50% - 5px);  
+    min-width: 120px;
+  }
+
+  .date-range-picker {
+    flex: 1 1 100%;
+    margin-bottom: 2px;  
+  }
+
+  .filter-btn {
+    flex: 1 1 auto;
+  }
+
+  .date-icon {
+    font-size: 0.9rem;
+  }
+
+  .date-range-dates {
+  font-size: 1rem;
+  }
+
+  /* ============== Transaction Table ============== */
+  .transaction-table {
+    overflow-x: auto;
+    border-radius: var(--mobile-radius);
+    border: 1px solid #e5e7eb;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;  
+    margin-top: 20px;
+  }
+
+  .tt {
+    font-size: var(--mobile-small);
+    table-layout: auto;
+  }
+
+  .tt th {
+    padding: 12px;  
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .tt td {
+    padding: 12px;  
+    font-size: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+
+  .tt tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .tt .neg { color: #dc2626; }
+  .tt .pos { color: #16a34a; }
+
+  /* View more link */
+  .view-more-t {
+    margin-top: 4px;  
+  }
+
+  .view-more-t a {
+    font-size: var(--mobile-body);
+    font-weight: 600;
+  }
+
+  .calendar-days {
+    width: 30px;        
+    height: 30px;
+    font-size: var(--mobile-label); 
+  }
+  
+  /* ============== Chatbot button ============== */
+  .chatbot {
+    right: 16px;
+    bottom: 16px;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    gap: var(--mobile-gap);
+  }
+}
+
+/* ===============================================================================Forgot username form Styling======================================================================*/
+/* Page container */
+.forgot-username-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--card-vertical-padding) var(--card-horizontal-padding);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--card-top-margin) + 20px);
+}
+
+/* Card wrapper for left and right panels */
+.forgot-username-card {
+  display: flex;
+  max-width: var(--card-max-width);
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  height: var(--auth-card-height);
+}
+
+/* Additional decorative circles on the page */
+.forgot-username-container::before,
+.forgot-username-container::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.forgot-username-container::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+
+.forgot-username-container::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+/* ============================================ Left panel ===================================================== */
+.forgot-left-panel {
+  flex: 1;
+  background: var(--secondary);
+  padding: 100px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+}
+
+.forgot-left-panel::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -140px;
+  right: -140px;
+}
+
+.forgot-left-panel h2 {
+  font-size: 60px;
+  margin-bottom: 30px;
+  z-index: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+.forgot-left-panel p {
+  font-size: 35px;
+  line-height: 1.7;
+  text-align: center;
+  opacity: 0.95;
+  z-index: 1;
+  max-width: 600px;
+}
+
+/* ======================================================= Right panel ================================================================================*/
+.forgot-right-panel {
+  flex: 1;
+  padding: 100px 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--background);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.forgot-right-panel h1 {
+  font-size: 60px;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 50px;
+  font-weight: 600;
+}
+
+/* Form inputs and layout */
+.forgot-right-panel form {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.forgot-right-panel .form-group {
+  margin-bottom: 30px;
+}
+
+.forgot-right-panel label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.forgot-right-panel .input-wrapper {
+  position: relative;
+}
+
+.forgot-right-panel input {
+  width: 100%;
+  padding: 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 25px;
+  background: white;
+  color: var(--text);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.forgot-right-panel input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  outline: none;
+}
+
+/* Submit button */
+.forgot-right-panel .submit-btn {
+  width: 100%;
+  padding: 22px;
+  background: var(--button);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 35px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.forgot-right-panel .submit-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
+}
+
+.forgot-icon {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  color: #fff;
+  font-size: 65px;
+  line-height: 1;
+  box-shadow: 0 10px 24px rgba(13, 148, 136, 0.30);
+  margin-bottom: 30px;
+}
+
+/* Message styling */
+.forgot-right-panel .message {
+  text-align: center;
+  font-size: 20px;
+  margin: 6px 0;
+  padding: 15px;
+  border-radius: 8px;
+  min-height: 0px;
+}
+
+/* Register links styling-- for example back to login */
+.forgot-right-panel .register-links {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.forgot-right-panel .register-links p {
+  font-size: 25px;
+  color: var(--text);
+  margin: 0;
+}
+
+.forgot-right-panel .register-links a {
+  color: var(--secondary);
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-right-panel .register-links a:hover {
+  color: var(--highlight);
+}
+
+/* Link back to login */
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 25px;
+  text-align: center;
+}
+
+.link-btn:hover {
+  color: var(--highlight);
+}
+
+/* ======================================================================== Mobile Styling for Forogt Username Page-===============================================================================*/
+@media (max-width: 768px) {
+   /* Page / logo adjustments */
+  header { 
+    height: 70px; 
+  }
+  .logo img { 
+    height: 40px; 
+  }
+
+  .floating-logo {
+    top: 10px;
+    left: 12px;
+  }
+  .floating-logo img {
+    height: 85px;
+  }
+
+  /* Simplify background decorations */
+  body::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -75px;
+  }
+  body::after {
+    width: 225px;
+    height: 225px;
+    bottom: -75px;
+    left: -60px;
+  }
+  .forgot-username-container::before,
+  .forgot-username-container::after { 
+    display: none; 
+  }
+
+  /* Make the container take more horizontal space */
+  .forgot-username-container {
+    padding: 20px;                  
+    padding-top: 90px;
+    padding-bottom: 20px;
+  }
+
+  /* Card sizing and appearance */
+  .forgot-username-card {
+    width: 100%;
+    max-width: 520px;
+    min-height: calc(100vh - 140px); 
+    border-radius: 16px !important;
+    box-shadow: 0 12px 36px var(--secondary);
+    margin: 0 auto;
+    margin-bottom: 0;
+    overflow: hidden;
+    height: auto;
+  }
+
+  /* Hide large left panel on small, mobile screens */
+  .forgot-left-panel { 
+    display: none; 
+  }
+  .forgot-left-panel::before,
+  .forgot-left-panel h2,
+  .forgot-left-panel p { 
+    display: none; 
+  }
+
+  /* ============================================== Right panel ============================================ */
+  .forgot-right-panel {
+    padding: var(--mobile-padding);
+    background: var(--background);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Header section */
+  .forgot-header {
+    margin-bottom: var(--mobile-margin);
+    margin-top: 5px;
+  }
+
+  .forgot-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .forgot-right-panel h1 { 
+    font-size: var(--mobile-h2); 
+    margin-bottom: 8px; 
+  }
+
+  .forgot-right-panel p { 
+    font-size: var(--mobile-body); 
+  }
+
+  /* Form spacing */
+  .forgot-right-panel .form-group {
+    margin-bottom: var(--mobile-margin); 
+  }
+
+  .forgot-right-panel label {
+    font-size: var(--mobile-label);
+    margin-bottom: 8px;
+  }
+
+  /* Inputs */
+  .forgot-right-panel input {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Submit button adjustments */
+  .forgot-right-panel .submit-btn {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Message styling */
+  .forgot-right-panel .message {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  /* Links adjustments */
+  .forgot-right-panel .register-links { 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
+    text-align: center; 
+  }
+
+  .forgot-right-panel .register-links p {
+    font-size: var(--mobile-small);
+  }
+
+  .link-btn {
+    font-size: var(--mobile-small);
+  }
+
+}
+
+
+/* ===============================================================================Forgot Password Form Styling======================================================================*/
+/* Page container */
+.forgot-password-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--card-vertical-padding) var(--card-horizontal-padding);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--card-top-margin) + 20px);
+}
+
+/* Card wrapper for left Panel */
+.forgot-password-card {
+  display: flex;
+  max-width: var(--card-max-width);
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  height: var(--auth-card-height);
+}
+
+/* Additional decorative circles */
+.forgot-password-container::before,
+.forgot-password-container::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.forgot-password-container::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+
+.forgot-password-container::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+/* Message styling */
+.message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+/* ============================================================== Mobile Styling for the Forgot Password Page-=============================================================================== */
+@media (max-width: 768px) {
+    /* Page / logo adjustments */
+  header { 
+    height: 70px; 
+  }
+  .logo img { 
+    height: 40px; 
+  }
+
+  .floating-logo {
+    top: 10px;
+    left: 12px;
+  }
+  .floating-logo img {
+    height: 85px;
+  }
+
+  /* Simplify background decorations for performance */
+  body::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -75px;
+  }
+  body::after {
+    width: 225px;
+    height: 225px;
+    bottom: -75px;
+    left: -60px;
+  }
+  .forgot-password-container::before,
+  .forgot-password-container::after { 
+    display: none; 
+  }
+
+  /* Make the container take more horizontal space */
+  .forgot-password-container {
+    padding: 20px;                  
+    padding-top: 90px;
+    padding-bottom: 20px;
+  }
+
+  /* Card sizing and appearance  */
+  .forgot-password-card {
+    width: 100%;
+    max-width: 520px;
+    min-height: calc(100vh - 140px);
+
+    border-radius: 16px !important;
+    box-shadow: 0 12px 36px var(--secondary);
+    margin: 0 auto;
+    margin-bottom: 0;
+    overflow: hidden;
+    height: auto;
+  }
+
+  /* Hide large left panel on small, mobile screens */
+  .forgot-password-left-panel { 
+    display: none; 
+  }
+  .forgot-password-left-panel::before,
+  .forgot-password-left-panel h2,
+  .forgot-password-left-panel p { 
+    display: none; 
+  }
+
+  /* ======================================== Right panel ================================================*/
+  .forgot-password-right-panel {
+    padding: var(--mobile-padding);
+    background: var(--background);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Header section */
+  .forgot-password-header {
+    margin-bottom: var(--mobile-margin);
+    margin-top: 5px;
+  }
+
+  .forgot-password-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .forgot-password-right-panel h1 { 
+    font-size: var(--mobile-h2); 
+    margin-bottom: 8px; 
+  }
+
+  .forgot-password-right-panel p { 
+    font-size: var(--mobile-body); 
+  }
+
+  /* Form spacing */
+  .forgot-password-right-panel .form-group {
+    margin-bottom: var(--mobile-margin); 
+  }
+
+  .forgot-password-right-panel label {
+    font-size: var(--mobile-label);
+    margin-bottom: 8px;
+  }
+
+  /* Inputs */
+  .forgot-password-right-panel input {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Submit button adjustments */
+  .forgot-password-right-panel .submit-btn,
+  .forgot-password-right-panel .btn {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    margin-top: var(--mobile-gap);
+    gap: var(--mobile-gap);
+    border-radius: var(--mobile-radius);
+  }
+
+  /* Message styling */
+  .message {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+    margin-top: 15px;
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .forgot-password-right-panel .message {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+  }
+
+  /* Links adjustments */
+  .forgot-password-right-panel .register-links,
+  .links { 
+    font-size: var(--mobile-small); 
+    margin-top: var(--mobile-margin); 
+    text-align: center; 
+  }
+
+  .forgot-password-right-panel .register-links p {
+    font-size: var(--mobile-small);
+  }
+
+  .link-btn {
+    font-size: var(--mobile-small);
+  }
+
+}
+
+/* ===============================================================================Confirm Password Form Styling======================================================================*/
+/* Page container */
+.confirm-password-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--card-vertical-padding) var(--card-horizontal-padding);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--card-top-margin) + 20px);
+}
+
+/* Card wrapper for left panel */
+.confirm-password-card {
+  display: flex;
+  max-width: var(--card-max-width);
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  height: var(--auth-card-height);
+}
+
+/* Additional decorative circles */
+.confirm-password-container::before,
+.confirm-password-container::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.confirm-password-container::before {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: -100px;
+  animation-delay: 2s;
+}
+
+.confirm-password-container::after {
+  width: 320px;
+  height: 320px;
+  top: 20%;
+  right: -80px;
+  animation-delay: 3s;
+}
+
+/* ========================================================== Left panel =============================================================== */
+.confirm-left-panel {
+  flex: 1;
+  background: var(--secondary);
+  padding: 100px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+}
+
+.confirm-left-panel::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -140px;
+  right: -140px;
+}
+
+.confirm-left-panel h2 {
+  font-size: 60px;
+  margin-bottom: 30px;
+  z-index: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+.confirm-left-panel p {
+  font-size: 35px;
+  line-height: 1.7;
+  text-align: center;
+  opacity: 0.95;
+  z-index: 1;
+  max-width: 600px;
+}
+
+/* Reused the exact same toggle hover effect as login page */
+.toggle-btn:hover .eye-icon {
+  filter: brightness(0) saturate(100%) invert(70%) sepia(65%) saturate(450%) hue-rotate(40deg) brightness(95%) contrast(87%);
+}
+
+.eye-icon {
+  width: 55px;
+  height: 55px;
+  display: block;
+  pointer-events: none;
+  filter: brightness(0) saturate(100%) invert(44%) sepia(10%) saturate(450%) hue-rotate(169deg) brightness(95%) contrast(87%);
+  transition: filter 0.3s ease;
+}
+
+.confirm-icon {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  color: #fff;
+  font-size: 80px;
+  line-height: 1;
+  box-shadow: 0 10px 24px rgba(13, 148, 136, 0.30);
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+/* ====================================== Right panel =================================== */
+.confirm-right-panel {
+  flex: 1;
+  padding: 100px 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--background);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.confirm-right-panel h1 {
+  font-size: 60px;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 50px;
+  font-weight: 600;
+}
+
+/* Form inputs and layout */
+.confirm-right-panel form {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.confirm-right-panel input {
+  padding: 20px 60px 20px 22px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 25px;
+  background: white;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.confirm-right-panel input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  outline: none;
+}
+
+/* Submit button */
+.confirm-right-panel .submit-btn {
+  width: 100%;
+  padding: 22px;
+  background: var(--button);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 35px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.confirm-right-panel .submit-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
+}
+
+/* ==================================================== Mobile Styling for the Confirm Password Page ======================================================================== */
+@media (max-width: 768px) {
+  .confirm-left-panel {
+    display: none;
+  }
+
+  .confirm-right-panel {
+    padding: var(--mobile-padding);
+  }
+
+  .confirm-right-panel h1 {
+    font-size: var(--mobile-h2);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .confirm-right-panel input {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+    padding-right: 50px;
+  }
+
+  .confirm-right-panel .submit-btn {
+    font-size: var(--mobile-body);
+    padding: var(--mobile-padding);
+  }
+
+  .confirm-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+
+  .confirm-password-card {
+    height: auto;
+  }
+
+  .message {
+    font-size: var(--mobile-body);
+    margin-top: 15px;
+  }
+}
+
+/* ================================================================================== My Accounts Styling =========================================================================== */
+/* Accounts Summary Section */
+.accounts-summary {
+    margin-bottom: 40px;
+}
+
+.total-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    background: var(--secondary);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.overview-label {
+    font-size: 2rem;
+    color: var(--background);
+    font-weight: 500;
+}
+
+.overview-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+}
+
+/* Accounts Grid */
+.accounts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 3rem;
+    align-items: stretch;
+    margin-bottom: 40px;
+}
+
+/* Account Card Style */
+.account-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 2px 24px var(--secondary);
+    transition: all 0.3s ease;
+    border-left: 5px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.account-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Account Card Color for background on each of the cards */
+.account-card.teal {
+    border-left-color: greenyellow;
+}
+
+.account-card.blue {
+    border-left-color: orangered;
+}
+
+.account-card.green {
+    border-left-color: var(--highlight);
+}
+
+.account-card.purple {
+    border-left-color: #9333ea;
+}
+
+/* Account Card Header */
+.account-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.account-card-balance .balance-label {
+    font-size: 1.8rem;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    color: var(--text);
+    font-weight: 500;
+    text-align: left;
+}
+.account-card-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #14b8a6, #0d9488); 
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.account-card.teal .account-card-icon {
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+.account-card.blue .account-card-icon {
+    background: linear-gradient(135deg, var(--secondary), #1d4ed8);
+}
+
+.account-card.green .account-card-icon {
+    background: linear-gradient(135deg, var(--highlight), #65a30d);
+}
+
+.account-card.purple .account-card-icon {
+    background: linear-gradient(135deg, #9333ea, #7c3aed);
+}
+
+.account-card-info {
+    flex: 1;
+}
+
+.account-card-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 5px 0;
+}
+
+.account-card-number {
+    font-size: 1.5rem;
+    color: #64748b;
+    margin: 0;
+    font-family: 'Courier New', monospace;
+}
+
+/* Account Card Balance */
+.account-card-balance {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: var(--background);
+    border-radius: 12px;
+}
+
+.balance-label {
+    font-size: 0.75rem;
+    color: var(--text);
+    text-align: center;
+}
+
+.balance-amount {
+    font-size: 2.7rem;
+    font-weight: 700;
+    color: var(--text);
+}
+/* Date Range Picker */
+#transactionModal .date-range-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px;
+    background: var(--secondary);
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.3rem;
+}
+
+#transactionModal .date-range-picker:hover {
+    background: var(--highlight);
+}
+
+#transactionModal .date-icon {
+    font-size: 1.7rem;
+}
+
+#transactionModal .date-range-dates {
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: white;
+}
+
+/* Account Card Stats */
+.account-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.account-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.account-stat .stat-label {
+    font-size: 1.5rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.account-stat .stat-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* Account Card Button */
+.account-card-btn {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.account-card-btn:hover {
+    background: var(--highlight);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(132, 204, 22, 0.3);
+}
+
+.account-card.blue .account-card-btn {
+    background: var(--secondary);
+}
+
+.account-card.blue .account-card-btn:hover {
+    background: var(--highlight);
+    box-shadow: 0 4px 12px rgba(132, 204, 22, 0.3);
+}
+
+/* ========= Transaction Modal Styles ========*/
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 30px 40px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.modal-header h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+
+.modal-subtitle {
+    font-size: 2.1rem;
+    color: #64748b;
+    margin: 0;
+    font-family: 'Courier New', monospace;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: #94a3b8;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: #f1f5f9;
+    color: var(--text);
+}
+
+.modal-body {
+    padding: 30px 40px 40px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Modal Filters */
+.modal-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--background);
+    border-radius: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.modal-balance {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-balance-label {
+    font-size: 1.9rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.modal-balance-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Transaction Table in Modal */
+#transactionModal .modal-body .transaction-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#transactionModal .modal-body .tt {
+    width: 100%;
+}
+
+#transactionModal .modal-body .tt thead {
+    background: var(--background);
+}
+
+#transactionModal .modal-body .tt th {
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#transactionModal .modal-body .tt td {
+    padding: 18px 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 1.rem;
+}
+
+#transactionModal .modal-body .tt tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+#transactionModal .modal-body .tt tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Transaction Type Badges */
+#transactionModal .transaction-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+#transactionModal .badge-income {
+    background-color: #d1fae5;
+    color: #16a34a;
+}
+
+#transactionModal .badge-expense {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+#transactionModal .badge-transfer {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+/* Amount Styling */
+#transactionModal .amount.positive {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+#transactionModal .amount.negative {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* ======================================================================== Mobile Styling for the Accounts Page=============================================================== */
+@media (max-width: 768px) {
+    .accounts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .total-overview {
+        grid-template-columns: 1fr;
+        padding: var(--mobile-padding);
+    }
+
+    .overview-label {
+        font-size: 1.5rem;  
+    }
+
+    .overview-value {
+        font-size: var(--mobile-h1);  
+    }
+
+    .account-card {
+        padding: var(--mobile-padding);  
+    }
+
+    .account-card-icon {
+        width: 50px;  
+        height: 50px;
+        font-size: 1.78rem; 
+    }
+    
+    .account-card-name {
+        margin-top: 15px;
+        margin-bottom: 4px;
+        margin-left: 0;
+        font-size: 1rem;
+        text-align: left;  
+    }
+
+    .account-card-header .account-card-number {
+        font-size: 1rem;
+        color: rgba(103, 102, 102, 0.499); 
+    }
+
+    .account-card-balance .balance-label {
+        font-size: 1rem;
+        text-align: left;
+        color: var(--text);
+    }
+
+    .balance-amount {
+        font-size: var(--mobile-h2);  
+    }
+
+    .account-stat .stat-label {
+        font-size: 1rem;  
+    }
+
+    .account-stat .stat-value {
+        font-size: 1rem;  
+    }
+
+    .account-card-btn {
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .modal-header,
+    .modal-body {
+        padding: var(--mobile-padding);
+    }
+
+    .modal-header h2 {
+        font-size: var(--mobile-h2);  
+    }
+
+    .modal-subtitle {
+        font-size: var(--mobile-body);  
+    }
+
+    .modal-balance-label {
+        font-size: var(--mobile-body); 
+    }
+
+    .modal-balance-value {
+        font-size: var(--mobile-label);  
+    }
+
+    #transactionModal .date-range-dates {
+        font-size: var(--mobile-label);  
+    }
+
+    #transactionModal .modal-body .tt th {
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
+    }
+
+    #transactionModal .modal-body .tt td {
+        padding: var(--mobile-padding);  
+        font-size: var(--mobile-body);  
+    }
+
+    #transactionModal .transaction-badge {
+        font-size: var(--mobile-small);  
+        padding: 3px 10px;  
+    }
+
+    .modal-filters {
+        flex-direction: column;
+        align-items: stretch;
+        padding: var(--mobile-padding);  
+        gap: var(--mobile-gap); 
+    }
+
+    .modal-balance {
+        justify-content: space-between;
+    }
+
+    #transactionModal .modal-body {
+        padding: var(--mobile-padding); 
+        overflow-x: hidden; 
+    }
+
+    #transactionModal .modal-body .transaction-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; 
+        border-radius: var(--mobile-radius);
+        box-shadow: inset 0 0 0 1px #e2e8f0; 
+    }
+
+    #transactionModal .modal-body .tt {
+        min-width: 550px; 
+        margin: 0; 
+    }
+
+    #transactionModal .modal-body .transaction-table {
+        position: relative;
+    }
+}
+
+
+/* ======================================================= Payment Transfers Page Styling =================================================================== */
+.transfer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;     
+    grid-template-rows: auto auto;      
+    gap: 3rem;                        
+    align-items: stretch;               
+}
+
+/* Forcing all cards to be exactly the same size */
+.transfer-card {
+    background: white;
+    border-radius: 22px;
+    border: 1px solid #e5e7eb;
+    border-left: 10px solid;
+    padding: 36px 32px;
+    box-shadow: 0 8px 24px var(--secondary);
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;                  
+    height: 100%;                       
+    box-sizing: border-box;
+}
+
+.transfer-card.teal {
+    border-left-color: greenyellow;
+}
+
+.transfer-card.blue {
+    border-left-color: orangered;
+}
+
+.transfer-card.green {
+    border-left-color: var(--highlight);
+}
+
+.transfer-card.purple {
+    border-left-color: #9333ea;
+}
+
+.no-transfers {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 24px;
+    font-size: 1.4rem;
+}
+
+
+/* Card Header */
+.transfer-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+}
+
+.transfer-card h2 {
+    margin-bottom: 24px;
+    font-size: 3rem;  
+    font-weight: 700;
+    color: var(--text);
+}
+
+/* Form Layout */
+.transfer-form label {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.8rem;  
+}
+
+.transfer-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.transfer-form .form-row--auto {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.transfer-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transfer-form input[type="date"],
+.transfer-form input[type="number"],
+.transfer-form select {
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1.6rem;  
+    outline: none;
+    background: #fff;
+    color: var(--text);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.transfer-form input:focus,
+.transfer-form select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+/* $ Input */
+.input-with-prefix {
+    position: relative;
+}
+
+.input-with-prefix .prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.input-with-prefix input {
+    padding-left: 34px !important;
+}
+
+/* date trigger as a clickable button */
+.date-picker-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 1.6rem;
+    color: var(--text);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.date-picker-trigger:hover,
+.date-picker-trigger:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.date-icon {
+    font-size: 1.4rem;
+}
+
+/* Form Actions (Submit Button) */
+.form-actions {
+    margin-top: auto;
+    padding-top: 10px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary {
+    padding: 16px 22px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: var(--highlight);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(132, 204, 22, 0.3);
+}
+
+/* Transfer List Items (Pending & History) */
+.transfer-list {
+    display: grid;
+    gap: 14px;
+    flex: 1;
+    align-content: start;  
+}
+
+.transfer-item {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    font-size: 1.4rem;  
+    align-items: center;
+    padding: 16px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+}
+
+.transfer-item .amt {
+    justify-self: end;
+    font-weight: 700;
+}
+
+/* ======================================================================== Mobile Styling for the Payment Transfers Page =================================================== */
+@media (max-width: 768px) {
+
+    /* 1 column layout */
+    .transfer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--mobile-gap);
+    }
+
+    .transfer-card {
+        padding: var(--mobile-padding);
+        min-height: unset;
+        height: auto;
+    }
+
+    .transfer-card h2 {
+        font-size: var(--mobile-h2);
+        margin-bottom: var(--mobile-gap);
+    }
+
+    .transfer-form label {
+        font-size: var(--mobile-label);
+    }
+
+    .transfer-form input[type="date"],
+    .transfer-form input[type="number"],
+    .transfer-form select {
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-body);
+        border-radius: var(--mobile-radius);
+    }
+
+    .input-with-prefix .prefix {
+        left: 10px;
+        font-size: var(--mobile-body);
+    }
+
+    .input-with-prefix input {
+        padding-left: 28px !important;
+    }
+
+    /* Date trigger  */
+    .date-picker-trigger {
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-body);
+        gap: var(--mobile-gap);
+    }
+
+    /* Primary Button */
+    .btn-primary {
+        padding: var(--mobile-padding);
+        font-size: var(--mobile-label);
+        border-radius: var(--mobile-radius);
+    }
+
+    /* Transfer list items */
+    .transfer-item {
+        padding: var(--mobile-padding);
+        gap: var(--mobile-gap);
+        font-size: var(--mobile-body);
+        grid-template-columns: 1fr;
+    }
+
+    .transfer-item .amt {
+        justify-self: start;
+    }
+}
+
+
+/* ================================================================= PROFILE PAGE ====================================================================================== */
+
+.cardish {
+  background: var(--background);
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* grid display vertically--stack */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+}
+
+/* stack the two right cards */
+.profile-grid .profile-card:nth-of-type(1) { grid-column: 2 / 3; }
+.profile-grid .profile-card:nth-of-type(2) { grid-column: 2 / 3; }
+
+/* hero spans first column */
+.profile-hero {
+  grid-column: 1 / 2;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  padding: 36px 32px;
+}
+
+/* avatar-- Profile picture styling */
+.profile-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar-img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid #ffffff6f;
+  background-color: #f3f4f6;  
+}
+
+/* profile identity block */
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-self: center;
+}
+/* Profile Name and username */
+.settings-card .profile-name {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.profile-username {
+  margin: 0;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+/* User's information */
+.profile-meta {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.7rem;
+}
+.profile-meta .meta-icon { margin-right: 8px; }
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+.btn.primary {
+  background: var(--secondary);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s ease;
+  text-decoration: none;
+}
+.btn.primary:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(238, 241, 232, 0.3);
+}
+.btn.subtle {
+  background: var(--secondary);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+.btn.subtle:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(238, 241, 232, 0.3);
+}
+
+/* detail cards on the right */
+.profile-card {
+  padding: 28px 24px;
+}
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.profile-card-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.mini-link {
+  color: var(--secondary);
+  font-weight: 800;
+  text-decoration: none;
+}
+.mini-link:hover {
+  text-decoration: underline;
+  color: var(--primary);
+}
+
+/* two-column info grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.info-item {
+  background: var(--background);
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 6px;
+}
+.info-item.full { grid-column: 1 / -1; }
+.info-label {
+  font-size: 1.8rem;
+  color: #64748b;
+  letter-spacing: .04em;
+  font-weight: 700;
+}
+.info-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* preferences list */
+.pref-list {
+  display: grid;
+  gap: 12px;
+}
+.pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--background);
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.pref-label { font-weight: 700; color: #64748b; }
+.pref-value { font-weight: 800; color: var(--text); }
+
+/* ============================================================================= Mobile Styling for Profile Page =================================================================== */
+@media (max-width: 768px) {
+  .info-grid { grid-template-columns: 1fr; }
+}
+
+/* Profile page avatar card styling */
+.settings-card .profile-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.settings-card .profile-avatar-img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid #ffffff6f;
+  background-color: #f3f4f6;
+}
+
+.settings-card .profile-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-card:has(.profile-identity) {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ============================================================ Setting Page Styling ============================================================================= */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 50px;
+  margin-bottom: 50px;
+}
+
+.settings-grid .settings-card {
+  min-height: 450px;
+}
+
+.settings-card {
+  background: #fff;
+  width: auto;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  border-left: 10px solid;
+  padding: 60px 50px;
+  box-shadow: 0 8px 24px var(--secondary);
+}
+
+.settings-card.teal {
+  border-left-color: greenyellow;
+}
+
+.settings-card.blue {
+  border-left-color: orangered;
+}
+
+.settings-card.green {
+  border-left-color: var(--highlight);
+}
+
+.settings-card.purple {
+  border-left-color: #9333ea;
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.settings-card h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.settings-badge {
+  background: linear-gradient(135deg, var(--secondary) 0%, #1d4ed8 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.5rem;
+  padding: 8px 14px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+.settings-badge.alt {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.avatar-tile {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 30px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* Wrap the image so we can style an outer ring / shadow separately-- together, they would not conform */
+.avatar-photo {
+  display: inline-block;
+  border-radius: 50%;
+}
+.avatar-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.avatar-upload-btn, .avatar-remove-btn {
+  border: 1px solid rgba(255, 255, 255, 0.849);
+  background: var(--secondary);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.avatar-upload-btn:hover, .avatar-remove-btn:hover {
+  background: var(--highlight);
+  color: #fff;
+}
+
+.avatar-edit-btn {
+  border: 1px solid rgba(255, 255, 255, 0.849);
+  background: var(--secondary);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.avatar-edit-btn:hover {
+  background: var(--highlight);
+  color: #fff;
+}
+
+/* Form layout */
+.settings-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.settings-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.settings-form label {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.65rem;
+}
+
+.settings-form input {
+  width: 100%;
+  padding: 24px 50px 24px 24px; 
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+.settings-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.settings-form .input-wrapper {
+  position: relative;
+}
+.settings-form .toggle-btn {
+  right: 12px;
+}
+
+/* Form Actions - Save/Update Buttons */
+.form-actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: var(--secondary);
+  color: #fff;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  background: var(--highlight);
+  box-shadow: 0 6px 20px rgba(13, 92, 203, 0.35);
+}
+
+.save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+}
+
+/* ====================================== Mobile Styles for the Settings Page ================================================= */
+@media (max-width: 768px) {
+  .settings-grid {
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .settings-grid .settings-card {
+    min-height: auto;
+  }
+
+  .settings-card {
+    padding: var(--mobile-padding);
+    padding-bottom: 40px;
+    border-radius: var(--mobile-radius);
+    min-height: auto;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .settings-card:has(.profile-identity) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mobile-gap);
+  }
+
+  .settings-card .profile-avatar {
+    flex-direction: row;
+    gap: var(--mobile-gap);
+    align-items: center;
+  }
+
+  .settings-card .profile-identity {
+    gap: var(--mobile-gap);
+  }
+
+  .avatar-edit-btn {
+    padding: 6px 10px;
+    font-size: var(--mobile-small);
+  }
+
+  .settings-card .profile-name {
+    font-size: var(--mobile-h2);
+  }
+
+  .profile-username {
+    font-size: var(--mobile-label);
+  }
+
+  .profile-meta {
+    font-size: var(--mobile-body);
+    gap: var(--mobile-gap);
+  }
+
+  .profile-actions {
+    gap: var(--mobile-gap);
+    margin-top: 0;
+  }
+
+  .btn.primary,
+  .btn.subtle {
+    padding: 8px 28px;
+    font-size: 0.9rem;
+    flex: 1;
+  }
+
+  .settings-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 12px;
+  }
+
+  .settings-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-top: 60px;
+    margin-left: -8px;
+  }
+
+  .settings-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: var(--mobile-small);
+    padding: 6px 12px;
+  }
+
+  .info-item {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  .info-label {
+    font-size: var(--mobile-small);
+  }
+
+  .info-value {
+    font-size: var(--mobile-label);
+  }
+
+  .avatar-tile {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-margin);
+  }
+
+  .avatar-photo {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .settings-card .profile-avatar-img {
+    width: 140px;
+    height: 140px;
+    border-width: 4px;
+  }
+
+  .avatar-controls {
+    gap: 8px;
+  }
+
+  .avatar-upload-btn, .avatar-remove-btn {
+    padding: 10px 14px;
+    font-size: var(--mobile-body);
+    flex: 1;
+  }
+
+  .settings-form .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .settings-form .form-group {
+    gap: 8px;
+    margin-bottom: var(--mobile-gap);
+  }
+
+  .settings-form label {
+    font-size: var(--mobile-label);
+    font-weight: 600;
+  }
+
+  .settings-form input {
+    padding: 12px 16px;
+    font-size: var(--mobile-body);
+    border-radius: var(--mobile-radius);
+  }
+
+  .settings-form .toggle-btn {
+    right: 10px;
+  }
+
+  .form-actions {
+    margin-top: 16px;
+    justify-content: stretch;
+  }
+
+  .save-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: var(--mobile-body);
+  }
+}
+
+/*================================================================ Monthly Budgeting Styling ======================================================================== */
+/* Budget Tab Navigation Menu */
+.budget-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 48px;
+  background: white;
+  padding: 8px;
+  border-radius: 16px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.budget-tab-btn {
+  padding: 16px 48px;
+  background: transparent;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.budget-tab-btn:hover {
+  background: var(--highlight);
+  color: white;
+}
+
+.budget-tab-btn.active {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+/* Budget Summary Card */
+.budget-summary-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.budget-summary-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 32px 0;
+}
+
+/* Budget Summary Stats */
+.budget-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.budget-stat-item {
+  padding: 28px 32px;
+  border-radius: 16px;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+.budget-stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.budget-stat-item.total-spent {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.budget-stat-item.remaining {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.budget-stat-label {
+  display: block;
+  font-size: 1.5rem;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.budget-stat-value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* Budget Table */
+.budget-table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.budget-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.budget-table thead {
+  background: #f9fafb;
+}
+
+.budget-table th {
+  text-align: left;
+  padding: 20px 24px;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.budget-table td {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--text);
+  font-size: 1.56rem;
+  font-weight: 500;
+}
+
+.budget-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.budget-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.budget-table .amount {
+  font-weight: 700;
+  font-size: 1.56rem;
+}
+
+/* Category Dots */
+.category-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.category-dot.bills {
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.category-dot.shopping {
+  background: #ec4899;
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+}
+
+.category-dot.transport {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.category-dot.groceries {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.category-dot.food {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.category-dot.entertainment {
+  background: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.status-badge.on-track {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.under-budget {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.over-budget {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Budget Editor Card */
+.budget-editor-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 50px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.budget-editor-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px 0;
+}
+
+.budget-editor-subtitle {
+  font-size: 1.56rem;
+  color: #6b7280;
+  margin: 0 0 36px 0;
+}
+
+/* Budget Form Grid */
+.budget-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 36px;
+}
+
+.budget-form-group.total-budget {
+  grid-column: span 2;
+}
+
+.budget-form-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.label-icon {
+  font-size: 2rem;
+}
+
+.budget-form-group input {
+  width: 100%;
+  padding: 18px 22px;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%) !important;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.budget-form-group input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 4px rgba(102, 145, 241, 0.1);
+}
+
+.budget-form-group.total-budget input {
+  font-size: 1.5rem;
+  padding: 24px 28px;
+}
+
+/* Form Action Buttons */
+.budget-form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.budget-btn-primary,
+.budget-btn-secondary {
+  padding: 28px 48px;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+}
+
+.budget-btn-primary {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 145, 241, 0.3);
+}
+
+.budget-btn-primary:hover {
+  background-color: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 145, 241, 0.4);
+}
+
+.budget-btn-secondary {
+  background: white;
+  color: var(--text);
+  border: 3px solid var(--secondary);
+}
+
+.budget-btn-secondary:hover {
+  background: var(--highlight);
+  color: var(--text);
+}
+
+.btn-icon-small {
+  font-size: 1.2rem;
+}
+
+/* =================================================================== Mobile Styles for Budget Page ========================================================== */
+@media (max-width: 768px) {
+  /* Tab Navigation */
+  .budget-tabs {
+    width: fit-content;
+    gap: 6px;
+    margin: 0 auto 20px;
+    display: flex;
+  }
+
+  .budget-tab-btn {
+    padding: 10px 12px;
+    font-size: 1.3rem;
+    border-width: 1px;
+  }
+
+  .budget-tab-btn:hover {
+    background: var(--highlight);
+    color: white;
+  }
+
+  /* Summary Card */
+  .budget-summary-card {
+    padding: 20px 16px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+  }
+
+  .budget-summary-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+
+  /* Summary Stats */
+  .budget-summary-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .budget-stat-item {
+    padding: 16px 14px;
+    border-radius: 10px;
+  }
+
+  .budget-stat-label {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+  }
+
+  .budget-stat-value {
+    font-size: 2.2rem;
+  }
+
+  /* Budget Table */
+  .budget-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--mobile-radius);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .budget-table {
+    font-size: var(--mobile-small);
+    table-layout: auto;
+  }
+
+  .budget-table th {
+    padding: 12px;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .budget-table td {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+
+  .budget-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .budget-table .amount {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .category-dot {
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 1.0rem;
+  }
+
+  /* Budget Editor Card */
+  .budget-editor-card {
+    padding: 16px;
+    margin-bottom: 100px; /* Extra space for mobile footer */
+    border-radius: var(--mobile-radius);
+  }
+
+  .budget-editor-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 4px;
+  }
+
+  .budget-editor-subtitle {
+    font-size: var(--mobile-body);
+    margin-bottom: 20px;
+  }
+
+  /* Budget Form */
+  .budget-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .budget-form-group.total-budget {
+    grid-column: span 1;
+  }
+
+  .budget-form-group label {
+    font-size: var(--mobile-body);
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .label-icon {
+    font-size: 1.2rem;
+  }
+
+  .budget-form-group input {
+    padding: 12px;
+    font-size: var(--mobile-body);
+    border-width: 1px;
+  }
+
+  .budget-form-group.total-budget input {
+    padding: 12px;
+    font-size: var(--mobile-body);
+  }
+
+  /* Form Buttons */
+  .budget-form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .budget-btn-primary,
+  .budget-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: var(--mobile-padding);
+    font-size: var(--mobile-body);
+    border-width: 2px;
+  }
+
+  .btn-icon-small {
+    font-size: 1rem;
+  }
+}
+
+
+/* ==================================================================== Yearly Budgeting Styling ================================================================================== */
+/* Yearly Overview Grid */
+.yearly-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-bottom: 48px;
+}
+
+.yearly-stat-card {
+  background: white;
+  padding: 36px 32px;
+  border-radius: 20px;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.yearly-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.yearly-stat-card.total {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.yearly-stat-card.remaining {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.yearly-stat-card.average {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+}
+
+.yearly-stat-icon {
+  font-size: 64px;
+  opacity: 0.9;
+}
+
+.yearly-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yearly-stat-label {
+  font-size: 1.6rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.yearly-stat-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.yearly-stat-subtitle {
+  font-size: 1.5rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Section Header with Actions */
+.section-header-with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.section-header-with-actions h2 {
+  margin: 0;
+}
+
+.year-selector {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #f9fafb;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.year-nav-btn {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.year-nav-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.current-year {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 100px;
+  text-align: center;
+}
+
+.yearly-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.yearly-table tfoot {
+  background: #f9fafb;
+  border-top: 3px solid var(--primary);
+}
+
+.yearly-table .total-row td {
+  padding: 24px;
+  font-size: 1.56rem;
+  font-weight: 700;
+}
+
+/* Trend Badges */
+.trend-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.trend-badge.stable {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.trend-badge.increasing {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.trend-badge.decreasing {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Monthly Breakdown Card */
+.monthly-breakdown-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.monthly-breakdown-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+  font-size: 1.75rem;
+  color: #6b7280;
+  margin: 0 0 36px 0;
+}
+
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.month-card {
+  background: #f9fafb;
+  padding: 24px;
+  border-radius: 16px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.month-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.month-card.upcoming {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
+.month-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.month-amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.month-card.upcoming .month-amount {
+  color: #d97706;
+  font-size: 1.2rem;
+}
+
+.month-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.month-bar-fill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.month-bar-fill.projected {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  opacity: 0.7;
+}
+
+/* Insights Card */
+.insights-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 50px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.insights-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 32px 0;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 28px;
+  border-radius: 16px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.insight-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.insight-item.positive {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+.insight-item.warning {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.insight-item.info {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.insight-icon {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.insight-content strong {
+  display: block;
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.insight-content p {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+
+/* ================================================ Weekly Budgeting Styling =============================================== */
+/* Week Selector Card */
+.week-selector-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 2px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.week-nav-btn {
+  background: linear-gradient(135deg, var(--secondary) 0%, #0695e7 100%);
+  color: white;
+  border: none;
+  padding: 18px 36px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.week-nav-btn:hover {
+  background: var(--highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
+}
+
+.week-date-range {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.week-label {
+  font-size: 1.7rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.week-dates {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Weekly Overview Grid */
+.weekly-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-bottom: 48px;
+}
+
+.weekly-stat-card {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.weekly-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.weekly-stat-card.spent {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+.weekly-stat-card.average {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+}
+
+.weekly-stat-card.remaining {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.weekly-stat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.weekly-stat-icon {
+  font-size: 2.2rem;
+}
+
+.weekly-stat-label {
+  font-size: 1.7rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.weekly-stat-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.weekly-stat-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekly-trend {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.weekly-trend.down {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.weekly-trend.up {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.weekly-trend.neutral {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.weekly-progress-text {
+  font-size: 1.25rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+/* Daily Breakdown Section */
+.daily-breakdown-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.daily-breakdown-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 28px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.day-card {
+  background: #f9fafb;
+  padding: 32px 28px;
+  border-radius: 16px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.day-card.today {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+  border-width: 3px;
+}
+
+.day-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.day-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.day-date {
+  font-size: 1.4rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.day-card.today .day-date {
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.day-amount {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.day-transactions {
+  font-size: 1.4rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.day-bar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.day-bar-fill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary) 0%, #0a7c72 100%);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.day-bar-fill.today-fill {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.day-top-category {
+  font-size: 1.35rem;
+  color: #374151;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Category Breakdown Section */
+.weekly-category-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.weekly-category-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 32px 0;
+}
+
+.category-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+.category-breakdown-item {
+  background: #f9fafb;
+  padding: 24px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.category-breakdown-item:hover {
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.category-breakdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.category-breakdown-name {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.category-breakdown-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.category-progress-bar {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.category-progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.category-progress-fill.groceries-fill {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.category-progress-fill.food-fill {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.category-progress-fill.shopping-fill {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+.category-progress-fill.transport-fill {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.category-progress-fill.entertainment-fill {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.category-progress-fill.bills-fill {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.category-budget-info {
+  font-size: 1.4rem;
+  color: #065f46;
+  font-weight: 600;
+}
+
+/* Weekly Tips Section */
+.weekly-tips-card {
+  background: white;
+  border-radius: 22px;
+  padding: 48px 44px;
+  margin-bottom: 50px;
+  box-shadow: 0 8px 24px var(--secondary);
+  border: 1px solid #e5e7eb;
+}
+
+.weekly-tips-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 32px 0;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 14px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.tip-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tip-item.success {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+.tip-item.info {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.tip-item.suggestion {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.tip-icon {
+  font-size: 2.2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.tip-content strong {
+  display: block;
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.tip-content p {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+/* ===================================================================== Mobile Styles For Weekly Budgeting Page ================================================================================================================= */
+@media (max-width: 768px) {
+  .week-selector-card {
+    flex-direction: column;
+    gap: var(--mobile-margin);
+    padding: var(--mobile-padding);
+  }
+
+  .week-nav-btn {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+
+  .week-label {
+    font-size: 1rem;
+  }
+
+  .week-dates {
+    font-size: 1.35rem;
+  }
+
+  .weekly-overview-grid {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-margin);
+    margin-bottom: 20px;
+  }
+
+  .weekly-stat-card {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  .weekly-stat-value {
+    font-size: var(--mobile-h2);
+  }
+
+  .weekly-stat-label {
+    font-size: 1.1rem;
+  }
+
+  .weekly-trend {
+    font-size: 0.9rem;
+  }
+
+  .weekly-progress-text {
+    font-size: 0.85rem;
+  }
+
+  .daily-breakdown-card {
+    display: none;
+  }
+
+  .days-grid {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+  }
+
+  .day-card {
+    padding: var(--mobile-padding);
+    border-radius: var(--mobile-radius);
+  }
+
+  .category-breakdown-grid {
+    display: block;
+    overflow-x: auto;
+    border-radius: var(--mobile-radius);
+    border: 1px solid #e5e7eb;
+  }
+
+  .category-breakdown-item {
+    display: table;
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    border-bottom: 1px solid #f3f4f6;
+    background: white;
+    table-layout: fixed;
+  }
+
+  .category-breakdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .category-breakdown-item:hover {
+    background: #f9fafb;
+  }
+
+  .category-breakdown-header {
+    display: table-cell;
+    padding: 18px 16px;
+    vertical-align: middle;
+    gap: 0;
+    margin-bottom: 0;
+    width: 60%;
+  }
+
+  .category-breakdown-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .category-breakdown-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .category-progress-bar {
+    display: none;
+  }
+
+  .category-budget-info {
+    display: table-cell;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 18px 16px;
+    vertical-align: middle;
+    text-align: right;
+    width: 40%;
+    color: #065f46;
+    font-weight: 600;
+  }
+
+  .tips-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .tip-item {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .weekly-category-card,
+  .weekly-tips-card {
+    padding: 24px 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .weekly-category-card h2,
+  .weekly-tips-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 16px;
+    margin-top: 0;
+  }
+
+  .tip-icon {
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .tip-content strong {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .tip-content p {
+    font-size: 1.05rem;
+  }
+
+  .weekly-tips-card {
+    margin-bottom: 100px;
+  }
+}
+
+/* =============================================================================== Mobile Styles for Yearly Budgeting Page ================================================================================ */
+@media (max-width: 768px) {
+  /* Yearly Overview Cards */
+  .yearly-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .yearly-stat-card {
+    padding: 16px 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .yearly-stat-icon {
+    font-size: 32px;
+  }
+
+  .yearly-stat-label {
+    font-size: 1.2rem;
+  }
+
+  .yearly-stat-value {
+    font-size: 2.2rem;
+  }
+
+  .yearly-stat-subtitle {
+    font-size: 1.1rem;
+  }
+
+  /* Spending Summary Section */
+  .budget-summary-card {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .section-header-with-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-header-with-actions h2 {
+    font-size: var(--mobile-h2);
+    margin: 0;
+  }
+
+  .year-selector {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 0px;
+    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .year-nav-btn {
+    width: 30px;         
+    height: 30px;
+    font-size: 1rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border-color: var(--secondary);
+  }
+
+  .current-year {
+    font-size: 1.3rem;
+    min-width: 56px;
+    max-width: calc(100% - 104px); 
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .budget-summary-card .budget-table-wrapper {
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--mobile-radius);
+  }
+
+  .trend-badge {
+    font-size: 0.85rem;
+  }  
+
+  /* Monthly Breakdown Section */
+  .monthly-breakdown-card {
+    display: none;
+  }
+
+  /* Insights Section */
+  .insights-card {
+    padding: 16px;
+    margin-bottom: 100px; 
+    border-radius: var(--mobile-radius);
+  }
+
+  .insights-card h2 {
+    font-size: var(--mobile-h2);
+    margin-bottom: 16px;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .insight-item {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .insight-icon {
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .insight-content strong {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+
+  .insight-content p {
+    font-size: 1.05rem;
+  }
+}
+
+
+
+/* ================================================== Mobile Footer Styling =============================================================== */
+
+/* Hide mobile menu elements on desktop */
+.menu-overlay,
+.menu-panel {
+  display: none;
+}
+
+/* Show footer only on mobile */
+@media (max-width: 868px) {
+  /* Footer bar container */
+  .mobile-footer {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 80px;
+    background: white;
+    border-top: 1px solid #e5e7eb; 
+    box-shadow: 0 -2px 10px var(--secondary);
+    z-index: 999;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 20px; 
+    box-sizing: border-box;
+  }
+
+  .sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /*  main content uses full width */
+  .main-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Individual footer icon buttons */
+  .footer-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .footer-icon:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .footer-icon:active {
+    transform: scale(0.92);
+  }
+
+  /* Icon images inside buttons */
+  .footer-icon img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* Active state for current page */
+  .footer-icon.active {
+    background: var(--primary);
+    border-radius: 15px;
+  }
+
+  .footer-icon.active img {
+    filter: brightness(0) invert(1); 
+  }
+
+  /* Add bottom padding to main content so footer doesn't cover it */
+  .main-container {
+    padding-bottom: 100px; 
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* Menu overlay when menu icon is clicked */
+  .menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .menu-overlay.active {
+    display: block;
+  }
+
+  /* Slide-in menu panel */
+  .menu-panel {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    max-width: 350px;
+    height: 100%;
+    background: white;
+    z-index: 1001;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+  }
+
+  .menu-panel.active {
+    left: 0;
+  }
+
+  /* Menu header with logo and close button */
+  .menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid #e5e7eb;
+    flex-shrink: 0; /* Prevent header from shrinking */
+  }
+
+  .menu-header img {
+    height: 100px;
+    width: auto;
+  }
+
+  .menu-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #6b7280;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .menu-close:hover {
+    background: #f3f4f6;
+  }
+
+  /* Menu navigation links */
+  .menu-nav {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .menu-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+  }
+
+  .menu-nav-item:hover {
+    background: var(--highlight);
+  }
+
+  .menu-nav-item.active {
+    background: rgba(13, 148, 136, 0.12);
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .menu-nav-icon {
+    font-size: 1.5rem;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Safe area padding for devices with notches/home indicators */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .mobile-footer {
+      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      height: calc(80px + env(safe-area-inset-bottom));
+    }
+
+    .main-container {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+  }
+}

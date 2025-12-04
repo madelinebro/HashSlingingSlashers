@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+        Financial Management Capstone Project
+        Weekly Budget
+        Author: Samantha Saunsaucie
+        Date: 10/11/2025
+        -->
+    <!-- Setup and Title -->
+    <title>Weekly Budget</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/budgeting.js" defer></script>
+    <script src="js/mobile_footer.js" defer></script>
+    <script src="js/chatbot.js" defer></script>
+</head>
+
+<!-- The main body of the page -->
+
+<body class="dashboard">
+
+    <!-- This is the left sidebar -->
+    <aside class="sidebar">
+
+        <!-- The BloomFi logo at the top of the sidebar -->
+        <div class="sidebar-logo">
+            <img src="images/logo.svg" alt="BloomFi Logo" />
+        </div>
+
+        <!-- The main navigation menu with links to different pages -->
+        <nav class="sidebar-nav">
+            <!-- Dashboard link  -->
+            <a class="sidebar-nav-item" href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </a>
+            <!-- My Accounts link -->
+            <a class="sidebar-nav-item" href="accounts.html">
+                <span class="nav-icon">💳</span>
+                My Accounts
+            </a>
+            <!-- Budgeting link, marked as active since we are on this page -->
+            <a class="sidebar-nav-item active" href="budgeting_week.html">
+                <span class="nav-icon">📊</span>
+                Budgeting
+            </a>
+            <!-- Transfers link -->
+            <a class="sidebar-nav-item" href="transfers.html">
+                <span class="nav-icon">🔄</span>
+                Transfers
+            </a>
+        </nav>
+
+        <!-- User profile section that sticks to the bottom of the sidebar -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <!-- The user's profile picture -->
+                <img src="images/Generic avatar (1).svg" alt="Jane avatar" />
+                <div class="sidebar-user-details">
+                    <!-- Button that shows the user's name and toggles a dropdown menu when clicked -->
+                    <!-- aria-expanded and aria-controls help screen readers understand the button's purpose -->
+                    <button id="userToggle" class="sidebar-user-name" aria-expanded="false" aria-controls="userMenu">
+                        Jane
+                        <!-- Little arrow icon that indicates there is a dropdown menu -->
+                        <img class="chev" src="images/Chevron left.svg" alt="" />
+                    </button>
+                    <!-- The dropdown menu that appears when clicking the user's name -->
+                    <div id="userMenu" class="sidebar-user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">Profile</a>
+                        <a href="settings.html" role="menuitem">Settings</a>
+                        <a href="login.html" role="menuitem">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- The main content area for the weekly budget page -->
+    <div class="main-container">
+
+        <!-- Page header with the title and description -->
+        <header class="content-header">
+            <h1 class="page-title">Weekly Budget</h1>
+            <p class="page-subtitle">Track your spending throughout the week</p>
+        </header>
+
+        <!-- Tab buttons to switch between viewing weekly, monthly, or yearly budgets -->
+        <div class="budget-tabs">
+            <!-- The week button is marked as active since we are viewing the weekly budget -->
+            <button class="budget-tab-btn active" data-period="week">Week</button>
+            <button class="budget-tab-btn" data-period="month">Month</button>
+            <button class="budget-tab-btn" data-period="year">Year</button>
+        </div>
+
+        <!-- Controls to navigate between different weeks -->
+        <div class="week-selector-card">
+            <!-- Button to go back and view the previous week -->
+            <button class="week-nav-btn" id="prevWeekBtn">← Previous Week</button>
+            <!-- Shows which week you're currently viewing and the date range -->
+            <div class="week-date-range">
+                <!-- Label like "Current Week" or "Week 1" -->
+                <span class="week-label" id="weekLabel">Current Week</span>
+                <!-- The actual dates for the week, like "Nov 4 - Nov 10, 2025" -->
+                <span class="week-dates" id="weekDates">Nov 4 - Nov 10, 2025</span>
+            </div>
+            <!-- Button to move forward and view the next week -->
+            <button class="week-nav-btn" id="nextWeekBtn">Next Week →</button>
+        </div>
+
+        <!-- Grid showing key stats for the week  -->
+        <div class="weekly-overview-grid" id="weeklyOverviewGrid">
+        </div>
+
+        <!-- Section that breaks down spending day by day for the week -->
+        <section class="daily-breakdown-card">
+            <h2>Daily Spending Breakdown</h2>
+            <p class="section-subtitle">Your spending activity each day this week</p>
+
+            <!-- Grid showing a card for each day of the week -->
+            <div class="days-grid" id="daysGrid">
+            </div>
+        </section>
+
+        <!-- Section showing how much was spent in each category this week -->
+        <section class="weekly-category-card">
+            <h2>Weekly Spending by Category</h2>
+
+            <!-- Grid displaying spending broken down by categories like groceries, gas, etc -->
+            <div class="category-breakdown-grid" id="categoryBreakdownGrid">
+                <!-- Each card will show the category name, amount spent, and a progress bar (but not for mobile) -->
+            </div>
+        </section>
+
+        <!-- Section providing helpful tips and insights based on the week's spending -->
+        <section class="weekly-tips-card">
+            <h2>💡 This Week's Insights</h2>
+            <!-- Grid of tip cards with personalized suggestions -->
+            <div class="tips-grid" id="tipsGrid">
+                <!-- show things like "You spent 20% less this week!" or savings tips -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Navigation footer that only shows on mobile devices -->
+    <footer id="mobile-footer" class="mobile-footer"></footer>
+</body>
+
+</html>

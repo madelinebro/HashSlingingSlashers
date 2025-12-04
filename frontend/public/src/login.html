@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+        Financial Management Capstone Project
+        Log in 
+        Author: Samantha Saunsaucie
+        Date: 10/10/2025
+        -->
+    <!-- Setup and Title -->
+    <title>Login BloomFi</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="js/script.js" defer></script>
+    <script src="js/login.js" defer></script>
+</head>
+<!-- This is the main content area where users sign in to their account -->
+
+<body>
+    <!-- The BloomFi logo floats in the top left corner of the page -->
+    <div class="floating-logo">
+        <img src="images/logo.svg" alt="BloomFi Logo" />
+    </div>
+
+    <!-- Main container that holds the entire login card with a two-panel layout -->
+    <div class="login-container">
+        <!-- Card is divided into two sections: left for displaying info, right for the login form -->
+        <div class="login-card">
+            <div class="left-panel">
+                <div class="login-icon">🔐</div>
+                <h2>Manage Your Finances</h2>
+                <p>Take control of your financial future with BloomFi. Track expenses, set budgets, and transfer
+                    payments with ease.</p>
+            </div>
+
+            <!-- Right panel contains the actual login form where users enter their credentials -->
+            <div class="right-panel">
+                <!-- Header with a welcome message -->
+                <div class="login-header">
+                    <h1>Welcome</h1>
+                    <p>Log In to Manage Finances</p>
+                </div>
+
+                <!-- Form that users fill out to provide their username and password to authenticate the user -->
+                <form id="loginForm" class="login-form">
+                    <!-- Input field for the username -->
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <!-- Username field -->
+                            <input type="text" id="username" placeholder="🔑 Username" autocomplete="username" required>
+                        </div>
+                    </div>
+                    <!-- Input field for the password -->
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <!-- Password field -->
+                            <input type="password" id="password" placeholder="🔒 Password"
+                                autocomplete="current-password" required>
+                            <!-- Eye button that toggles between showing and hiding the password text -->
+                            <button type="button" class="toggle-btn" id="passwordToggle"
+                                aria-label="Toggle password visibility">
+                                <!-- Eye icon that changes when hovered, handled by JavaScript -->
+                                <img src="images/Eye off.svg" alt="Show password" class="eye-icon">
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Button that submits the form and attempts to log the user in -->
+                    <button type="submit" class="btn"><img src="images/Log in.svg" alt="" class="btn-icon">Log
+                        In</button>
+                </form>
+                <!-- Helpful links for users who forgot their information or need to create an account -->
+                <div class="links">
+                    <a href="forgot_password.html">Forgot Password?</a>
+                    <span>|</span>
+                    <a href="forgot_username.html">Forgot Username?</a>
+                    <p>Don't have an account? <a href="register.html"><strong>Create Account</strong></a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
