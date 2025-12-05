@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle what happens after the server responds
     if (success) {
       alert("Account created successfully! Redirecting to login...");
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     } else {
       // Turn the button back on if registration did not work
       submitButton.disabled = false;

@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // If we can't get user data, send them back to the login page
     if (!userData) {
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
       return;
     }
 
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Handle the logout button click
-  const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
+  const logoutLink = document.querySelector(".sidebar-user-menu a[href='index.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
       e.preventDefault();
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("userName");
       localStorage.removeItem("authToken");
       removeStoredAvatar();
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     });
   }
 

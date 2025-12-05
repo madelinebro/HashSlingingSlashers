@@ -78,7 +78,7 @@ function createMenuPanel() {
           <span class="menu-nav-icon">⚙️</span>
           Settings
         </a>
-        <a class="menu-nav-item" href="login.html">
+        <a class="menu-nav-item" href="index.html">
           <span class="menu-nav-icon">🚪</span>
           Log Out
         </a>

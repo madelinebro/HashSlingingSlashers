@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     if (!userData) {
       // No user data means not logged in, redirect to login
-      window.location.href = "login.html";
+      window.location.href = "index.html";
       return;
     }
 
@@ -380,7 +380,7 @@ function setupEventListeners() {
   }
 
   // Logout link functionality
-  const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
+  const logoutLink = document.querySelector(".sidebar-user-menu a[href='index.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", handleLogout);
   }
@@ -409,7 +409,7 @@ function handleLogout(e) {
   localStorage.removeItem("authToken");
   
   // Send user to login page
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 

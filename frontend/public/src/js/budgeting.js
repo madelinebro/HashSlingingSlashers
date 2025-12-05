@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Log Out Functionality
   // Clears the user session data and redirects them to login page
-  const logoutLink = document.querySelector(".sidebar-user-menu a[href='login.html']");
+  const logoutLink = document.querySelector(".sidebar-user-menu a[href='index.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
       e.preventDefault(); // Prevent default link navigation
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem("userName");
       
       // Redirect to login page
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     });
   }
 

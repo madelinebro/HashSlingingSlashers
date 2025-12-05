@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Redirect to login page after 2 seconds
         setTimeout(() => {
-          window.location.href = 'login.html';
+          window.location.href = 'index.html';
         }, 2000);
       } else {
         // Backend returned an error
