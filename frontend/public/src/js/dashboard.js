@@ -1,13 +1,16 @@
 /* ======================================================================
   BloomFi - Dashboard (dashboard.js)
   Author: Samantha Saunsaucie 
-  Date: 11/03/2025
+  Date: Updated 12/05/2025 - Backend Integration
    ====================================================================== */
+
+// API Configuration
+const API_BASE_URL = "http://localhost:8000/api";
 
 // Global state management
 let allTransactions = []; // All transactions from database
 let filteredTransactions = []; // Transactions after applying filters
-let userData = {}; // Current user's account data
+let userData = null; // Current user's account data
 let currentFilters = {
   startDate: null,
   endDate: null,
@@ -27,7 +30,7 @@ let tempEndDate = null;
 // Page initialization
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // Load user data from backend or mock data
+    // Load user data from backend
     userData = await loadUserData();
     
     if (!userData) {
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeUserProfile();
     calculateAndDisplayBalance();
     renderAccountChips();
-    renderCategorySpendingChart(); // NEW: Render the spending chart
+    renderCategorySpendingChart();
     renderTransactions();
     populateAccountDropdown();
     setupEventListeners();
@@ -60,134 +63,110 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Data loading functions 
-// Loads user data from the backend API or returns mock data for now
-// Returns user object with accounts and transactions, or null if not authenticated
+/**
+ * Loads user data from the backend API
+ * Returns user object with accounts and transactions, or null if not authenticated
+ */
 async function loadUserData() {
   try {
-    // Development mode flag - set to false when backend is ready
-    const useMockData = true;
+    // Fetch dashboard data from backend
+    const dashboardResponse = await fetch(`${API_BASE_URL}/dashboard/`);
     
-    if (useMockData) {
-      // Get stored user name or use default
-      const storedUserName = localStorage.getItem('userName') || "Jane";
-      
-      // Check if we have saved profile data in localStorage
-      const savedProfileData = localStorage.getItem('userProfileData');
-      
-      if (savedProfileData) {
-        // Use saved profile data if it exists
-        const profileData = JSON.parse(savedProfileData);
-        
-        // Merge profile data with transaction data
-        return {
-          name: profileData.fullName.split(' ')[0], // Use first name from saved profile
-          accounts: [
-            { id: 1, type: "Checking", number: "****3456", balance: 4890.25, color: "teal" },
-            { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
-          ],
-          transactions: [
-            { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1, category: "Bills & Utilities" },
-            { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1, category: "Income" },
-            { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2, category: "Groceries" },
-            { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2, category: "Entertainment" },
-            { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1, category: "Food & Drinks" },
-            { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1, category: "Car & Transportation" },
-            { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2, category: "Food & Drinks" },
-            { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2, category: "Income" },
-            { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1, category: "Bills & Utilities" },
-            { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1, category: "Shopping" },
-            { desc: "Target", date: "2025-10-14", amount: -124.50, accountId: 2, category: "Shopping" },
-            { desc: "Movie Tickets", date: "2025-10-12", amount: -32.00, accountId: 1, category: "Entertainment" },
-            { desc: "Uber", date: "2025-10-11", amount: -18.50, accountId: 2, category: "Car & Transportation" },
-            { desc: "Whole Foods", date: "2025-10-09", amount: -156.30, accountId: 1, category: "Groceries" },
-          ],
-          previousPeriod: {
-            income: 0,
-            expenses: 245.00
-          },
-          // Include full profile data
-          fullName: profileData.fullName,
-          username: profileData.username,
-          email: profileData.email,
-          mobile: profileData.mobile
-        };
-      }
-      
-      // If no saved data, return defaults using storedUserName
+    if (!dashboardResponse.ok) {
+      throw new Error(`HTTP error! status: ${dashboardResponse.status}`);
+    }
+    
+    const dashboardData = await dashboardResponse.json();
+    
+    // Fetch accounts data from backend
+    const accountsResponse = await fetch(`${API_BASE_URL}/accounts/`);
+    
+    if (!accountsResponse.ok) {
+      throw new Error(`HTTP error! status: ${accountsResponse.status}`);
+    }
+    
+    const accountsData = await accountsResponse.json();
+    
+    // Fetch all transactions from backend
+    const transactionsResponse = await fetch(`${API_BASE_URL}/transactions/`);
+    
+    if (!transactionsResponse.ok) {
+      throw new Error(`HTTP error! status: ${transactionsResponse.status}`);
+    }
+    
+    const transactionsData = await transactionsResponse.json();
+    
+    // Get user name from profile or localStorage
+    let userName = "User";
+    const savedProfileData = localStorage.getItem('userProfileData');
+    
+    if (savedProfileData) {
+      const profileData = JSON.parse(savedProfileData);
+      userName = profileData.fullName ? profileData.fullName.split(' ')[0] : profileData.username;
+    } else {
+      userName = localStorage.getItem('userName') || "User";
+    }
+    
+    // Transform backend data to frontend format
+    const accounts = accountsData.map(acc => ({
+      id: acc.account_id,
+      type: acc.account_type,
+      number: `****${String(acc.account_number).slice(-4)}`,
+      balance: parseFloat(acc.balance),
+      color: getAccountColor(acc.account_type)
+    }));
+    
+    const transactions = transactionsData.map(tx => ({
+      desc: tx.description || "Unknown",
+      date: tx.transaction_date,
+      amount: parseFloat(tx.amount) * (tx.transaction_type === 'Withdrawal' ? -1 : 1),
+      accountId: tx.account_id,
+      category: tx.category || "Uncategorized"
+    }));
+    
+    return {
+      name: userName,
+      accounts: accounts,
+      transactions: transactions,
+      totalBalance: dashboardData.total_balance
+    };
+    
+  } catch (error) {
+    console.error('Failed to load user data from backend:', error);
+    
+    // Fallback to localStorage if available
+    const savedProfileData = localStorage.getItem('userProfileData');
+    if (savedProfileData) {
+      const profileData = JSON.parse(savedProfileData);
       return {
-        name: storedUserName,
-        accounts: [
-          { id: 1, type: "Checking", number: "****3456", balance: 4890.25, color: "teal" },
-          { id: 2, type: "Savings", number: "****7890", balance: 3000.20, color: "blue" }
-        ],
-        transactions: [
-          { desc: "Electric Bill", date: "2025-10-08", amount: -120.75, accountId: 1, category: "Bills & Utilities" },
-          { desc: "Paycheck", date: "2025-10-05", amount: 2500.00, accountId: 1, category: "Income" },
-          { desc: "Grocery Store", date: "2025-10-04", amount: -89.45, accountId: 2, category: "Groceries" },
-          { desc: "Streaming Subscription", date: "2025-10-03", amount: -12.99, accountId: 2, category: "Entertainment" },
-          { desc: "Coffee Shop", date: "2025-10-27", amount: -5.50, accountId: 1, category: "Food & Drinks" },
-          { desc: "Gas Station", date: "2025-10-26", amount: -45.00, accountId: 1, category: "Car & Transportation" },
-          { desc: "Restaurant", date: "2025-10-25", amount: -67.89, accountId: 2, category: "Food & Drinks" },
-          { desc: "Freelance Payment", date: "2025-10-24", amount: 850.00, accountId: 2, category: "Income" },
-          { desc: "Internet Bill", date: "2025-10-20", amount: -79.99, accountId: 1, category: "Bills & Utilities" },
-          { desc: "Gym Membership", date: "2025-10-15", amount: -49.99, accountId: 1, category: "Shopping" },
-          { desc: "Target", date: "2025-10-14", amount: -124.50, accountId: 2, category: "Shopping" },
-          { desc: "Movie Tickets", date: "2025-10-12", amount: -32.00, accountId: 1, category: "Entertainment" },
-          { desc: "Uber", date: "2025-10-11", amount: -18.50, accountId: 2, category: "Car & Transportation" },
-          { desc: "Whole Foods", date: "2025-10-09", amount: -156.30, accountId: 1, category: "Groceries" },
-        ],
-        previousPeriod: {
-          income: 0,
-          expenses: 245.00
-        }
+        name: profileData.fullName ? profileData.fullName.split(' ')[0] : profileData.username,
+        accounts: [],
+        transactions: [],
+        totalBalance: 0
       };
     }
     
-    // Production mode - call actual backend API
-    // Check if user has authentication token
-    const authToken = localStorage.getItem('authToken');
-    
-    if (!authToken) {
-      console.warn('No authentication token found');
-      return null;
-    }
-
-    const response = await fetch('/api/user/dashboard', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      }
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Token expired or invalid, clear stored data
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userName');
-        return null;
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    // Make sure we got valid data back
-    if (!data.accounts || !data.transactions) {
-      console.error('Invalid data structure from API');
-      return null;
-    }
-    
-    return data;
-    
-  } catch (error) {
-    console.error('Failed to load user data:', error);
     return null;
   }
 }
 
+/**
+ * Helper function to assign colors to account types
+ */
+function getAccountColor(accountType) {
+  const colorMap = {
+    'Checking': 'teal',
+    'Savings': 'blue',
+    'Credit': 'purple',
+    'Investment': 'green'
+  };
+  return colorMap[accountType] || 'gray';
+}
+
 // UI initialization functions
-// Sets the greeting message based on time of day
+/**
+ * Sets the greeting message based on time of day
+ */
 function initializeGreeting() {
   const greetingTitle = document.getElementById("greetingTitle");
   if (!greetingTitle) return;
@@ -203,7 +182,9 @@ function initializeGreeting() {
   greetingTitle.textContent = `${greeting}, ${userData.name}`;
 }
 
-// Updates the user's name in the sidebar menu
+/**
+ * Updates the user's name in the sidebar menu
+ */
 function initializeUserProfile() {
   const userToggleBtn = document.getElementById("userToggle");
   if (!userToggleBtn) return;
@@ -225,19 +206,28 @@ function initializeUserProfile() {
   userToggleBtn.appendChild(chevron);
 }
 
-// Calculates total balance across all accounts and displays it
+/**
+ * Calculates total balance across all accounts and displays it
+ */
 function calculateAndDisplayBalance() {
   const totalBalanceEl = document.getElementById("totalBalance");
   if (!totalBalanceEl) return;
 
-  const totalBalance = userData.accounts.reduce((sum, acc) => sum + acc.balance, 0);
+  const totalBalance = userData.totalBalance || userData.accounts.reduce((sum, acc) => sum + acc.balance, 0);
   totalBalanceEl.textContent = formatCurrency(totalBalance);
 }
 
-// Creates and displays account chips showing account type and number
+/**
+ * Creates and displays account chips showing account type and number
+ */
 function renderAccountChips() {
   const accountChipsList = document.getElementById("accountChipsList");
   if (!accountChipsList) return;
+
+  if (userData.accounts.length === 0) {
+    accountChipsList.innerHTML = '<div style="padding: 20px; text-align: center; color: rgba(255,255,255,0.6);">No accounts found</div>';
+    return;
+  }
 
   accountChipsList.innerHTML = userData.accounts
     .map(acc => `
@@ -252,7 +242,9 @@ function renderAccountChips() {
     .join("");
 }
 
-// Fills the account dropdown in the filter modal with user's accounts
+/**
+ * Fills the account dropdown in the filter modal with user's accounts
+ */
 function populateAccountDropdown() {
   const filterAccountSelect = document.getElementById("filterAccount");
   if (!filterAccountSelect) return;
@@ -268,7 +260,9 @@ function populateAccountDropdown() {
   });
 }
 
-// NEW FUNCTION: Renders the category spending chart
+/**
+ * Renders the category spending chart
+ */
 function renderCategorySpendingChart() {
   const chartContainer = document.getElementById("categoryChart");
   if (!chartContainer) return;
@@ -348,7 +342,9 @@ function renderCategorySpendingChart() {
   });
 }
 
-// Attaches all event listeners for interactive elements
+/**
+ * Attaches all event listeners for interactive elements
+ */
 function setupEventListeners() {
   // User menu dropdown toggle
   const userToggle = document.getElementById("userToggle");
@@ -399,7 +395,9 @@ function setupEventListeners() {
   });
 }
 
-// Logs out the user and redirects to login page
+/**
+ * Logs out the user and redirects to login page
+ */
 function handleLogout(e) {
   e.preventDefault();
   
@@ -407,13 +405,15 @@ function handleLogout(e) {
   localStorage.removeItem("loggedIn");
   localStorage.removeItem("userName");
   localStorage.removeItem("authToken");
+  localStorage.removeItem("userProfileData");
   
   // Send user to login page
   window.location.href = "index.html";
 }
 
-
-// Displays an error message with a retry button
+/**
+ * Displays an error message with a retry button
+ */
 function showErrorState(message) {
   const mainContainer = document.querySelector('.main-container');
   if (!mainContainer) return;
@@ -433,7 +433,9 @@ function showErrorState(message) {
 }
 
 // Transaction table rendering
-//  Renders the transaction table with filtered and sorted transactions
+/**
+ * Renders the transaction table with filtered and sorted transactions
+ */
 function renderTransactions() {
   const txBody = document.getElementById("txBody");
   if (!txBody) return;
@@ -475,7 +477,9 @@ function renderTransactions() {
 }
 
 // Filter functions
-// Sets up the default date range of last 30 days
+/**
+ * Sets up the default date range of last 30 days
+ */
 function initializeDateRange() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -488,8 +492,10 @@ function initializeDateRange() {
   updateDateRangeDisplay();
 }
 
-// Filters transactions based on all active filters
-// Then updates the UI with filtered results
+/**
+ * Filters transactions based on all active filters
+ * Then updates the UI with filtered results
+ */
 function applyAllFilters() {
   filteredTransactions = allTransactions.filter(transaction => {
     // Filter by date range
@@ -526,7 +532,9 @@ function applyAllFilters() {
   renderCategorySpendingChart(); // Update chart with filtered data
 }
 
-// Opens the filter modal and populates it with current filter values
+/**
+ * Opens the filter modal and populates it with current filter values
+ */
 function openFilterModal() {
   const modal = document.getElementById("filterModal");
   if (!modal) return;
@@ -541,14 +549,18 @@ function openFilterModal() {
   modal.style.display = "flex";
 }
 
-// Closes the filter modal
+/**
+ * Closes the filter modal
+ */
 function closeFilterModal() {
   const modal = document.getElementById("filterModal");
   if (!modal) return;
   modal.style.display = "none";
 }
 
-// Saves filter selections from modal and applies them
+/**
+ * Saves filter selections from modal and applies them
+ */
 function applyFilters() {
   currentFilters.account = document.getElementById("filterAccount").value;
   currentFilters.type = document.getElementById("filterType").value;
@@ -564,7 +576,9 @@ function applyFilters() {
   closeFilterModal();
 }
 
-// Resets all filters to their default values
+/**
+ * Resets all filters to their default values
+ */
 function clearFilters() {
   currentFilters = {
     startDate: null,
@@ -588,7 +602,9 @@ function clearFilters() {
 }
 
 // Date picker functions
-// Opens the date picker modal and initializes calendar
+/**
+ * Opens the date picker modal and initializes calendar
+ */
 function openDatePicker() {
   const modal = document.getElementById("datePickerModal");
   if (!modal) return;
@@ -606,14 +622,18 @@ function openDatePicker() {
   modal.style.display = "flex";
 }
 
-// Closes the date picker modal
+/**
+ * Closes the date picker modal
+ */
 function closeDatePicker() {
   const modal = document.getElementById("datePickerModal");
   if (!modal) return;
   modal.style.display = "none";
 }
 
-// Sets date range based on quick filter buttons (today, week, month, all)
+/**
+ * Sets date range based on quick filter buttons (today, week, month, all)
+ */
 function setQuickFilter(period) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -641,7 +661,9 @@ function setQuickFilter(period) {
   renderCalendar();
 }
 
-// Applies the selected date range and closes modal
+/**
+ * Applies the selected date range and closes modal
+ */
 function applyDateFilter() {
   currentFilters.startDate = tempStartDate;
   currentFilters.endDate = tempEndDate;
@@ -651,7 +673,9 @@ function applyDateFilter() {
   closeDatePicker();
 }
 
-// Updates the date range text shown in the header
+/**
+ * Updates the date range text shown in the header
+ */
 function updateDateRangeDisplay() {
   const dateRangeEl = document.getElementById("dateRange");
   if (!dateRangeEl) return;
@@ -671,7 +695,9 @@ function updateDateRangeDisplay() {
 }
 
 // Calendar rendering and interaction
-// Renders the monthly calendar view with selectable dates
+/**
+ * Renders the monthly calendar view with selectable dates
+ */
 function renderCalendar() {
   const calendarDays = document.getElementById("calendarDays");
   const calendarMonthYear = document.getElementById("calendarMonthYear");
@@ -740,7 +766,9 @@ function renderCalendar() {
   }
 }
 
-// Creates a single calendar day element
+/**
+ * Creates a single calendar day element
+ */
 function createDayElement(dayNumber, className) {
   const dayEl = document.createElement('div');
   dayEl.className = `calendar-day ${className}`;
@@ -748,9 +776,10 @@ function createDayElement(dayNumber, className) {
   return dayEl;
 }
 
-
-// Handles clicking a date in the calendar
-// First click selects start date, second click selects end date
+/**
+ * Handles clicking a date in the calendar
+ * First click selects start date, second click selects end date
+ */
 function selectDate(date) {
   if (selectingStartDate) {
     tempStartDate = date;
@@ -775,8 +804,9 @@ function selectDate(date) {
   renderCalendar();
 }
 
-
-//  Updates the date selection display boxes above calendar
+/**
+ * Updates the date selection display boxes above calendar
+ */
 function updateDateDisplay() {
   const startDateEl = document.getElementById("selectedStartDate");
   const endDateEl = document.getElementById("selectedEndDate");
@@ -800,15 +830,15 @@ function updateDateDisplay() {
   endDateEl.parentElement.style.opacity = selectingStartDate ? '0.6' : '1';
 }
 
-
-// Changes the calendar to next or previous month
+/**
+ * Changes the calendar to next or previous month
+ */
 function changeMonth(direction) {
   currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + direction);
   renderCalendar();
 }
 
 // Utility functions
-// Formats a number as US currency (e.g., $1,234.56)
 function formatCurrency(amount) {
   return new Intl.NumberFormat("en-US", { 
     style: "currency", 
@@ -817,7 +847,6 @@ function formatCurrency(amount) {
 }
 
 
-// Formats a date in readable format (e.g., "Oct 15, 2025")
 function formatDate(dateInput) {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   return date.toLocaleDateString('en-US', { 
@@ -828,7 +857,6 @@ function formatDate(dateInput) {
 }
 
 
-// Converts date string to midnight local time for accurate date comparisons
 function normalizeDate(dateString) {
   const date = new Date(dateString);
   date.setHours(0, 0, 0, 0);
@@ -836,8 +864,6 @@ function normalizeDate(dateString) {
 }
 
 
-// Safely updates an element's text content
-// Logs a warning if element doesn't exist
 function updateElement(id, text) {
   const el = document.getElementById(id);
   if (!el) {
@@ -849,8 +875,6 @@ function updateElement(id, text) {
 }
 
 
-// Escapes HTML characters 
-// Converts user input to safe display text
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;

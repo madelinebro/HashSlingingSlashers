@@ -1,18 +1,17 @@
 /* ======================================================================
   BloomFi - Script (script.js)
   For functions that are used across multiple pages
+  Connected to Backend API
   Author: Samantha Saunsaucie 
-  Date: 11/03/2025
+  Date: Updated 12/05/2025
    ====================================================================== */
 
 // Wait for the page to finish loading before running any code
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   
- 
-  // load users profile info
-  loadUserProfileData();
+  // Load user's profile info from backend
+  await loadUserProfileData();
   
-
   // Get the current page's filename (like transfers.html or dashboard.html)
   const currentPage = window.location.pathname.split('/').pop();
 
@@ -31,16 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Profile management is handled automatically by profile_settings.js
-  // That file loads user data and populates profile information when needed
   console.log('BloomFi application initialized');
 });
 
 
-// Loads user profile data from localStorage and updates all relevant UI elements
-
-function loadUserProfileData() {
-  // Default values in case no saved data exists
+// Loads user profile data from backend API and updates all relevant UI elements
+async function loadUserProfileData() {
+  // API Configuration
+  const API_BASE_URL = 'http://localhost:8000/api';
+  
+  // Default values in case API call fails or no data exists
   let currentUser = {
     id: "user123",
     fullName: "Jane Doe",
@@ -52,30 +51,66 @@ function loadUserProfileData() {
     avatarUrl: "images/Generic avatar (1).svg"
   };
 
-  // Check if we have saved profile data in localStorage
-  const savedProfileData = localStorage.getItem('userProfileData');
-  
-  if (savedProfileData) {
-    try {
-      // Parse and use the saved profile data
-      const profileData = JSON.parse(savedProfileData);
+  try {
+    // Fetch profile data from backend
+    const response = await fetch(`${API_BASE_URL}/profile`);
+    
+    if (response.ok) {
+      const profileData = await response.json();
       
-      // Merge saved data with defaults (in case some fields are missing)
+      // Transform backend data to match frontend format
       currentUser = {
-        ...currentUser,
-        fullName: profileData.fullName || currentUser.fullName,
+        id: profileData.user_id?.toString() || currentUser.id,
+        fullName: profileData.username || currentUser.fullName, // Backend doesn't have full_name yet
         username: profileData.username || currentUser.username,
         email: profileData.email || currentUser.email,
-        mobile: profileData.mobile || currentUser.mobile,
-        address: profileData.address || currentUser.address,
-        memberSince: profileData.memberSince || currentUser.memberSince,
-        avatarUrl: profileData.avatarUrl || currentUser.avatarUrl
+        mobile: profileData.phone_number || currentUser.mobile,
+        address: currentUser.address, // Backend doesn't have address field
+        memberSince: profileData.created_at 
+          ? new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+          : currentUser.memberSince,
+        avatarUrl: currentUser.avatarUrl // Backend doesn't have picture_url in your current schema
       };
       
-      console.log('Loaded saved profile data:', profileData);
-    } catch (e) {
-      console.error('Error parsing saved profile data:', e);
-      // Continue with default values if parsing fails
+      // Save to localStorage for other pages to access
+      localStorage.setItem('userProfileData', JSON.stringify(currentUser));
+      
+      console.log('Loaded profile data from backend:', profileData);
+    } else {
+      console.warn('Failed to load profile from backend, using localStorage or defaults');
+      
+      // Try to load from localStorage as fallback
+      const savedProfileData = localStorage.getItem('userProfileData');
+      if (savedProfileData) {
+        try {
+          const profileData = JSON.parse(savedProfileData);
+          currentUser = {
+            ...currentUser,
+            fullName: profileData.fullName || currentUser.fullName,
+            username: profileData.username || currentUser.username,
+            email: profileData.email || currentUser.email,
+            mobile: profileData.mobile || currentUser.mobile,
+            address: profileData.address || currentUser.address,
+            memberSince: profileData.memberSince || currentUser.memberSince,
+            avatarUrl: profileData.avatarUrl || currentUser.avatarUrl
+          };
+        } catch (e) {
+          console.error('Error parsing saved profile data:', e);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching profile from backend:', error);
+    
+    // Fallback to localStorage
+    const savedProfileData = localStorage.getItem('userProfileData');
+    if (savedProfileData) {
+      try {
+        const profileData = JSON.parse(savedProfileData);
+        currentUser = { ...currentUser, ...profileData };
+      } catch (e) {
+        console.error('Error parsing saved profile data:', e);
+      }
     }
   }
 

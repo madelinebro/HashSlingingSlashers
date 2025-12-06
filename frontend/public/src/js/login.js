@@ -1,8 +1,11 @@
 /* ======================================================================
   BloomFi - Log In (login.js)
   Author: Samantha Saunsaucie 
-  Date: 11/03/2025
+  Date: Updated 12/05/2025 - Backend Integration
    ====================================================================== */
+
+// API Configuration
+const API_BASE_URL = "http://localhost:8000/auth";
 
 // Form submission handling
 const loginForm = document.getElementById("loginForm");
@@ -29,6 +32,60 @@ function clearError(field) {
   field.setAttribute("aria-invalid", "false");
 }
 
+// Show loading state on submit button
+function setLoading(isLoading) {
+  const submitBtn = loginForm.querySelector('button[type="submit"]');
+  if (!submitBtn) return;
+  
+  if (isLoading) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Logging in...";
+  } else {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Log In";
+  }
+}
+
+// Authenticate user with backend
+async function authenticateUser(credentials) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/login`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        email: credentials.username, // Backend expects 'email' field
+        password: credentials.password
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Authentication failed');
+    }
+    
+    const data = await response.json();
+    
+    // Store authentication tokens
+    localStorage.setItem('authToken', data.access_token);
+    if (data.csrf_token) {
+      localStorage.setItem('csrfToken', data.csrf_token);
+    }
+    
+    // Store username for personalization
+    localStorage.setItem('userName', credentials.username.split('@')[0]); // Use email username part
+    localStorage.setItem('loggedIn', 'true');
+    
+    // Redirect to dashboard
+    window.location.href = 'dashboard.html';
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error; // Re-throw to handle in form submit
+  }
+}
+
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -40,9 +97,16 @@ if (loginForm) {
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
     
-    // Validate username field
+    // Validate username field (should be email)
     if (!username) {
-      showError(usernameInput, "Username is required");
+      showError(usernameInput, "Email is required");
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(username)) {
+      showError(usernameInput, "Please enter a valid email address");
       return;
     }
     
@@ -54,11 +118,25 @@ if (loginForm) {
     
     const credentials = { username, password };
     
-    // TODO: Replace with actual API call when backend is ready
-    // Example: await authenticateUser(credentials);
+    // Set loading state
+    setLoading(true);
     
-    // For now, just redirect to dashboard
-    window.location.href = "dashboard.html";
+    try {
+      // Authenticate with backend
+      await authenticateUser(credentials);
+    } catch (error) {
+      // Show error to user
+      setLoading(false);
+      
+      if (error.message.includes('Invalid credentials') || error.message.includes('401')) {
+        showError(usernameInput, "Invalid email or password");
+        showError(passwordInput, "Invalid email or password");
+      } else if (error.message.includes('Failed to fetch')) {
+        showError(usernameInput, "Cannot connect to server. Please try again later.");
+      } else {
+        showError(usernameInput, error.message || "Login failed. Please try again.");
+      }
+    }
   });
 }
 
@@ -81,28 +159,3 @@ if (passwordToggle && passwordInput && passwordIcon) {
     passwordIcon.alt = "Show password";
   });
 }
-
-// Future API integration
-// This function will handle actual authentication when backend is ready
-/*
-async function authenticateUser(credentials) {
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    });
-    
-    if (!response.ok) throw new Error('Authentication failed');
-    
-    const data = await response.json();
-    // Store authentication token and redirect to dashboard
-    sessionStorage.setItem('authToken', data.token);
-    window.location.href = 'dashboard.html';
-    
-  } catch (error) {
-    console.error('Login error:', error);
-    // Show error message to user
-  }
-}
-*/

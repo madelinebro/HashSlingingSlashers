@@ -1,36 +1,131 @@
 /* ======================================================================
   BloomFi - Budgeting (budgeting.js)
   Incorporates functionality for monthly, weekly, and yearly views
+  Connected to FastAPI Backend
   Author: Samantha Saunsaucie 
-  Date: 11/03/2025
+  Date: Updated 12/05/2025
    ====================================================================== */
 
-// Wait for DOM to be fully loaded before executing scripts
+// ============================================
+// DOM READY INITIALIZATION
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  // API Configuration
+  const API_BASE_URL = 'http://localhost:8000/api';
+  
+  // ============================================
+  // API HELPER FUNCTIONS
+  // ============================================
+
+  /**
+   * Fetch budgets from the backend
+   */
+  async function fetchBudgets(period = null) {
+    try {
+      let url = `${API_BASE_URL}/budgets`;
+      
+      // Add query parameters if period is specified
+      if (period) {
+        url += `?period=${period}`;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch budgets: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching budgets:', error);
+      showNotification('⚠️ Failed to load budget data', 'error');
+      return [];
+    }
+  }
+
+  /**
+   * Fetch transactions from the backend with optional filters
+   */
+  async function fetchTransactions(startDate = null, endDate = null, category = null) {
+    try {
+      let url = `${API_BASE_URL}/transactions`;
+      const params = new URLSearchParams();
+      
+      if (startDate) params.append('start_date', startDate);
+      if (endDate) params.append('end_date', endDate);
+      if (category) params.append('category', category);
+      
+      const queryString = params.toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch transactions: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      showNotification('⚠️ Failed to load transaction data', 'error');
+      return [];
+    }
+  }
+
+  /**
+   * Create or update a budget
+   */
+  async function saveBudgetToBackend(budgetData) {
+    try {
+      const method = budgetData.budget_id ? 'PUT' : 'POST';
+      const url = budgetData.budget_id 
+        ? `${API_BASE_URL}/budgets/${budgetData.budget_id}` 
+        : `${API_BASE_URL}/budgets`;
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(budgetData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to save budget: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      showNotification('⚠️ Failed to save budget', 'error');
+      return null;
+    }
+  }
+
+  // ============================================
+  // MONTHLY BUDGET FUNCTIONS
+  // ============================================
   
   //  User Menu Toggle (Works on all pages) 
-  // Handles the dropdown menu in the user profile section
   const userToggle = document.getElementById("userToggle");
   const userMenu = document.getElementById("userMenu");
   
   if (userToggle && userMenu) {
-    // Toggle menu visibility when clicking the user button
     userToggle.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent click from bubbling to document
+      e.stopPropagation();
       
-      // Check current state and toggle
       const expanded = userToggle.getAttribute("aria-expanded") === "true";
       userToggle.setAttribute("aria-expanded", !expanded);
       userMenu.style.display = expanded ? "none" : "block";
       
-      // Rotate chevron icon to indicate menu state
       const chevron = userToggle.querySelector(".chev");
       if (chevron) {
         chevron.style.transform = expanded ? "rotate(0deg)" : "rotate(-90deg)";
       }
     });
 
-    // Close menu when clicking anywhere outside of it
     document.addEventListener("click", () => {
       userToggle.setAttribute("aria-expanded", "false");
       userMenu.style.display = "none";
@@ -42,21 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Log Out Functionality
-  // Clears the user session data and redirects them to login page
   const logoutLink = document.querySelector(".sidebar-user-menu a[href='index.html']");
   if (logoutLink) {
     logoutLink.addEventListener("click", (e) => {
-      e.preventDefault(); // Prevent default link navigation
+      e.preventDefault();
       
-      // Clear authentication data from localStorage
       localStorage.removeItem("loggedIn");
       localStorage.removeItem("userName");
       
-      // Redirect to login page
       window.location.href = "index.html";
     });
   }
-
 
   // Budget View Navigation Tabs
   const budgetTabs = document.querySelectorAll('.budget-tab-btn');
@@ -66,25 +157,25 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.addEventListener('click', (e) => {
         e.preventDefault();
       
-      const period = tab.getAttribute('data-period');
+        const period = tab.getAttribute('data-period');
       
-      if (period) {
-        let targetPage = '';
-        if (period === 'week') {
-          targetPage = 'budgeting_week.html';
-        } else if (period === 'month') {
-          targetPage = 'budgeting_month.html';
-        } else if (period === 'year') {
-          targetPage = 'budgeting_year.html';
-        }
+        if (period) {
+          let targetPage = '';
+          if (period === 'week') {
+            targetPage = 'budgeting_week.html';
+          } else if (period === 'month') {
+            targetPage = 'budgeting_month.html';
+          } else if (period === 'year') {
+            targetPage = 'budgeting_year.html';
+          }
         
-        if (targetPage) {
-          window.location.href = targetPage;
+          if (targetPage) {
+            window.location.href = targetPage;
+          }
         }
-      }
+      });
     });
-  });
-}
+  }
   
   // Initialize the appropriate budget page based on current URL
   if (window.location.pathname.includes('budgeting_month')) {
@@ -100,29 +191,117 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ============================================
+// API HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Fetch budgets from the backend
+ */
+async function fetchBudgets(period = null) {
+  try {
+    let url = API_ENDPOINTS.budgets;
+    
+    // Add query parameters if period is specified
+    if (period) {
+      url += `?period=${period}`;
+    }
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch budgets: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching budgets:', error);
+    showNotification('⚠️ Failed to load budget data', 'error');
+    return [];
+  }
+}
+
+/**
+ * Fetch transactions from the backend with optional filters
+ */
+async function fetchTransactions(startDate = null, endDate = null, category = null) {
+  try {
+    let url = API_ENDPOINTS.transactions;
+    const params = new URLSearchParams();
+    
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (category) params.append('category', category);
+    
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch transactions: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    showNotification('⚠️ Failed to load transaction data', 'error');
+    return [];
+  }
+}
+
+/**
+ * Create or update a budget
+ */
+async function saveBudgetToBackend(budgetData) {
+  try {
+    const method = budgetData.id ? 'PUT' : 'POST';
+    const url = budgetData.id 
+      ? `${API_ENDPOINTS.budgets}/${budgetData.id}` 
+      : API_ENDPOINTS.budgets;
+    
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(budgetData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to save budget: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving budget:', error);
+    showNotification('⚠️ Failed to save budget', 'error');
+    return null;
+  }
+}
 
 // ============================================
 // MONTHLY BUDGET FUNCTIONS
 // ============================================
-function initMonthlyBudget() {
+async function initMonthlyBudget() {
   console.log('Initializing Monthly Budget Page...');
   
-  // Load saved or default budget data and display it
-  const budgetData = loadMonthlyBudgetData();
+  // Load budget data from backend
+  const budgetData = await loadMonthlyBudgetData();
   renderMonthlyBudget(budgetData);
   
   // Budget form submission
   const budgetForm = document.getElementById('budgetForm');
   
   if (budgetForm) {
-    // Handle save button click
     budgetForm.addEventListener('submit', (e) => {
-      e.preventDefault(); // Prevent page reload
+      e.preventDefault();
       saveMonthlyBudget();
     });
 
-    // Budget Calculation
-    // Update totals as user types in any input field
+    // Real-time calculation
     const inputs = budgetForm.querySelectorAll('input[type="number"]');
     inputs.forEach(input => {
       input.addEventListener('input', () => {
@@ -132,14 +311,12 @@ function initMonthlyBudget() {
   }
 
   // Reset button
-  // Restore default budget values
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', async () => {
       if (confirm('Reset to default values?')) {
-        // Clear saved data and reload defaults
         localStorage.removeItem('monthlyBudget');
-        const defaultData = getDefaultMonthlyBudget();
+        const defaultData = await loadMonthlyBudgetData();
         renderMonthlyBudget(defaultData);
         showNotification('ℹ️ Budget reset to defaults', 'info');
       }
@@ -147,89 +324,80 @@ function initMonthlyBudget() {
   }
 }
 
-// Gets default monthly budget structure
-function getDefaultMonthlyBudget() {
-  return {
-    totalBudget: 3705, // Total monthly budget allocation
-    categories: [
-      { 
-        id: 'bills', 
-        name: 'Bills & Utilities', 
-        budgeted: 2200, // Amount allocated for this category
-        spent: 2135,    // Amount actually spent
-        icon: '💡',
-        colorClass: 'bills' 
-      },
-      { 
-        id: 'shopping', 
-        name: 'Shopping', 
-        budgeted: 150, 
-        spent: 58, 
-        icon: '🛍️',
-        colorClass: 'shopping'
-      },
-      { 
-        id: 'car', 
-        name: 'Car & Transportation', 
-        budgeted: 150, 
-        spent: 71, 
-        icon: '🚗',
-        colorClass: 'transport'
-      },
-      { 
-        id: 'groceries', 
-        name: 'Groceries', 
-        budgeted: 300, 
-        spent: 126, 
-        icon: '🛒',
-        colorClass: 'groceries'
-      },
-      { 
-        id: 'food', 
-        name: 'Food & Drinks', 
-        budgeted: 250, 
-        spent: 133, 
-        icon: '🍔',
-        colorClass: 'food'
-      },
-      { 
-        id: 'entertainment', 
-        name: 'Entertainment', 
-        budgeted: 100, 
-        spent: 42, 
-        icon: '🎬',
-        colorClass: 'entertainment'
-      }
-    ],
-    month: 'October',
-    year: 2025
+/**
+ * Load monthly budget data from backend
+ * Combines budget settings with actual spending from transactions
+ */
+async function loadMonthlyBudgetData() {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // 1-12
+  const currentYear = currentDate.getFullYear();
+  
+  // Get the first and last day of current month
+  const startDate = new Date(currentYear, currentDate.getMonth(), 1).toISOString().split('T')[0];
+  const endDate = new Date(currentYear, currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+  
+  // Fetch budgets and transactions in parallel
+  const [budgets, transactions] = await Promise.all([
+    fetchBudgets('monthly'),
+    fetchTransactions(startDate, endDate)
+  ]);
+  
+  // Process budget data
+  const budgetData = {
+    totalBudget: 0,
+    categories: [],
+    month: currentDate.toLocaleDateString('en-US', { month: 'long' }),
+    year: currentYear
   };
-}
-
-
-// Load monthly budget data
-function loadMonthlyBudgetData() {
-  const savedBudget = localStorage.getItem('monthlyBudget');
   
-  if (savedBudget) {
-    try {
-      return JSON.parse(savedBudget);
-    } catch (e) {
-      console.error('Error loading saved budget:', e);
-      return getDefaultMonthlyBudget();
+  // Define category mappings
+  const categoryMap = {
+    'bills': { name: 'Bills & Utilities', icon: '💡', colorClass: 'bills' },
+    'shopping': { name: 'Shopping', icon: '🛍️', colorClass: 'shopping' },
+    'car': { name: 'Car & Transportation', icon: '🚗', colorClass: 'transport' },
+    'groceries': { name: 'Groceries', icon: '🛒', colorClass: 'groceries' },
+    'food': { name: 'Food & Drinks', icon: '🍔', colorClass: 'food' },
+    'entertainment': { name: 'Entertainment', icon: '🎬', colorClass: 'entertainment' }
+  };
+  
+  // Calculate spending by category from transactions
+  const spendingByCategory = {};
+  transactions.forEach(transaction => {
+    const category = transaction.category || 'other';
+    if (!spendingByCategory[category]) {
+      spendingByCategory[category] = 0;
     }
-  }
+    spendingByCategory[category] += Math.abs(transaction.amount);
+  });
   
-  // No saved data found, return defaults
-  return getDefaultMonthlyBudget();
+  // Build categories array
+  Object.keys(categoryMap).forEach(categoryId => {
+    const categoryInfo = categoryMap[categoryId];
+    const budget = budgets.find(b => b.category === categoryId);
+    
+    budgetData.categories.push({
+      id: categoryId,
+      budget_id: budget ? budget.budget_id : null, // Store backend ID for updates
+      name: categoryInfo.name,
+      budgeted: budget ? budget.amount : 0,
+      spent: spendingByCategory[categoryId] || 0,
+      icon: categoryInfo.icon,
+      colorClass: categoryInfo.colorClass
+    });
+    
+    budgetData.totalBudget += (budget ? budget.amount : 0);
+  });
+  
+  return budgetData;
 }
 
 // Render monthly budget to the page
 function renderMonthlyBudget(budgetData) {
-  // update month display
+  // Update month display
   const currentMonthEl = document.getElementById('currentMonth');
   if (currentMonthEl) {
-    currentMonthEl.textContent = budgetData.month || 'October';
+    currentMonthEl.textContent = budgetData.month || 'Current Month';
   }
   
   // Calculate totals
@@ -249,8 +417,8 @@ function renderMonthlyBudget(budgetData) {
   }
   
   // Render components
-  renderCategoryTable(budgetData);  // Spending breakdown table
-  renderBudgetForm(budgetData);     // Editable budget form
+  renderCategoryTable(budgetData);
+  renderBudgetForm(budgetData);
 }
 
 // Render category breakdown table
@@ -258,9 +426,8 @@ function renderCategoryTable(budgetData) {
   const tbody = document.getElementById('categoryTableBody');
   if (!tbody) return;
   
-  tbody.innerHTML = ''; // Clear existing rows
+  tbody.innerHTML = '';
   
-  // Create a row for each category
   budgetData.categories.forEach(category => {
     const percentage = calculatePercentage(category.spent, budgetData.totalBudget);
     const status = getSpendingStatus(category.spent, category.budgeted);
@@ -282,7 +449,7 @@ function renderBudgetForm(budgetData) {
   const formGrid = document.getElementById('budgetFormGrid');
   if (!formGrid) return;
   
-  formGrid.innerHTML = ''; // Clear existing form fields
+  formGrid.innerHTML = '';
   
   // Total Monthly budget input
   const totalBudgetGroup = document.createElement('div');
@@ -311,13 +478,11 @@ function renderBudgetForm(budgetData) {
   });
   
   // Attach event listeners
-  // Add real-time calculation to all inputs
   const inputs = formGrid.querySelectorAll('input[type="number"]');
   inputs.forEach(input => {
     input.addEventListener('input', calculateAndUpdateMonthlyTotals);
   });
   
-  // Perform initial calculation
   calculateAndUpdateMonthlyTotals();
 }
 
@@ -326,33 +491,25 @@ function calculateAndUpdateMonthlyTotals() {
   const monthlySpendInput = document.getElementById('monthlySpend');
   const totalBudget = parseFloat(monthlySpendInput?.value) || 0;
   
-  // Get current budget data to access spent amounts
-  const budgetData = loadMonthlyBudgetData();
-  
   // Calculate total allocated budget
   let totalAllocated = 0;
-  budgetData.categories.forEach(category => {
-    const input = document.getElementById(category.id);
-    if (input) {
-      totalAllocated += parseFloat(input.value) || 0;
-    }
+  const categoryInputs = document.querySelectorAll('input[data-category-id]');
+  categoryInputs.forEach(input => {
+    totalAllocated += parseFloat(input.value) || 0;
   });
   
   const remaining = totalBudget - totalAllocated;
   
-  // visual for total budget input
+  // Visual feedback for total budget input
   if (monthlySpendInput) {
-    // Over-allocated: Red warning
     if (totalAllocated > totalBudget) {
       monthlySpendInput.style.borderColor = '#ef4444';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
     } 
-    // Near limit: Orange warning
     else if (remaining < totalBudget * 0.1) {
       monthlySpendInput.style.borderColor = '#f59e0b';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
     } 
-    // Healthy: Green confirmation
     else {
       monthlySpendInput.style.borderColor = '#10b981';
       monthlySpendInput.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
@@ -360,45 +517,72 @@ function calculateAndUpdateMonthlyTotals() {
   }
 }
 
-// Save monthly budget to localStorage
-function saveMonthlyBudget() {
-  const budgetData = loadMonthlyBudgetData();
-  
-  // Update total budget
+// Save monthly budget to backend
+async function saveMonthlyBudget() {
   const monthlySpendInput = document.getElementById('monthlySpend');
-  budgetData.totalBudget = parseFloat(monthlySpendInput?.value) || 0;
+  const totalBudget = parseFloat(monthlySpendInput?.value) || 0;
   
-  // Update category budgets
+  // Get current budget data to access budget_ids
+  const currentBudgetData = await loadMonthlyBudgetData();
+  
+  // Collect category budgets
+  const categoryBudgets = [];
   let totalAllocated = 0;
-  budgetData.categories.forEach(category => {
-    const input = document.getElementById(category.id);
-    if (input) {
-      category.budgeted = parseFloat(input.value) || 0;
-      totalAllocated += category.budgeted;
+  
+  const categoryInputs = document.querySelectorAll('input[data-category-id]');
+  categoryInputs.forEach(input => {
+    const categoryId = input.getAttribute('data-category-id');
+    const amount = parseFloat(input.value) || 0;
+    
+    // Find the existing budget for this category (if it exists)
+    const existingCategory = currentBudgetData.categories.find(c => c.id === categoryId);
+    
+    const budgetPayload = {
+      category: categoryId,
+      amount: amount,
+      period: 'monthly'
+    };
+    
+    // If updating existing budget, include the budget_id
+    if (existingCategory && existingCategory.budget_id) {
+      budgetPayload.budget_id = existingCategory.budget_id;
     }
+    
+    categoryBudgets.push(budgetPayload);
+    totalAllocated += amount;
   });
   
   // Validation
-  // Prevent saving if over-allocated
-  if (totalAllocated > budgetData.totalBudget) {
+  if (totalAllocated > totalBudget) {
     showNotification(
-      `⚠️ Warning: Total allocated (${formatCurrency(totalAllocated)}) exceeds monthly budget (${formatCurrency(budgetData.totalBudget)})!`, 
+      `⚠️ Warning: Total allocated (${formatCurrency(totalAllocated)}) exceeds monthly budget (${formatCurrency(totalBudget)})!`, 
       'warning'
     );
-    return; // Don't save invalid data
+    return;
   }
   
-  // Save to localStorage
-  budgetData.lastUpdated = new Date().toISOString();
-  localStorage.setItem('monthlyBudget', JSON.stringify(budgetData));
+  // Save each category budget to backend
+  const savePromises = categoryBudgets.map(budget => saveBudgetToBackend(budget));
   
-  // Render and notify
-  renderMonthlyBudget(budgetData);
-  showNotification('✅ Budget updated successfully!', 'success');
+  try {
+    await Promise.all(savePromises);
+    showNotification('✅ Budget updated successfully!', 'success');
+    
+    // Reload data to reflect changes
+    const updatedData = await loadMonthlyBudgetData();
+    renderMonthlyBudget(updatedData);
+  } catch (error) {
+    console.error('Error saving budgets:', error);
+    showNotification('⚠️ Failed to save budget', 'error');
+  }
 }
 
 // Determine spending status based on actual vs. budgeted
 function getSpendingStatus(spent, budgeted) {
+  if (budgeted === 0) {
+    return { class: 'under-budget', label: 'No Budget' };
+  }
+  
   const percentUsed = (spent / budgeted) * 100;
   
   if (percentUsed >= 100) {
@@ -413,18 +597,16 @@ function getSpendingStatus(spent, budgeted) {
 // ============================================
 // WEEKLY BUDGET FUNCTIONS
 // ============================================
-function initWeeklyBudget() {
+async function initWeeklyBudget() {
   console.log('Initializing Weekly Budget Page...');
   
-  // Load and display the current week's budget
-  const weeklyData = loadWeeklyBudgetData();
+  const weeklyData = await loadWeeklyBudgetData();
   renderWeeklyBudget(weeklyData);
   
   // Week navigation buttons
   const prevWeekBtn = document.getElementById('prevWeekBtn');
   const nextWeekBtn = document.getElementById('nextWeekBtn');
   
-  // Navigate to previous week
   if (prevWeekBtn) {
     prevWeekBtn.addEventListener('click', () => {
       navigateWeek(-1);
@@ -432,7 +614,6 @@ function initWeeklyBudget() {
     });
   }
   
-  // Navigate to next week
   if (nextWeekBtn) {
     nextWeekBtn.addEventListener('click', () => {
       navigateWeek(1);
@@ -443,197 +624,180 @@ function initWeeklyBudget() {
   console.log('Weekly budget initialized successfully!');
 }
 
-
-// Get default weekly budget structure
-function getDefaultWeeklyBudget() {
+/**
+ * Load weekly budget data from backend
+ */
+async function loadWeeklyBudgetData(weekOffset = 0) {
+  // Calculate the week dates based on offset
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - daysToMonday + (weekOffset * 7));
+  weekStart.setHours(0, 0, 0, 0);
+  
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+  
+  const startDateISO = weekStart.toISOString().split('T')[0];
+  const endDateISO = weekEnd.toISOString().split('T')[0];
+  
+  // Fetch transactions for the week
+  const transactions = await fetchTransactions(startDateISO, endDateISO);
+  
+  // Fetch weekly budgets
+  const budgets = await fetchBudgets('weekly');
+  
+  // Calculate weekly budget total
+  const weeklyBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+  
+  // Calculate total spent
+  const totalSpent = transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  
+  // Build daily data
+  const dailyData = [];
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  for (let i = 0; i < 7; i++) {
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + i);
+    const dayDateISO = dayDate.toISOString().split('T')[0];
+    
+    // Filter transactions for this day
+    const dayTransactions = transactions.filter(t => {
+      const tDate = new Date(t.date).toISOString().split('T')[0];
+      return tDate === dayDateISO;
+    });
+    
+    const dayAmount = dayTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    // Find top category for the day
+    const categoryTotals = {};
+    dayTransactions.forEach(t => {
+      const cat = t.category || 'other';
+      categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(t.amount);
+    });
+    
+    const topCategoryId = Object.keys(categoryTotals).reduce((a, b) => 
+      categoryTotals[a] > categoryTotals[b] ? a : b, 'other'
+    );
+    
+    const categoryMap = {
+      'bills': { name: 'Bills & Utilities', colorClass: 'bills' },
+      'shopping': { name: 'Shopping', colorClass: 'shopping' },
+      'car': { name: 'Transportation', colorClass: 'transport' },
+      'groceries': { name: 'Groceries', colorClass: 'groceries' },
+      'food': { name: 'Food & Drinks', colorClass: 'food' },
+      'entertainment': { name: 'Entertainment', colorClass: 'entertainment' },
+      'other': { name: 'Other', colorClass: 'other' }
+    };
+    
+    const topCategoryInfo = categoryMap[topCategoryId] || categoryMap['other'];
+    
+    dailyData.push({
+      day: daysOfWeek[i],
+      date: dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      dateISO: dayDateISO,
+      amount: dayAmount,
+      transactions: dayTransactions.length,
+      topCategory: {
+        name: topCategoryInfo.name,
+        amount: categoryTotals[topCategoryId] || 0,
+        colorClass: topCategoryInfo.colorClass
+      },
+      isToday: dayDateISO === new Date().toISOString().split('T')[0]
+    });
+  }
+  
+  // Build category data
+  const categorySpending = {};
+  transactions.forEach(t => {
+    const cat = t.category || 'other';
+    categorySpending[cat] = (categorySpending[cat] || 0) + Math.abs(t.amount);
+  });
+  
+  const categoryData = [];
+  const categoryMap = {
+    'groceries': { name: 'Groceries', colorClass: 'groceries' },
+    'food': { name: 'Food & Drinks', colorClass: 'food' },
+    'shopping': { name: 'Shopping', colorClass: 'shopping' },
+    'car': { name: 'Transportation', colorClass: 'transport' },
+    'entertainment': { name: 'Entertainment', colorClass: 'entertainment' },
+    'bills': { name: 'Bills & Utilities', colorClass: 'bills' }
+  };
+  
+  Object.keys(categoryMap).forEach(catId => {
+    const budget = budgets.find(b => b.category === catId);
+    categoryData.push({
+      id: catId,
+      name: categoryMap[catId].name,
+      spent: categorySpending[catId] || 0,
+      budget: budget ? budget.amount : 0,
+      colorClass: categoryMap[catId].colorClass
+    });
+  });
+  
+  // Generate insights
+  const insights = [];
+  const remaining = weeklyBudget - totalSpent;
+  
+  if (remaining > 0) {
+    insights.push({
+      type: 'success',
+      icon: '✓',
+      title: 'Great Job!',
+      message: "You're on track to stay under budget this week"
+    });
+  } else {
+    insights.push({
+      type: 'warning',
+      icon: '⚠',
+      title: 'Over Budget',
+      message: `You've exceeded your weekly budget by ${formatCurrency(Math.abs(remaining))}`
+    });
+  }
+  
+  // Find highest spending day
+  const maxDaySpending = Math.max(...dailyData.map(d => d.amount));
+  const highestDay = dailyData.find(d => d.amount === maxDaySpending);
+  
+  if (highestDay && maxDaySpending > 0) {
+    insights.push({
+      type: 'suggestion',
+      icon: '💡',
+      title: 'Smart Tip',
+      message: `${highestDay.day} was your highest spending day at ${formatCurrency(maxDaySpending)}`
+    });
+  }
+  
   return {
-    weekStart: '2025-11-04',      // ISO date for week start
-    weekEnd: '2025-11-10',        // ISO date for week end
-    weekLabel: 'Current Week',
-    weeklyBudget: 850,            // Total weekly budget
-    totalSpent: 592,              // Total spent this week
-    lastWeekSpent: 640,           // For comparison purposes
-    
-    // Daily Spending breakdown
-    dailyData: [
-      {
-        day: 'Monday',
-        date: 'Nov 4',
-        dateISO: '2025-11-04',
-        amount: 127.50,
-        transactions: 8,
-        topCategory: { name: 'Groceries', amount: 52, colorClass: 'groceries' },
-        isToday: false
-      },
-      {
-        day: 'Tuesday',
-        date: 'Nov 5',
-        dateISO: '2025-11-05',
-        amount: 43.20,
-        transactions: 3,
-        topCategory: { name: 'Food & Drinks', amount: 28, colorClass: 'food' },
-        isToday: false
-      },
-      {
-        day: 'Wednesday',
-        date: 'Nov 6',
-        dateISO: '2025-11-06',
-        amount: 89.75,
-        transactions: 5,
-        topCategory: { name: 'Transportation', amount: 45, colorClass: 'transport' },
-        isToday: false
-      },
-      {
-        day: 'Thursday',
-        date: 'Nov 7',
-        dateISO: '2025-11-07',
-        amount: 156.30,
-        transactions: 6,
-        topCategory: { name: 'Shopping', amount: 98, colorClass: 'shopping' },
-        isToday: false
-      },
-      {
-        day: 'Friday',
-        date: 'Nov 8',
-        dateISO: '2025-11-08',
-        amount: 78.40,
-        transactions: 7,
-        topCategory: { name: 'Food & Drinks', amount: 45, colorClass: 'food' },
-        isToday: false
-      },
-      {
-        day: 'Saturday',
-        date: 'Nov 9',
-        dateISO: '2025-11-09',
-        amount: 64.85,
-        transactions: 4,
-        topCategory: { name: 'Entertainment', amount: 38, colorClass: 'entertainment' },
-        isToday: false
-      },
-      {
-        day: 'Sunday',
-        date: 'Nov 10',
-        dateISO: '2025-11-10',
-        amount: 32.00,
-        transactions: 2,
-        topCategory: { name: 'Food & Drinks', amount: 32, colorClass: 'food' },
-        isToday: true // Highlighted as today
-      }
-    ],
-    
-    // CAtegory spending summary
-    categoryData: [
-      {
-        id: 'groceries',
-        name: 'Groceries',
-        spent: 126,
-        budget: 150,
-        colorClass: 'groceries'
-      },
-      {
-        id: 'food',
-        name: 'Food & Drinks',
-        spent: 133,
-        budget: 145,
-        colorClass: 'food'
-      },
-      {
-        id: 'shopping',
-        name: 'Shopping',
-        spent: 98,
-        budget: 150,
-        colorClass: 'shopping'
-      },
-      {
-        id: 'transport',
-        name: 'Transportation',
-        spent: 71,
-        budget: 95,
-        colorClass: 'transport'
-      },
-      {
-        id: 'entertainment',
-        name: 'Entertainment',
-        spent: 42,
-        budget: 75,
-        colorClass: 'entertainment'
-      },
-      {
-        id: 'bills',
-        name: 'Bills & Utilities',
-        spent: 122,
-        budget: 170,
-        colorClass: 'bills'
-      }
-    ],
-    
-    // Weekly Insights and tips
-    insights: [
-      {
-        type: 'success',
-        icon: '✓',
-        title: 'Great Job!',
-        message: "You're on track to stay under budget this week"
-      },
-      {
-        type: 'info',
-        icon: '📌',
-        title: 'Reminder',
-        message: 'Weekly budget resets in 1 day'
-      },
-      {
-        type: 'suggestion',
-        icon: '💡',
-        title: 'Smart Tip',
-        message: 'Thursday was your highest spending day. Plan meals ahead to save more'
-      }
-    ]
+    weekStart: startDateISO,
+    weekEnd: endDateISO,
+    weekLabel: weekOffset === 0 ? 'Current Week' : 
+               weekOffset === -1 ? 'Last Week' : 
+               weekOffset === 1 ? 'Next Week' : 
+               weekOffset < 0 ? `${Math.abs(weekOffset)} Weeks Ago` : 
+               `${weekOffset} Weeks Ahead`,
+    weeklyBudget: weeklyBudget,
+    totalSpent: totalSpent,
+    lastWeekSpent: 0, // Could calculate from previous week if needed
+    dailyData: dailyData,
+    categoryData: categoryData,
+    insights: insights
   };
 }
 
-// Loads weekly budget data
-function loadWeeklyBudgetData(weekOffset = 0) {
-  const savedWeeklyData = localStorage.getItem(`weeklyBudget_${weekOffset}`);
-  
-  if (savedWeeklyData) {
-    try {
-      return JSON.parse(savedWeeklyData);
-    } catch (e) {
-      console.error('Error loading saved weekly budget:', e);
-      return getDefaultWeeklyBudget();
-    }
-  }
-  
-  return getDefaultWeeklyBudget();
-}
-
-// NAvigates to a different week
-function navigateWeek(offset) {
-  // Get current week offset from localStorage (default 0 = current week)
+// Navigate to a different week
+async function navigateWeek(offset) {
   let currentOffset = parseInt(localStorage.getItem('currentWeekOffset') || '0');
   currentOffset += offset;
   localStorage.setItem('currentWeekOffset', currentOffset.toString());
   
-  // Load data for the new week
-  const weeklyData = loadWeeklyBudgetData(currentOffset);
-  
-  // Update week label based on offset
-  if (currentOffset === 0) {
-    weeklyData.weekLabel = 'Current Week';
-  } else if (currentOffset === -1) {
-    weeklyData.weekLabel = 'Last Week';
-  } else if (currentOffset === 1) {
-    weeklyData.weekLabel = 'Next Week';
-  } else if (currentOffset < 0) {
-    weeklyData.weekLabel = `${Math.abs(currentOffset)} Weeks Ago`;
-  } else {
-    weeklyData.weekLabel = `${currentOffset} Weeks Ahead`;
-  }
-  
-  // Render the updated week
+  const weeklyData = await loadWeeklyBudgetData(currentOffset);
   renderWeeklyBudget(weeklyData);
 }
-
 
 // Render the weekly budget to the page
 function renderWeeklyBudget(weeklyData) {
@@ -651,7 +815,9 @@ function renderWeeklyBudget(weeklyData) {
   // Calculate statistics
   const dailyAverage = weeklyData.totalSpent / 7;
   const remaining = weeklyData.weeklyBudget - weeklyData.totalSpent;
-  const percentRemaining = ((remaining / weeklyData.weeklyBudget) * 100).toFixed(0);
+  const percentRemaining = weeklyData.weeklyBudget > 0 
+    ? ((remaining / weeklyData.weeklyBudget) * 100).toFixed(0) 
+    : 0;
   const spendingDiff = weeklyData.totalSpent - weeklyData.lastWeekSpent;
   
   // Render all the components
@@ -661,13 +827,11 @@ function renderWeeklyBudget(weeklyData) {
   renderWeeklyInsights(weeklyData.insights);
 }
 
-
 // Render weekly overview statistics cards
 function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentRemaining, spendingDiff) {
   const overviewGrid = document.getElementById('weeklyOverviewGrid');
   if (!overviewGrid) return;
   
-  // ========== DETERMINE SPENDING TREND ==========
   let trendClass = 'neutral';
   let trendText = 'Similar to usual';
   
@@ -679,7 +843,6 @@ function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentR
     trendText = `↑ ${formatCurrency(spendingDiff)} from last week`;
   }
   
-  // Create stat cards with html
   overviewGrid.innerHTML = `
     <div class="weekly-stat-card spent">
         <div class="weekly-stat-header">
@@ -714,22 +877,18 @@ function renderWeeklyOverviewCards(totalSpent, dailyAverage, remaining, percentR
   `;
 }
 
-// render daily spending breakdown
+// Render daily spending breakdown
 function renderDailyBreakdown(dailyData) {
   const daysGrid = document.getElementById('daysGrid');
   if (!daysGrid) return;
   
-  daysGrid.innerHTML = ''; // Clear existing content
+  daysGrid.innerHTML = '';
   
-  // Find maximum amount for scaling the bars
-  const maxAmount = Math.max(...dailyData.map(d => d.amount));
+  const maxAmount = Math.max(...dailyData.map(d => d.amount), 1);
   
-  // Create card for each day
   dailyData.forEach(dayData => {
-    // Calculate bar width as percentage of max
     const barWidth = ((dayData.amount / maxAmount) * 100).toFixed(0);
     
-    // Apply special styling for today
     const todayClass = dayData.isToday ? 'today' : '';
     const barFillClass = dayData.isToday ? 'today-fill' : '';
     const dateDisplay = dayData.isToday ? `${dayData.date} • Today` : dayData.date;
@@ -761,14 +920,14 @@ function renderWeeklyCategoryBreakdown(categoryData) {
   const categoryGrid = document.getElementById('categoryBreakdownGrid');
   if (!categoryGrid) return;
   
-  categoryGrid.innerHTML = ''; // Clear existing content
+  categoryGrid.innerHTML = '';
   
-  // Create item for each category
   categoryData.forEach(category => {
-    const percentUsed = ((category.spent / category.budget) * 100).toFixed(0);
+    const percentUsed = category.budget > 0 
+      ? ((category.spent / category.budget) * 100).toFixed(0) 
+      : 0;
     const remaining = category.budget - category.spent;
     
-    // Determine if over or under budget
     const budgetText = remaining >= 0 
       ? `${formatCurrency(remaining)} under budget` 
       : `${formatCurrency(Math.abs(remaining))} over budget`;
@@ -791,14 +950,13 @@ function renderWeeklyCategoryBreakdown(categoryData) {
   });
 }
 
-// render weekly insights section
+// Render weekly insights section
 function renderWeeklyInsights(insights) {
   const tipsGrid = document.getElementById('tipsGrid');
   if (!tipsGrid) return;
   
-  tipsGrid.innerHTML = ''; // Clear existing content
+  tipsGrid.innerHTML = '';
   
-  // Create card for each insight
   insights.forEach(insight => {
     const tipItem = document.createElement('div');
     tipItem.className = `tip-item ${insight.type}`;
@@ -814,7 +972,7 @@ function renderWeeklyInsights(insights) {
   });
 }
 
-// Formay week range for displaying
+// Format week range for display
 function formatWeekDateRange(startDate, endDate) {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -825,12 +983,9 @@ function formatWeekDateRange(startDate, endDate) {
   const endDay = end.getDate();
   const year = end.getFullYear();
   
-  // Same month: "Nov 4 - 10, 2025"
   if (startMonth === endMonth) {
     return `${startMonth} ${startDay} - ${endDay}, ${year}`;
-  } 
-  // Different months: "Oct 28 - Nov 3, 2025"
-  else {
+  } else {
     return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
   }
 }
@@ -839,34 +994,30 @@ function formatWeekDateRange(startDate, endDate) {
 // YEARLY BUDGET FUNCTIONS
 // ============================================
 
-// Initialize yearly budget page
-function initYearlyBudget() {
+async function initYearlyBudget() {
   console.log('Initializing Yearly Budget Page...');
   
-  // Load and display the current year's budget
-  const yearlyData = loadYearlyBudgetData();
+  const yearlyData = await loadYearlyBudgetData();
   renderYearlyBudget(yearlyData);
   
   // Year navigation buttons
   const prevYearBtn = document.getElementById('prevYearBtn');
   const nextYearBtn = document.getElementById('nextYearBtn');
   
-  // Navigate to previous year
   if (prevYearBtn) {
-    prevYearBtn.addEventListener('click', () => {
-      const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || 2025;
+    prevYearBtn.addEventListener('click', async () => {
+      const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || new Date().getFullYear();
       const newYear = currentYear - 1;
-      loadAndRenderYear(newYear);
+      await loadAndRenderYear(newYear);
       showNotification(`⬅️ Loading ${newYear} data...`, 'info');
     });
   }
   
-  // Navigate to next year
   if (nextYearBtn) {
-    nextYearBtn.addEventListener('click', () => {
-      const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || 2025;
+    nextYearBtn.addEventListener('click', async () => {
+      const currentYear = parseInt(document.getElementById('currentYear')?.textContent) || new Date().getFullYear();
       const newYear = currentYear + 1;
-      loadAndRenderYear(newYear);
+      await loadAndRenderYear(newYear);
       showNotification(`➡️ Loading ${newYear} data...`, 'info');
     });
   }
@@ -874,154 +1025,137 @@ function initYearlyBudget() {
   console.log('Yearly budget initialized successfully!');
 }
 
-// Ge the default yearly budget structure
-function getDefaultYearlyBudget() {
+/**
+ * Load yearly budget data from backend
+ */
+async function loadYearlyBudgetData(year = null) {
+  const targetYear = year || new Date().getFullYear();
+  
+  const startDate = `${targetYear}-01-01`;
+  const endDate = `${targetYear}-12-31`;
+  
+  // Fetch transactions for the entire year
+  const transactions = await fetchTransactions(startDate, endDate);
+  
+  // Fetch budgets
+  const budgets = await fetchBudgets('yearly');
+  
+  const totalYearlyBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+  
+  // Calculate spending by category
+  const categorySpending = {};
+  transactions.forEach(t => {
+    const cat = t.category || 'other';
+    categorySpending[cat] = (categorySpending[cat] || 0) + Math.abs(t.amount);
+  });
+  
+  // Build categories array
+  const categoryMap = {
+    'bills': { name: 'Bills & Utilities', colorClass: 'bills' },
+    'shopping': { name: 'Shopping', colorClass: 'shopping' },
+    'car': { name: 'Car & Transportation', colorClass: 'transport' },
+    'groceries': { name: 'Groceries', colorClass: 'groceries' },
+    'food': { name: 'Food & Drinks', colorClass: 'food' },
+    'entertainment': { name: 'Entertainment', colorClass: 'entertainment' }
+  };
+  
+  const categories = Object.keys(categoryMap).map(catId => {
+    const annualAmount = categorySpending[catId] || 0;
+    const monthlyAvg = annualAmount / 12;
+    
+    return {
+      id: catId,
+      name: categoryMap[catId].name,
+      annualAmount: annualAmount,
+      monthlyAvg: monthlyAvg,
+      colorClass: categoryMap[catId].colorClass,
+      trend: { type: 'stable', value: 0, label: 'Stable' }
+    };
+  });
+  
+  // Build monthly data
+  const currentMonth = new Date().getMonth();
+  const monthlyData = [];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                  'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  for (let i = 0; i < 12; i++) {
+    const monthStart = new Date(targetYear, i, 1).toISOString().split('T')[0];
+    const monthEnd = new Date(targetYear, i + 1, 0).toISOString().split('T')[0];
+    
+    const monthTransactions = transactions.filter(t => {
+      const tDate = t.date;
+      return tDate >= monthStart && tDate <= monthEnd;
+    });
+    
+    const monthAmount = monthTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+    monthlyData.push({
+      month: months[i],
+      amount: monthAmount,
+      isProjected: targetYear === new Date().getFullYear() && i > currentMonth
+    });
+  }
+  
+  // Generate insights
+  const totalSpent = categories.reduce((sum, cat) => sum + cat.annualAmount, 0);
+  const remaining = totalYearlyBudget - totalSpent;
+  
+  const insights = [];
+  
+  if (remaining > 0) {
+    const monthsRemaining = 12 - currentMonth - 1;
+    const percentRemaining = ((remaining / totalYearlyBudget) * 100).toFixed(0);
+    insights.push({
+      type: 'positive',
+      icon: '✓',
+      title: 'On Track',
+      message: `You're ${percentRemaining}% under your annual budget with ${monthsRemaining} months remaining`
+    });
+  }
+  
   return {
-    year: 2025,
-    totalYearlyBudget: 44436,  // Total budget for the year
-    
-    // Category Annual Summary
-    categories: [
-      {
-        id: 'bills',
-        name: 'Bills & Utilities',
-        annualAmount: 25620,     // Total spent in category for the year
-        monthlyAvg: 2135,        // Average monthly spending
-        colorClass: 'bills',
-        trend: { type: 'stable', value: 0, label: 'Stable' }
-      },
-      {
-        id: 'shopping',
-        name: 'Shopping',
-        annualAmount: 696,
-        monthlyAvg: 58,
-        colorClass: 'shopping',
-        trend: { type: 'decreasing', value: -12, label: '↓ 12%' }
-      },
-      {
-        id: 'car',
-        name: 'Car & Transportation',
-        annualAmount: 852,
-        monthlyAvg: 71,
-        colorClass: 'transport',
-        trend: { type: 'stable', value: 0, label: 'Stable' }
-      },
-      {
-        id: 'groceries',
-        name: 'Groceries',
-        annualAmount: 1512,
-        monthlyAvg: 126,
-        colorClass: 'groceries',
-        trend: { type: 'increasing', value: 8, label: '↑ 8%' }
-      },
-      {
-        id: 'food',
-        name: 'Food & Drinks',
-        annualAmount: 1596,
-        monthlyAvg: 133,
-        colorClass: 'food',
-        trend: { type: 'increasing', value: 15, label: '↑ 15%' }
-      },
-      {
-        id: 'entertainment',
-        name: 'Entertainment',
-        annualAmount: 504,
-        monthlyAvg: 42,
-        colorClass: 'entertainment',
-        trend: { type: 'decreasing', value: -5, label: '↓ 5%' }
-      }
-    ],
-    
-    // Monthly spending breakdown
-    monthlyData: [
-      { month: 'January', amount: 2890, isProjected: false },
-      { month: 'February', amount: 2650, isProjected: false },
-      { month: 'March', amount: 2450, isProjected: false },
-      { month: 'April', amount: 2580, isProjected: false },
-      { month: 'May', amount: 2720, isProjected: false },
-      { month: 'June', amount: 2340, isProjected: false },
-      { month: 'July', amount: 2810, isProjected: false },
-      { month: 'August', amount: 2490, isProjected: false },
-      { month: 'September', amount: 2380, isProjected: false },
-      { month: 'October', amount: 2567, isProjected: false },
-      { month: 'November', amount: 2600, isProjected: true },   // Future months marked as projected
-      { month: 'December', amount: 2703, isProjected: true }
-    ],
-    
-    // Yearly insights
-    insights: [
-      {
-        type: 'positive',
-        icon: '✓',
-        title: 'On Track',
-        message: "You're 31% under your annual budget with 2 months remaining"
-      },
-      {
-        type: 'warning',
-        icon: '⚠',
-        title: 'Watch Out',
-        message: 'Food & Drinks spending increased 15% this year'
-      },
-      {
-        type: 'info',
-        icon: '💡',
-        title: 'Tip',
-        message: 'Consider setting aside $1,000/month for savings based on your surplus'
-      }
-    ]
+    year: targetYear,
+    totalYearlyBudget: totalYearlyBudget,
+    categories: categories,
+    monthlyData: monthlyData,
+    insights: insights
   };
 }
 
-// Load yearly budget data from local storage
-function loadYearlyBudgetData(year = 2025) {
-  const savedYearlyData = localStorage.getItem(`yearlyBudget_${year}`);
-  
-  if (savedYearlyData) {
-    try {
-      return JSON.parse(savedYearlyData);
-    } catch (e) {
-      console.error('Error loading saved yearly budget:', e);
-      return getDefaultYearlyBudget();
-    }
-  }
-  
-  return getDefaultYearlyBudget();
-}
-
 // Load and render specified year
-function loadAndRenderYear(year) {
-  const yearlyData = loadYearlyBudgetData(year);
-  yearlyData.year = year; // Ensure year property is set
+async function loadAndRenderYear(year) {
+  const yearlyData = await loadYearlyBudgetData(year);
   renderYearlyBudget(yearlyData);
 }
 
 // Render the yearly budget to the page
 function renderYearlyBudget(yearlyData) {
-  // Update year label
   const currentYearEl = document.getElementById('currentYear');
   if (currentYearEl) {
     currentYearEl.textContent = yearlyData.year;
   }
   
-  // Calculate statistics
   const totalSpent = yearlyData.categories.reduce((sum, cat) => sum + cat.annualAmount, 0);
   const remaining = yearlyData.totalYearlyBudget - totalSpent;
   const avgMonthly = totalSpent / 12;
   
-  // Render all the components
   renderYearlyOverviewCards(totalSpent, remaining, avgMonthly, yearlyData.year);
   renderYearlyCategoryTable(yearlyData, totalSpent);
   renderMonthlyBreakdown(yearlyData.monthlyData);
   renderInsights(yearlyData.insights);
 }
+
 // Render yearly overview statistics cards
 function renderYearlyOverviewCards(totalSpent, remaining, avgMonthly, year) {
   const overviewGrid = document.getElementById('yearlyOverviewGrid');
   if (!overviewGrid) return;
   
-  const percentRemaining = ((remaining / (totalSpent + remaining)) * 100).toFixed(0);
+  const totalBudget = totalSpent + remaining;
+  const percentRemaining = totalBudget > 0 
+    ? ((remaining / totalBudget) * 100).toFixed(0) 
+    : 0;
   
-  // Create stat cards with HTML
   overviewGrid.innerHTML = `
     <div class="yearly-stat-card total">
         <div class="yearly-stat-icon">💵</div>
@@ -1057,9 +1191,8 @@ function renderYearlyCategoryTable(yearlyData, totalSpent) {
   
   if (!tbody) return;
   
-  tbody.innerHTML = ''; // Clear existing rows
+  tbody.innerHTML = '';
   
-  // Create row for each category
   yearlyData.categories.forEach(category => {
     const percentage = calculatePercentage(category.annualAmount, totalSpent);
     
@@ -1075,7 +1208,6 @@ function renderYearlyCategoryTable(yearlyData, totalSpent) {
     tbody.appendChild(row);
   });
   
-  // Add row at bottom for totals
   if (tfoot) {
     const avgMonthly = totalSpent / 12;
     tfoot.innerHTML = `
@@ -1095,17 +1227,13 @@ function renderMonthlyBreakdown(monthlyData) {
   const monthsGrid = document.getElementById('monthsGrid');
   if (!monthsGrid) return;
   
-  monthsGrid.innerHTML = ''; // Clear existing content
+  monthsGrid.innerHTML = '';
   
-  // Find maximum amount for scaling the bars
-  const maxAmount = Math.max(...monthlyData.map(m => m.amount));
+  const maxAmount = Math.max(...monthlyData.map(m => m.amount), 1);
   
-  // Create card for each month
   monthlyData.forEach(monthData => {
-    // Calculate bar width as percentage of max
     const barWidth = ((monthData.amount / maxAmount) * 100).toFixed(0);
     
-    // Apply styling for projected (future) months
     const upcomingClass = monthData.isProjected ? 'upcoming' : '';
     const barFillClass = monthData.isProjected ? 'projected' : '';
     const amountPrefix = monthData.isProjected ? 'Est. ' : '';
@@ -1129,9 +1257,8 @@ function renderInsights(insights) {
   const insightsGrid = document.getElementById('insightsGrid');
   if (!insightsGrid) return;
   
-  insightsGrid.innerHTML = ''; // Clear existing content
+  insightsGrid.innerHTML = '';
   
-  // Create card for each insight
   insights.forEach(insight => {
     const insightItem = document.createElement('div');
     insightItem.className = `insight-item ${insight.type}`;
@@ -1148,21 +1275,17 @@ function renderInsights(insights) {
 }
 
 // ============================================
-// HELPER FUNCTIONS (Used by all pages)
+// HELPER FUNCTIONS (theses are used by all pages)
 // ============================================
 
- //Displays a temporary notification 
 function showNotification(message, type = 'info') {
-  // Remove any existing notifications first
   const existing = document.querySelector('.budget-notification');
   if (existing) existing.remove();
   
-  // Create new notification element
   const notification = document.createElement('div');
   notification.className = `budget-notification ${type}`;
   notification.textContent = message;
   
-  // Apply inline styles for positioning and animation
   notification.style.cssText = `
     position: fixed;
     top: 120px;
@@ -1179,7 +1302,6 @@ function showNotification(message, type = 'info') {
     max-width: 400px;
   `;
   
-  // Set color based on notification type
   const colors = {
     success: '#10b981',
     warning: '#f59e0b',
@@ -1188,21 +1310,18 @@ function showNotification(message, type = 'info') {
   };
   notification.style.borderLeftColor = colors[type] || colors.info;
   
-  // Add to page
   document.body.appendChild(notification);
   
-  // Auto-remove after 3 seconds with fade-out animation
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s ease';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
-// Format number as currency 
+
 function formatCurrency(amount) {
   return '$' + parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-// Calculate percentage
 function calculatePercentage(part, total) {
   if (total === 0) return 0;
   return ((part / total) * 100).toFixed(1);
@@ -1211,7 +1330,6 @@ function calculatePercentage(part, total) {
 // ============================================
 // CSS ANIMATIONS
 // ============================================
-// Add keyframe animations for notification slide-in/out effects
 const style = document.createElement('style');
 style.textContent = `
   @keyframes slideIn {
@@ -1238,6 +1356,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialization is complete messages
 console.log('Budgeting.js loaded successfully!');
+console.log('Connected to backend at:', API_BASE_URL);
 console.log('Current page:', window.location.pathname);
