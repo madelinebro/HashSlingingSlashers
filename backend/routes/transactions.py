@@ -1,3 +1,4 @@
+# pyright: reportArgumentType=false
 # -------------------------------------------------------------
 #  TRANSACTIONS ROUTES
 #  Purpose:
@@ -15,6 +16,7 @@
 #  Notes:
 #    - Uses a dummy get_current_user() for now (replace with JWT later)
 # -------------------------------------------------------------
+
 from datetime import datetime
 from typing import List, Optional
 
@@ -37,7 +39,7 @@ router = APIRouter()
 
 
 # -------------------------------------------------------------
-#  Pydantic response model
+#  Pydantic Response Model
 # -------------------------------------------------------------
 class TransactionResponse(BaseModel):
     transaction_id: int
@@ -56,14 +58,14 @@ class TransactionResponse(BaseModel):
 
 # -------------------------------------------------------------
 #  GET /transactions
-#  Return all transactions for the authenticated user
-#  Optional filters: start_date and end_date (YYYY-MM-DD)
+#  Returns all transactions for the authenticated user
+#  Supports optional start_date and end_date filters
 # -------------------------------------------------------------
 @router.get(
     "/",
     response_model=List[TransactionResponse],
-    summary="Get all transactions for the current user (optional date filter)",
-    description="Return all transactions that belong to the authenticated user, optionally filtered by a date range.",
+    summary="Get all transactions for the current user",
+    description="Returns all transactions for the authenticated user, optionally filtered by start_date and end_date (YYYY-MM-DD).",
 )
 def get_transactions(
     db: Session = Depends(get_db),
@@ -75,7 +77,6 @@ def get_transactions(
         None, description="Filter transactions on or before this date (YYYY-MM-DD)"
     ),
 ):
-    # Base query — all transactions for this user
     query = db.query(Transaction).filter(Transaction.user_id == user_id)
 
     # Apply optional date filters
@@ -99,52 +100,48 @@ def get_transactions(
                 detail="Invalid end_date format. Use YYYY-MM-DD.",
             )
 
-    # Execute query — newest first
+    # Execute query and sort (newest first)
     transactions = query.order_by(Transaction.transaction_date.desc()).all()
 
-    # Let FastAPI + Pydantic handle the conversion via orm_mode
-    # But we still cast amount to float to avoid Decimal serialization issues
-    responses: List[TransactionResponse] = []
-    for tx in transactions:
-        responses.append(
-            TransactionResponse(
-                transaction_id=tx.transaction_id,
-                user_id=tx.user_id,
-                accountnumber=tx.accountnumber,
-                transaction_type=tx.transaction_type,
-                amount=float(tx.amount),
-                description=tx.description,
-                category=tx.category,
-                state=tx.state,
-                transaction_date=tx.transaction_date,
-            )
+    # Convert to response objects
+    return [
+        TransactionResponse(
+            transaction_id=tx.transaction_id,
+            user_id=tx.user_id,
+            accountnumber=tx.accountnumber,
+            transaction_type=tx.transaction_type,
+            amount=float(tx.amount),
+            description=tx.description,
+            category=tx.category,
+            state=tx.state,
+            transaction_date=tx.transaction_date,
         )
-
-    return responses
+        for tx in transactions
+    ]
 
 
 # -------------------------------------------------------------
 #  GET /transactions/{transaction_id}
-#  Return a single transaction
+#  Returns a single transaction (ensures it belongs to the user)
 # -------------------------------------------------------------
 @router.get(
     "/{transaction_id}",
     response_model=TransactionResponse,
     summary="Get a single transaction by ID",
-    description="Return details for a specific transaction owned by the authenticated user.",
+    description="Returns a single transaction if it belongs to the authenticated user.",
 )
 def get_transaction_by_id(
     transaction_id: int,
     db: Session = Depends(get_db),
     user_id: int = Depends(get_current_user),
 ):
-    # Ensure the transaction belongs to this user.
-    # We can check via Transaction.user_id directly,
-    # or join with Account if you want ownership via accounts.
     tx = (
         db.query(Transaction)
         .join(Account, Transaction.accountnumber == Account.accountnumber)
-        .filter(Account.user_id == user_id, Transaction.transaction_id == transaction_id)
+        .filter(
+            Account.user_id == user_id,
+            Transaction.transaction_id == transaction_id,
+        )
         .first()
     )
 

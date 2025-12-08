@@ -1,3 +1,6 @@
+# pyright: reportIncompatibleMethodOverride=false
+# pyright: reportArgumentType=false
+
 # -------------------------------------------------------------
 #  DATABASE CONNECTION & MODELS
 #  Purpose:
@@ -20,10 +23,22 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from decimal import Decimal
+from dotenv import load_dotenv
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Bloomfi%402025@localhost/bloomfi_db"
+load_dotenv()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+DB_URL = os.getenv("CONNECTION")
+
+if DB_URL is None:
+    raise ValueError("DATABASE_URL is not set in the environment")
+
+engine = create_engine(DB_URL)
+
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -74,23 +89,19 @@ class Account(Base):
 
 
 class Transaction(Base):
-    """
-    Represents an individual transaction record.
-    Each transaction belongs to a specific account (and user).
-    """
     __tablename__ = "transactions"
 
-    transaction_id = Column(Integer, primary_key=True)
-    accountnumber = Column(Integer, ForeignKey("accounts.accountnumber", ondelete="CASCADE"))
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))  
-    transaction_date = Column(TIMESTAMP, default=datetime.utcnow)
-    transaction_type = Column(String(20), nullable=False)
-    amount = Column(DECIMAL(12, 2), nullable=False)
-    description = Column(String(70))
-    category = Column(String(50))
-    state = Column(String(20))
+    transaction_id: Mapped[int] = mapped_column(primary_key=True)
+    accountnumber: Mapped[int] = mapped_column(ForeignKey("accounts.accountnumber", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"))
+    transaction_date: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow)
+    transaction_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(DECIMAL(12, 2), nullable=False)
+    description: Mapped[str | None] = mapped_column(String(70))
+    category: Mapped[str | None] = mapped_column(String(50))
+    state: Mapped[str | None] = mapped_column(String(20))
 
-    account = relationship("Account", back_populates="transactions")
+    account: Mapped["Account"] = relationship("Account", back_populates="transactions")
 
 class Budget(Base):
     __tablename__ = "budgets"
