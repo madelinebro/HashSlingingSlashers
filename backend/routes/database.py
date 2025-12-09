@@ -21,7 +21,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Bloomfi%402025@localhost/bloomfi_db"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Bloomfi%402025@localhost/capstone_db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
