@@ -14,25 +14,38 @@
 #    • One User → Many Accounts
 #    • One Account → Many Transactions
 # -------------------------------------------------------------
+# -------------------------------------------------------------
+#  DATABASE CONNECTION & MODELS
+# -------------------------------------------------------------
+import os
+from pathlib import Path
 from sqlalchemy import (
     create_engine, Column, Integer, String, Numeric, ForeignKey, TIMESTAMP, DECIMAL
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
+from dotenv import load_dotenv
+
+from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+# Point to .env in project root
+env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set in the environment")
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Bloomfi%402025@localhost/capstone_db"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
 
 # -------------------------------------------------------------
 #  DEPENDENCY: DATABASE SESSION
 # -------------------------------------------------------------
-# This helper provides a clean session for each request
-# and automatically closes the connection afterward.
 def get_db():
     db = SessionLocal()
     try:
@@ -40,11 +53,9 @@ def get_db():
     finally:
         db.close()
 
-
 # -----------------------------
 #  MODELS
 # -----------------------------
-
 class User(Base):
     __tablename__ = "users"
 
@@ -57,7 +68,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     accounts = relationship("Account", back_populates="user")
-    budgets = relationship("Budget", back_populates="user")   # ⬅️ add this line
+    budgets = relationship("Budget", back_populates="user")
 
 
 class Account(Base):
@@ -74,15 +85,11 @@ class Account(Base):
 
 
 class Transaction(Base):
-    """
-    Represents an individual transaction record.
-    Each transaction belongs to a specific account (and user).
-    """
     __tablename__ = "transactions"
 
     transaction_id = Column(Integer, primary_key=True)
     accountnumber = Column(Integer, ForeignKey("accounts.accountnumber", ondelete="CASCADE"))
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))  
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
     transaction_date = Column(TIMESTAMP, default=datetime.utcnow)
     transaction_type = Column(String(20), nullable=False)
     amount = Column(DECIMAL(12, 2), nullable=False)
@@ -92,6 +99,7 @@ class Transaction(Base):
 
     account = relationship("Account", back_populates="transactions")
 
+
 class Budget(Base):
     __tablename__ = "budgets"
 
@@ -99,9 +107,7 @@ class Budget(Base):
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     category = Column(String(50), nullable=False)
     amount = Column(DECIMAL(12, 2), nullable=False)
-    period = Column(String(20), nullable=False, default="monthly")  # e.g. 'weekly', 'monthly', 'yearly'
+    period = Column(String(20), nullable=False, default="monthly")
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     user = relationship("User", back_populates="budgets")
-
-
