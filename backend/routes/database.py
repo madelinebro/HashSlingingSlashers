@@ -1,5 +1,18 @@
 # -------------------------------------------------------------
-# DATABASE CONNECTION & MODELS
+#  DATABASE CONNECTION & MODELS
+#  Purpose:
+#    • Define the PostgreSQL connection (SQLAlchemy ORM)
+#    • Create reusable session dependency (get_db)
+#    • Define data models for users, accounts, and transactions
+#
+#  Models:
+#    1. User → represents a single registered user
+#    2. Account → represents a user’s financial account
+#    3. Transaction → represents deposits, withdrawals, or transfers
+#
+#  Relationships:
+#    • One User → Many Accounts
+#    • One Account → Many Transactions
 # -------------------------------------------------------------
 from sqlalchemy import (
     create_engine, Column, Integer, String, Numeric, ForeignKey, TIMESTAMP, DECIMAL
