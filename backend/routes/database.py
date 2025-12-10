@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 import os
 
 # -------------------------------------------------------------
-# LOAD ENV VARIABLES
+# LOAD ENV VARIABLEs
 # -------------------------------------------------------------
 load_dotenv()  # loads variables from .env file
 
