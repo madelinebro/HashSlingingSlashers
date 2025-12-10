@@ -1,50 +1,27 @@
 # -------------------------------------------------------------
-#  DATABASE CONNECTION & MODELS
-#  Purpose:
-#    • Define the PostgreSQL connection (SQLAlchemy ORM)
-#    • Create reusable session dependency (get_db)
-#    • Define data models for users, accounts, and transactions
-#
-#  Models:
-#    1. User → represents a single registered user
-#    2. Account → represents a user’s financial account
-#    3. Transaction → represents deposits, withdrawals, or transfers
-#
-#  Relationships:
-#    • One User → Many Accounts
-#    • One Account → Many Transactions
+# DATABASE CONNECTION & MODELS
 # -------------------------------------------------------------
-# -------------------------------------------------------------
-#  DATABASE CONNECTION & MODELS
-# -------------------------------------------------------------
-import os
-from pathlib import Path
 from sqlalchemy import (
     create_engine, Column, Integer, String, Numeric, ForeignKey, TIMESTAMP, DECIMAL
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 from dotenv import load_dotenv
-
-from pathlib import Path
-from dotenv import load_dotenv
 import os
 
-# Point to .env in project root
-env_path = Path(__file__).resolve().parent.parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
+# -------------------------------------------------------------
+# LOAD ENV VARIABLES
+# -------------------------------------------------------------
+load_dotenv()  # loads variables from .env file
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set in the environment")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # -------------------------------------------------------------
-#  DEPENDENCY: DATABASE SESSION
+# DEPENDENCY: DATABASE SESSION
 # -------------------------------------------------------------
 def get_db():
     db = SessionLocal()
@@ -54,11 +31,10 @@ def get_db():
         db.close()
 
 # -----------------------------
-#  MODELS
+# MODELS
 # -----------------------------
 class User(Base):
     __tablename__ = "users"
-
     user_id = Column(Integer, primary_key=True)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
@@ -70,10 +46,8 @@ class User(Base):
     accounts = relationship("Account", back_populates="user")
     budgets = relationship("Budget", back_populates="user")
 
-
 class Account(Base):
     __tablename__ = "accounts"
-
     accountnumber = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
     account_type = Column(String(20), nullable=False)
@@ -83,10 +57,8 @@ class Account(Base):
     user = relationship("User", back_populates="accounts")
     transactions = relationship("Transaction", back_populates="account")
 
-
 class Transaction(Base):
     __tablename__ = "transactions"
-
     transaction_id = Column(Integer, primary_key=True)
     accountnumber = Column(Integer, ForeignKey("accounts.accountnumber", ondelete="CASCADE"))
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"))
@@ -99,10 +71,8 @@ class Transaction(Base):
 
     account = relationship("Account", back_populates="transactions")
 
-
 class Budget(Base):
     __tablename__ = "budgets"
-
     budget_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     category = Column(String(50), nullable=False)
@@ -111,3 +81,5 @@ class Budget(Base):
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     user = relationship("User", back_populates="budgets")
+
+
