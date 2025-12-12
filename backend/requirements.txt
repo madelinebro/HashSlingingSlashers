@@ -313,3 +313,6 @@ yarl
 zict
 zipp==2.2.0
 zstandard
+flask
+flask-cors
+psycopg2-binary

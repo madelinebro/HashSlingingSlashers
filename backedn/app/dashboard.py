@@ -24,9 +24,40 @@ from sqlalchemy import func
 from decimal import Decimal
 import secrets
 
-from .routes.database import get_db, Account, Transaction
+from .db import get_db, Account, Transaction
 from .authorize import get_current_user
 from .login import validate_csrf
+
+# backend/routes/dashboard.py
+from flask import Blueprint, jsonify, request
+
+bp = Blueprint("dashboard", __name__)
+
+def require_auth():
+  auth = request.headers.get("Authorization", "")
+  if not auth.startswith("Bearer "):
+    return None
+  return auth.split(" ", 1)[1]
+
+@bp.get("/dashboard")
+def dashboard():
+  token = require_auth()
+  if not token:
+    return jsonify({"error": "Unauthorized"}), 401
+
+  # Return JSON shape your dashboard.js expects
+  return jsonify({
+    "name": "jeff",
+    "accounts": [
+      {"id": 1, "type": "Checking", "number": "****3456", "balance": 4890.25, "color": "teal"},
+      {"id": 2, "type": "Savings",  "number": "****7890", "balance": 3000.20, "color": "blue"}
+    ],
+    "transactions": [
+      {"desc":"Electric Bill","date":"2025-12-08","amount":-120.75,"accountId":1,"category":"Bills & Utilities"},
+      {"desc":"Paycheck","date":"2025-12-05","amount":2500.00,"accountId":1,"category":"Income"}
+    ]
+  })
+
 
 router = APIRouter()
 
